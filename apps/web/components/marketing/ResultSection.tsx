@@ -9,8 +9,8 @@ import { Reveal } from '@/components/ui/Reveal';
 const CALLOUTS = [
   { label: 'Score', value: '9.2 / 10', side: 'left', top: '18%' },
   { label: 'Confidence', value: '92%', side: 'right', top: '30%' },
-  { label: 'Models agreed', value: '3 of 3', side: 'left', top: '58%' },
-  { label: 'Criteria met', value: '5 / 5', side: 'right', top: '72%' },
+  { label: 'Models agreed', value: '3 of 3', side: 'left', top: '46%' },
+  { label: 'Criteria met', value: '5 / 5', side: 'right', top: '58%' },
 ] as const;
 
 export function ResultSection() {

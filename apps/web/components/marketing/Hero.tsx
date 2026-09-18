@@ -1,40 +1,30 @@
 import React from 'react';
-import { ArrowRightIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Reveal } from '@/components/ui/Reveal';
-import { HeroApiDemo } from './HeroApiDemo';
-import { HeroBackground } from './HeroBackground';
 
 export function Hero() {
   return (
-    <section id="top" className="relative isolate overflow-hidden border-b border-line-soft">
-      <HeroBackground />
-      <div className="relative mx-auto max-w-shell px-6 pb-20 pt-20 sm:pt-28">
+    <section id="top" className="border-b border-line-soft">
+      <div className="mx-auto max-w-shell px-6 pb-28 pt-24 sm:pb-36 sm:pt-32">
         <Reveal className="mx-auto max-w-3xl text-center">
-          <Eyebrow dot className="justify-center">
-            AI code assessment API
-          </Eyebrow>
-          <h1 className="mt-6 text-4xl font-medium leading-[1.08] tracking-[-0.03em] text-white sm:text-5xl lg:text-6xl">
-            Multi-model code assessment through one API.
+          <p className="text-sm text-faint">
+            AI code assessment <span className="text-white">API</span>
+          </p>
+          <h1 className="mt-6 text-5xl font-semibold leading-[1.02] tracking-[-0.035em] text-white sm:text-6xl lg:text-7xl">
+            One API.
+            <br />
+            Reliable code grading.
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-[15px] leading-relaxed text-muted sm:text-base">
-            Codeverity helps educational and coding platforms evaluate student code using multiple LLMs and an
-            independent reassessment layer for more reliable, actionable feedback.
+          <p className="mx-auto mt-6 max-w-xl text-[15px] leading-relaxed text-muted sm:text-[17px]">
+            Codeverity is the code assessment API built for learning platforms.
+            <br className="hidden sm:block" /> Grade student code with multiple models from one place.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button to="/signup">
-              Start building
-              <ArrowRightIcon aria-hidden="true" className="h-4 w-4" />
-            </Button>
-            <Button to="/docs/quickstart" variant="secondary">
-              Read the docs
+            <Button to="/signup">Get started</Button>
+            <Button href="mailto:dev@codeverity.dev?subject=Codeverity%20sales%20enquiry" variant="secondary">
+              Contact sales
             </Button>
           </div>
-        </Reveal>
-
-        <Reveal delay={0.08} className="mt-16">
-          <HeroApiDemo />
         </Reveal>
       </div>
     </section>

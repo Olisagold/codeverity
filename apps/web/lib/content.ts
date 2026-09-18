@@ -186,7 +186,7 @@ export const footerColumns: FooterColumn[] = [
     items: [
       { label: 'Features', href: '#features' },
       { label: 'How it works', href: '#how-it-works' },
-      { label: 'Research', href: '#research' },
+      { label: 'Research', href: '/research' },
     ],
   },
   {
@@ -194,7 +194,6 @@ export const footerColumns: FooterColumn[] = [
     items: [
       { label: 'Documentation', href: '/docs/introduction' },
       { label: 'API Reference', href: '/docs/reference/endpoints' },
-      { label: 'API Status', href: '#infrastructure' },
     ],
   },
   {

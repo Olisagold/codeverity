@@ -6,7 +6,7 @@ import { Features } from '@/components/marketing/Features';
 import { Architecture } from '@/components/marketing/Architecture';
 import { DeveloperSection } from '@/components/marketing/DeveloperSection';
 import { ResultSection } from '@/components/marketing/ResultSection';
-import { TransparencySection } from '@/components/marketing/TransparencySection';
+import { FaqSection } from '@/components/marketing/FaqSection';
 import { FinalCta } from '@/components/marketing/FinalCta';
 
 export default function HomePage() {
@@ -20,7 +20,7 @@ export default function HomePage() {
       <Architecture />
       <ResultSection />
       <DeveloperSection />
-      <TransparencySection />
+      <FaqSection />
       <FinalCta />
     </>
   );

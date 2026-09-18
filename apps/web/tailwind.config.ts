@@ -5,6 +5,8 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // NOTE: naming a colour `base` makes `text-base` resolve to `color: #000` (black on black)
+        // instead of the 16px font size. Use `text-[16px]` for that size; never `text-base`.
         base: '#000000',
         surface: '#050505',
         'surface-2': '#0A0A0A',

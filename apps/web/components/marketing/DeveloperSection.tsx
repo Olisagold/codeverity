@@ -266,7 +266,7 @@ export function DeveloperSection() {
           <h2 className="text-4xl font-medium leading-[1.05] tracking-[-0.03em] text-white sm:text-5xl">
             Integrate <span className="text-accent">this afternoon</span>.
           </h2>
-          <p className="mx-auto mt-5 max-w-xl text-[15px] leading-relaxed text-muted sm:text-base">
+          <p className="mx-auto mt-5 max-w-xl text-[15px] leading-relaxed text-muted sm:text-[16px]">
             One JSON endpoint, plain HTTP, no SDK lock-in. Send a submission from whatever your platform already
             runs on and get a validated assessment back.
           </p>

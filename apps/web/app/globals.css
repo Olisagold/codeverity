@@ -1,5 +1,5 @@
 /* @import url() FONT IMPORTS MUST ALWAYS BE AT THE VERY TOP OF THIS FILE, ABOVE THE TAILWIND IMPORTS — DO NOT DELETE THIS COMMENT */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
 /* CRITICAL: THE FOLLOWING TAILWIND IMPORTS MUST NEVER BE DELETED OR REORDERED — DO NOT DELETE THIS COMMENT */
 @import 'tailwindcss/base';
@@ -139,4 +139,52 @@ body {
 }
 .code-frame__header {
   background: #0c0c0e;
+}
+
+/* ---------------------------------------------------------------------------
+   Hero backdrop (perspective grid)
+   --------------------------------------------------------------------------- */
+.hero-bg {
+  --grid-line: rgba(255, 255, 255, 0.07);
+  --grid-size: 84px;
+  perspective: 900px;
+}
+.hero-bg__wall {
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+  background-position: center top;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.55) 60%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.55) 60%, transparent);
+}
+.hero-bg__floor-wrap {
+  perspective: 700px;
+  perspective-origin: 50% 0%;
+  mask-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.9) 30%, rgba(0, 0, 0, 0.9) 80%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.9) 30%, rgba(0, 0, 0, 0.9) 80%, transparent);
+}
+.hero-bg__floor {
+  position: absolute;
+  left: -50%;
+  right: -50%;
+  top: 0;
+  height: 200%;
+  transform-origin: 50% 0%;
+  transform: rotateX(62deg);
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+  background-position: center top;
+}
+.hero-bg__vignette {
+  background:
+    radial-gradient(60% 55% at 50% 42%, rgba(0, 0, 0, 0.55), transparent 70%),
+    linear-gradient(to bottom, transparent 70%, #000 100%);
+}
+@media (max-width: 640px) {
+  .hero-bg {
+    --grid-size: 56px;
+  }
 }

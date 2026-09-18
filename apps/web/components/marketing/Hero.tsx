@@ -4,11 +4,13 @@ import { Button } from '@/components/ui/Button';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { Reveal } from '@/components/ui/Reveal';
 import { HeroApiDemo } from './HeroApiDemo';
+import { HeroBackground } from './HeroBackground';
 
 export function Hero() {
   return (
-    <section id="top" className="border-b border-line-soft">
-      <div className="mx-auto max-w-shell px-6 pb-20 pt-20 sm:pt-28">
+    <section id="top" className="relative isolate overflow-hidden border-b border-line-soft">
+      <HeroBackground />
+      <div className="relative mx-auto max-w-shell px-6 pb-20 pt-20 sm:pt-28">
         <Reveal className="mx-auto max-w-3xl text-center">
           <Eyebrow dot className="justify-center">
             AI code assessment API

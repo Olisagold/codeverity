@@ -19,7 +19,7 @@ const config: Config = {
         amber: '#F59E0B',
       },
       fontFamily: {
-        sans: ['"DM Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
         mono: ['"DM Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       maxWidth: {

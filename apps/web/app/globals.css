@@ -194,3 +194,102 @@ body {
     linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
   background-size: 40px 40px;
 }
+
+/* ---------------------------------------------------------------------------
+   Architecture pipeline animation
+   One 10s loop:  0–8%  platform → API      8–16% API pulse / fan-out
+                 16–48% models assess       48–58% converge on Claude
+                 58–76% Claude reassesses   76–84% → output
+                 84–100% output holds, then everything resets.
+   --------------------------------------------------------------------------- */
+.arch {
+  --arch-loop: 10s;
+  --arch-wire: #27272a;
+  --arch-flow: #ffffff;
+  --arch-node: #0a0a0b;
+  --arch-node-line: #27272a;
+}
+.arch text {
+  font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.arch-label { font-size: 13px; fill: #ffffff; }
+.arch-caption { font-size: 10.5px; fill: #71717a; }
+.arch-accent { fill: #3b82f6; }
+.arch-score-value { font-size: 13px; fill: #ffffff; }
+.arch-mark { fill: #d4d4d8; }
+.arch-mark-claude { fill: #d97757; }
+
+.arch-node { fill: var(--arch-node); stroke: var(--arch-node-line); stroke-width: 1; }
+.arch-node-active { fill: none; stroke: #ffffff; stroke-width: 1; opacity: 0; }
+.arch-wire { fill: none; stroke: var(--arch-wire); stroke-width: 1; }
+.arch-flow {
+  fill: none;
+  stroke: var(--arch-flow);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 16 100;
+  stroke-dashoffset: 16;
+  animation: var(--arch-loop) linear infinite;
+}
+.arch-flow-1 { animation-name: arch-flow-1; }
+.arch-flow-2 { animation-name: arch-flow-2; }
+.arch-flow-3 { animation-name: arch-flow-3; }
+.arch-flow-4 { animation-name: arch-flow-4; }
+
+/* A dash of 16 (of pathLength 100) travels the wire when offset goes 16 → -100. */
+@keyframes arch-flow-1 { 0%, 1% { stroke-dashoffset: 16; } 8%, 100% { stroke-dashoffset: -100; } }
+@keyframes arch-flow-2 { 0%, 9% { stroke-dashoffset: 16; } 16%, 100% { stroke-dashoffset: -100; } }
+@keyframes arch-flow-3 { 0%, 48% { stroke-dashoffset: 16; } 58%, 100% { stroke-dashoffset: -100; } }
+@keyframes arch-flow-4 { 0%, 76% { stroke-dashoffset: 16; } 84%, 100% { stroke-dashoffset: -100; } }
+
+.arch-node-active { animation: var(--arch-loop) ease-out infinite; }
+.arch-on-1 { animation-name: arch-on-1; }
+.arch-on-2 { animation-name: arch-on-2; }
+.arch-on-3 { animation-name: arch-on-3; }
+.arch-on-4 { animation-name: arch-on-4; }
+.arch-on-5 { animation-name: arch-on-5; }
+@keyframes arch-on-1 { 0% { opacity: 0.9; } 6%, 100% { opacity: 0; } }
+@keyframes arch-on-2 { 0%, 7% { opacity: 0; } 9% { opacity: 0.9; } 18%, 100% { opacity: 0; } }
+@keyframes arch-on-3 { 0%, 15% { opacity: 0; } 17% { opacity: 0.9; } 46% { opacity: 0.35; } 52%, 100% { opacity: 0; } }
+@keyframes arch-on-4 { 0%, 57% { opacity: 0; } 59% { opacity: 0.9; } 74% { opacity: 0.35; } 80%, 100% { opacity: 0; } }
+@keyframes arch-on-5 { 0%, 83% { opacity: 0; } 85% { opacity: 0.9; } 97%, 100% { opacity: 0; } }
+
+/* Model progress rings draw while assessing, then the score fades in. */
+.arch-ring-track { fill: none; stroke: #27272a; stroke-width: 1.5; }
+.arch-ring {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transform: rotate(-90deg);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: arch-ring var(--arch-loop) ease-in-out infinite;
+}
+@keyframes arch-ring {
+  0%, 16% { stroke-dashoffset: 100; opacity: 1; }
+  40% { stroke-dashoffset: 0; opacity: 1; }
+  48% { stroke-dashoffset: 0; opacity: 0; }
+  100% { stroke-dashoffset: 100; opacity: 0; }
+}
+.arch-score { opacity: 0; animation: arch-score var(--arch-loop) ease-out infinite; }
+@keyframes arch-score { 0%, 38% { opacity: 0; } 42%, 92% { opacity: 1; } 97%, 100% { opacity: 0; } }
+
+/* Claude status line swaps from "comparing…" to "consensus". */
+.arch-swap-a { animation: arch-swap-a var(--arch-loop) linear infinite; }
+.arch-swap-b { opacity: 0; animation: arch-swap-b var(--arch-loop) linear infinite; }
+@keyframes arch-swap-a { 0%, 68% { opacity: 1; } 70%, 96% { opacity: 0; } 98%, 100% { opacity: 1; } }
+@keyframes arch-swap-b { 0%, 69% { opacity: 0; } 71%, 94% { opacity: 1; } 96%, 100% { opacity: 0; } }
+
+
+@media (prefers-reduced-motion: reduce) {
+  .arch * { animation: none !important; }
+  .arch-node-active { opacity: 0; }
+  .arch-flow { stroke-dashoffset: 16; }
+  .arch-ring { stroke-dashoffset: 0; }
+  .arch-score { opacity: 1; }
+  .arch-swap-a { opacity: 0; }
+  .arch-swap-b { opacity: 1; }
+}

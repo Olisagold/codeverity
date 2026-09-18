@@ -1,0 +1,32 @@
+import type { Config } from 'tailwindcss';
+
+const config: Config = {
+  content: ['./app/**/*.{js,ts,jsx,tsx,mdx}', './components/**/*.{js,ts,jsx,tsx,mdx}'],
+  theme: {
+    extend: {
+      colors: {
+        base: '#000000',
+        surface: '#050505',
+        'surface-2': '#0A0A0A',
+        line: '#27272A',
+        'line-soft': '#18181B',
+        'line-strong': '#3F3F46',
+        muted: '#D4D4D8',
+        faint: '#A1A1AA',
+        accent: '#3B82F6',
+        ok: '#22C55E',
+        violet: '#8B5CF6',
+        amber: '#F59E0B',
+      },
+      fontFamily: {
+        sans: ['"DM Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['"DM Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+      },
+      maxWidth: {
+        shell: '72rem',
+      },
+    },
+  },
+};
+
+export default config;

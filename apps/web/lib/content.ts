@@ -175,40 +175,52 @@ export const infrastructure = [
   { title: 'Usage', body: 'Track API requests and assessment activity.' },
 ];
 
+export interface FooterLink {
+  label: string;
+  href: string;
+  /** Opens in a new tab and shows the external-link marker. */
+  external?: boolean;
+  /** Social mark rendered before the label. */
+  icon?: 'x' | 'linkedin';
+}
+
 export interface FooterColumn {
   title: string;
-  items: { label: string; href: string }[];
+  items: FooterLink[];
 }
 
 export const footerColumns: FooterColumn[] = [
   {
     title: 'Product',
     items: [
+      { label: 'Home', href: '/' },
       { label: 'Features', href: '#features' },
       { label: 'How it works', href: '#how-it-works' },
-      { label: 'Research', href: '/research' },
+      { label: 'Use cases', href: '/use-cases' },
     ],
   },
   {
-    title: 'Developers',
+    title: 'Company',
     items: [
-      { label: 'Documentation', href: '/docs/introduction' },
-      { label: 'API Reference', href: '/docs/reference/endpoints' },
+      { label: 'Research', href: '/research' },
+      { label: 'Terms', href: '#', external: true },
+      { label: 'Privacy', href: '#', external: true },
     ],
   },
   {
     title: 'Resources',
     items: [
-      { label: 'GitHub', href: '#' },
-      { label: 'Research', href: '/docs/research/methodology' },
-      { label: 'Changelog', href: '#' },
+      { label: 'Docs', href: '/docs/introduction' },
+      { label: 'API Reference', href: '/docs/reference/endpoints' },
+      { label: 'Methodology', href: '/docs/research/methodology' },
+      { label: 'Dashboard', href: '/dashboard' },
     ],
   },
   {
-    title: 'Legal',
+    title: 'Social',
     items: [
-      { label: 'Privacy', href: '#' },
-      { label: 'Terms', href: '#' },
+      { label: 'Twitter', href: 'https://x.com/', external: true, icon: 'x' },
+      { label: 'LinkedIn', href: 'https://www.linkedin.com/', external: true, icon: 'linkedin' },
     ],
   },
 ];

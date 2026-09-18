@@ -147,7 +147,6 @@ export function Architecture() {
                     cx={m.x - 52}
                     cy={Y.models + 36}
                     r={19}
-                    pathLength={100}
                     className="arch-ring"
                     style={{ animationDelay: `${i * 0.35}s` }}
                   />

@@ -261,18 +261,18 @@ body {
   stroke: #ffffff;
   stroke-width: 1.5;
   stroke-linecap: round;
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
+  stroke-dasharray: 119.4;
+  stroke-dashoffset: 119.4;
   transform: rotate(-90deg);
   transform-box: fill-box;
   transform-origin: center;
   animation: arch-ring var(--arch-loop) ease-in-out infinite;
 }
 @keyframes arch-ring {
-  0%, 16% { stroke-dashoffset: 100; opacity: 1; }
+  0%, 16% { stroke-dashoffset: 119.4; opacity: 1; }
   40% { stroke-dashoffset: 0; opacity: 1; }
   48% { stroke-dashoffset: 0; opacity: 0; }
-  100% { stroke-dashoffset: 100; opacity: 0; }
+  100% { stroke-dashoffset: 119.4; opacity: 0; }
 }
 .arch-score { opacity: 0; animation: arch-score var(--arch-loop) ease-out infinite; }
 @keyframes arch-score { 0%, 38% { opacity: 0; } 42%, 92% { opacity: 1; } 97%, 100% { opacity: 0; } }
@@ -288,8 +288,16 @@ body {
   .arch * { animation: none !important; }
   .arch-node-active { opacity: 0; }
   .arch-flow { stroke-dashoffset: 16; }
-  .arch-ring { stroke-dashoffset: 0; }
+  .arch-ring { stroke-dashoffset: 0; opacity: 1; }
   .arch-score { opacity: 1; }
   .arch-swap-a { opacity: 0; }
   .arch-swap-b { opacity: 1; }
 }
+
+
+
+
+
+
+
+

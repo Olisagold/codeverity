@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { footerColumns } from '@/lib/content';
 
@@ -8,7 +9,7 @@ export function Footer() {
       <div className="mx-auto max-w-shell px-6 py-14">
         <div className="grid gap-10 lg:grid-cols-12">
           <div className="lg:col-span-4">
-            <p className="font-mono text-[13px] font-medium uppercase tracking-[0.2em] text-white">Codeverity</p>
+            <Image src="/icons/logo.png" alt="Codeverity" width={44} height={24} className="h-6 w-auto" />
             <p className="mt-3 max-w-xs text-[13px] leading-relaxed text-faint">
               Multi-model code assessment through one API.
             </p>

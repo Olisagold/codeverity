@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { MenuIcon, XIcon } from 'lucide-react';
 import { NavDropdown } from './NavDropdown';
@@ -30,9 +31,10 @@ export function Navbar() {
         <div className="flex items-center gap-8">
           <a
             href="#top"
-            className="font-mono text-[13px] font-medium uppercase tracking-[0.2em] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            aria-label="Codeverity home"
+            className="flex items-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
           >
-            Codeverity
+            <Image src="/icons/logo.png" alt="Codeverity" width={44} height={24} priority className="h-6 w-auto" />
           </a>
           <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
             {navGroups.map((group) => (

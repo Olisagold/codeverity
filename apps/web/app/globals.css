@@ -145,9 +145,9 @@ body {
    Hero backdrop (perspective grid)
    --------------------------------------------------------------------------- */
 .hero-bg {
-  --grid-line: rgba(255, 255, 255, 0.07);
+  --grid-line: rgba(255, 255, 255, 0.075);
+  --grid-line-floor: rgba(255, 255, 255, 0.11);
   --grid-size: 84px;
-  perspective: 900px;
 }
 .hero-bg__wall {
   background-image:
@@ -155,33 +155,40 @@ body {
     linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
   background-size: var(--grid-size) var(--grid-size);
   background-position: center top;
-  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.55) 60%, transparent);
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.55) 60%, transparent);
+  mask-image:
+    radial-gradient(70% 90% at 50% 30%, transparent 25%, #000 85%),
+    linear-gradient(to bottom, #000 40%, transparent 100%);
+  -webkit-mask-image:
+    radial-gradient(70% 90% at 50% 30%, transparent 25%, #000 85%),
+    linear-gradient(to bottom, #000 40%, transparent 100%);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
 }
 .hero-bg__floor-wrap {
-  perspective: 700px;
+  perspective: 600px;
   perspective-origin: 50% 0%;
-  mask-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.9) 30%, rgba(0, 0, 0, 0.9) 80%, transparent);
-  -webkit-mask-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.9) 30%, rgba(0, 0, 0, 0.9) 80%, transparent);
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 78%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 78%, transparent 100%);
 }
 .hero-bg__floor {
   position: absolute;
-  left: -50%;
-  right: -50%;
+  left: -100%;
+  right: -100%;
   top: 0;
-  height: 200%;
+  height: 300%;
   transform-origin: 50% 0%;
-  transform: rotateX(62deg);
+  transform: rotateX(72deg);
   background-image:
-    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-line-floor) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line-floor) 1px, transparent 1px);
   background-size: var(--grid-size) var(--grid-size);
   background-position: center top;
 }
 .hero-bg__vignette {
   background:
-    radial-gradient(60% 55% at 50% 42%, rgba(0, 0, 0, 0.55), transparent 70%),
-    linear-gradient(to bottom, transparent 70%, #000 100%);
+    radial-gradient(55% 50% at 50% 40%, rgba(0, 0, 0, 0.5), transparent 70%),
+    linear-gradient(to bottom, transparent 75%, #000 100%);
 }
 @media (max-width: 640px) {
   .hero-bg {

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { MethodBadge } from '@/components/ui/MethodBadge';
 import { CopyButton } from '@/components/ui/CopyButton';
-import { highlight } from '@/lib/utils/highlight';
+import { CodePre } from '@/components/ui/CodePre';
 import type { CodeSample, HttpMethod } from '@/types/docs';
 
 interface EndpointCardProps {
@@ -20,8 +20,8 @@ export function EndpointCard({ method, path, description, request, response, sta
   const current = request[active];
 
   return (
-    <div className="overflow-hidden rounded-xl border border-line bg-surface">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3">
+    <div className="code-frame overflow-hidden rounded-xl border border-line">
+      <div className="code-frame__header flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3">
         <div className="flex min-w-0 items-center gap-2.5">
           <MethodBadge method={method} />
           <code className="truncate font-mono text-[13px] text-white">{path}</code>
@@ -50,9 +50,7 @@ export function EndpointCard({ method, path, description, request, response, sta
               </button>
             ))}
           </div>
-          <pre className="overflow-x-auto px-4 py-4 font-mono text-[12.5px] leading-6 text-muted">
-            <code>{highlight(current.code)}</code>
-          </pre>
+          <CodePre code={current.code} className="h-full" />
         </div>
 
         <div>
@@ -60,9 +58,7 @@ export function EndpointCard({ method, path, description, request, response, sta
             <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-faint">Response</span>
             <span className="font-mono text-[11px] text-ok">{status}</span>
           </div>
-          <pre className="overflow-x-auto px-4 py-4 font-mono text-[12.5px] leading-6 text-muted">
-            <code>{highlight(response)}</code>
-          </pre>
+          <CodePre code={response} className="h-full" />
         </div>
       </div>
     </div>

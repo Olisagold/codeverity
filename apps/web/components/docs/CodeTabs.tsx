@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { CopyButton } from '@/components/ui/CopyButton';
-import { highlight } from '@/lib/utils/highlight';
+import { CodePre } from '@/components/ui/CodePre';
 import type { CodeSample } from '@/types/docs';
 
 interface CodeTabsProps {
@@ -15,8 +15,8 @@ export function CodeTabs({ tabs, className = '' }: CodeTabsProps) {
   const current = tabs[active];
 
   return (
-    <div className={`overflow-hidden rounded-xl border border-line bg-surface ${className}`}>
-      <div role="tablist" aria-label="Code examples" className="flex items-center justify-between border-b border-line pl-1 pr-2">
+    <div className={`overflow-hidden code-frame rounded-xl border border-line ${className}`}>
+      <div role="tablist" aria-label="Code examples" className="code-frame__header flex items-center justify-between border-b border-line pl-1 pr-2">
         <div className="flex items-center">
           {tabs.map((tab, index) => (
             <button
@@ -36,9 +36,7 @@ export function CodeTabs({ tabs, className = '' }: CodeTabsProps) {
         </div>
         <CopyButton value={current.code} />
       </div>
-      <pre className="overflow-x-auto px-4 py-4 font-mono text-[12.5px] leading-6 text-muted">
-        <code>{highlight(current.code)}</code>
-      </pre>
+      <CodePre code={current.code} />
     </div>
   );
 }

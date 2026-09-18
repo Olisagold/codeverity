@@ -36,3 +36,107 @@ body {
     scroll-behavior: auto;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Code blocks
+   One theme for every <CodePre>. Palette is a soft "midnight" scheme tuned for
+   the pure-black surface: muted base text, warm strings, cool keywords.
+   --------------------------------------------------------------------------- */
+:root {
+  --code-bg: #09090b;
+  --code-fg: #d4d4d8;
+  --code-gutter: #3f3f46;
+  --code-gutter-border: #18181b;
+  --tok-comment: #6b7280;
+  --tok-string: #f0abfc;
+  --tok-property: #93c5fd;
+  --tok-number: #fdba74;
+  --tok-literal: #fb923c;
+  --tok-keyword: #c4b5fd;
+  --tok-method: #6ee7b7;
+  --tok-flag: #a5b4fc;
+  --tok-variable: #fcd34d;
+  --tok-function: #7dd3fc;
+  --tok-type: #5eead4;
+  --tok-url: #a5f3fc;
+  --tok-punctuation: #71717a;
+  --tok-operator: #a1a1aa;
+}
+
+.code-pre {
+  position: relative;
+  margin: 0;
+  overflow-x: auto;
+  padding: 14px 16px;
+  background: var(--code-bg);
+  color: var(--code-fg);
+  font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12.5px;
+  line-height: 1.7;
+  font-variant-ligatures: none;
+  tab-size: 2;
+  scrollbar-width: thin;
+  scrollbar-color: #27272a transparent;
+}
+.code-pre:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+}
+.code-pre::-webkit-scrollbar {
+  height: 6px;
+}
+.code-pre::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 999px;
+}
+.code-pre code {
+  display: block;
+  min-width: max-content;
+  counter-reset: line;
+}
+.code-line {
+  display: block;
+  padding: 0 8px;
+  margin: 0 -8px;
+  border-radius: 4px;
+  white-space: pre;
+}
+.code-pre--numbered .code-line {
+  counter-increment: line;
+  padding-left: 0;
+  margin-left: 0;
+}
+.code-pre--numbered .code-line::before {
+  content: counter(line);
+  display: inline-block;
+  width: 2ch;
+  margin-right: 16px;
+  padding-right: 12px;
+  text-align: right;
+  color: var(--code-gutter);
+  border-right: 1px solid var(--code-gutter-border);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.tok-comment { color: var(--tok-comment); font-style: italic; }
+.tok-string { color: var(--tok-string); }
+.tok-property { color: var(--tok-property); }
+.tok-number { color: var(--tok-number); }
+.tok-literal { color: var(--tok-literal); }
+.tok-keyword { color: var(--tok-keyword); }
+.tok-method { color: var(--tok-method); font-weight: 500; }
+.tok-flag { color: var(--tok-flag); }
+.tok-variable { color: var(--tok-variable); }
+.tok-function { color: var(--tok-function); }
+.tok-type { color: var(--tok-type); }
+.tok-url { color: var(--tok-url); }
+.tok-punctuation { color: var(--tok-punctuation); }
+.tok-operator { color: var(--tok-operator); }
+
+.code-frame {
+  background: var(--code-bg);
+}
+.code-frame__header {
+  background: #0c0c0e;
+}

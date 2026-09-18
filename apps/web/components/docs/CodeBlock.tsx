@@ -1,32 +1,34 @@
 import React from 'react';
 import { CopyButton } from '@/components/ui/CopyButton';
-import { highlight } from '@/lib/utils/highlight';
+import { CodePre } from '@/components/ui/CodePre';
 
 interface CodeBlockProps {
   code: string;
   label?: string;
   className?: string;
   bare?: boolean;
+  lineNumbers?: boolean;
 }
 
-export function CodeBlock({ code, label, className = '', bare = false }: CodeBlockProps) {
+export function CodeBlock({ code, label, className = '', bare = false, lineNumbers }: CodeBlockProps) {
   if (bare) {
-    return (
-      <pre className={`overflow-x-auto px-4 py-4 font-mono text-[12.5px] leading-6 text-muted ${className}`}>
-        <code>{highlight(code)}</code>
-      </pre>
-    );
+    return <CodePre code={code} lineNumbers={lineNumbers} className={className} />;
   }
 
   return (
-    <div className={`overflow-hidden rounded-xl border border-line bg-surface ${className}`}>
-      <div className="flex items-center justify-between gap-4 border-b border-line px-3 py-2">
-        <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-faint">{label ?? 'Code'}</span>
+    <div className={`code-frame overflow-hidden rounded-xl border border-line ${className}`}>
+      <div className="code-frame__header flex items-center justify-between gap-4 border-b border-line px-3 py-2">
+        <div className="flex items-center gap-2.5">
+          <span aria-hidden="true" className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#3f3f46]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#3f3f46]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#3f3f46]" />
+          </span>
+          <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-faint">{label ?? 'Code'}</span>
+        </div>
         <CopyButton value={code} />
       </div>
-      <pre className="overflow-x-auto px-4 py-4 font-mono text-[12.5px] leading-6 text-muted">
-        <code>{highlight(code)}</code>
-      </pre>
+      <CodePre code={code} lineNumbers={lineNumbers} />
     </div>
   );
 }

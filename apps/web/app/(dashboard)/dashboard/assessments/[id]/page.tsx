@@ -10,7 +10,7 @@ import { StatusBadge } from '@/components/dashboard/StatusBadge';
 import { EmptyState } from '@/components/dashboard/EmptyState';
 import { ErrorState } from '@/components/dashboard/ErrorState';
 import { CopyButton } from '@/components/ui/CopyButton';
-import { highlight } from '@/lib/utils/highlight';
+import { CodePre } from '@/components/ui/CodePre';
 import { assessments } from '@/lib/dashboard';
 
 export default function AssessmentDetailsPage() {
@@ -100,9 +100,7 @@ export default function AssessmentDetailsPage() {
             <h2 className="font-mono text-[11px] uppercase tracking-[0.14em] text-faint">Submission</h2>
             <span className="font-mono text-[11.5px] text-muted">{assessment.language}</span>
           </div>
-          <pre className="overflow-x-auto px-4 py-4 font-mono text-[12.5px] leading-6 text-muted">
-            <code>{highlight(assessment.code)}</code>
-          </pre>
+          <CodePre code={assessment.code} />
         </div>
 
         <div className="overflow-hidden rounded-xl border border-line bg-surface lg:col-span-2">

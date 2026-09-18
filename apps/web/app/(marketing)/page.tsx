@@ -22,8 +22,8 @@ export default function HomePage() {
       <HowItWorks />
       <Features />
       <Architecture />
-      <DeveloperSection />
       <ResultSection />
+      <DeveloperSection />
       <TransparencySection />
       <ResearchSection />
       <UseCases />

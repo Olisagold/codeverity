@@ -1,88 +1,112 @@
-import React from 'react';
-import { CheckCircle2Icon } from 'lucide-react';
+'use client';
+
+import React, { useRef } from 'react';
+import Image from 'next/image';
+import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { Reveal } from '@/components/ui/Reveal';
-import { scoreBreakdown } from '@/lib/content';
 
-const suggestedCode = `def find_max(numbers):
-    if not numbers:
-        return None
-
-    max_num = numbers[0]
-
-    for n in numbers[1:]:
-        if n > max_num:
-            max_num = n
-
-    return max_num`;
+const CALLOUTS = [
+  { label: 'Score', value: '9.2 / 10', side: 'left', top: '18%' },
+  { label: 'Confidence', value: '92%', side: 'right', top: '30%' },
+  { label: 'Models agreed', value: '3 of 3', side: 'left', top: '58%' },
+  { label: 'Criteria met', value: '5 / 5', side: 'right', top: '72%' },
+] as const;
 
 export function ResultSection() {
+  const ref = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
+
+  // Scroll-driven entrance: the window starts slightly tilted back and low,
+  // then settles flat as it travels up through the viewport.
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 90%', 'start 25%'] });
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 24, mass: 0.4 });
+  const rotateX = useTransform(progress, [0, 1], reduceMotion ? [0, 0] : [10, 0]);
+  const y = useTransform(progress, [0, 1], reduceMotion ? [0, 0] : [72, 0]);
+  const scale = useTransform(progress, [0, 1], reduceMotion ? [1, 1] : [0.94, 1]);
+  const opacity = useTransform(progress, [0, 0.35], [reduceMotion ? 1 : 0.4, 1]);
+
   return (
     <section id="result" className="border-b border-line-soft bg-surface">
       <div className="mx-auto max-w-shell px-6 py-24">
         <SectionHeading
           eyebrow="The result"
           title="Feedback your application can actually use."
-          description="Every assessment returns a score breakdown, an explanation, a suggested implementation, and a confidence value."
+          description="Every assessment returns a score, a confidence value, each model's independent take, and the reassessment that reconciles them."
+          align="center"
         />
 
         <Reveal delay={0.05} className="mt-14">
-          <div className="overflow-hidden rounded-xl border border-line bg-base">
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line px-6 py-4">
-              <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-ok">
-                <CheckCircle2Icon aria-hidden="true" className="h-3.5 w-3.5" />
-                Assessment completed
-              </p>
-              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-faint">asm_01J8QF··· · python</p>
+          <div ref={ref} className="result-stage relative overflow-hidden rounded-2xl border border-line">
+            {/* Background layers: flat tint, dotted grid, two horizontal bands. No glow. */}
+            <div aria-hidden="true" className="result-stage__dots absolute inset-0" />
+            <div aria-hidden="true" className="result-stage__band result-stage__band--a absolute inset-x-0" />
+            <div aria-hidden="true" className="result-stage__band result-stage__band--b absolute inset-x-0" />
+
+            <div className="relative px-4 pt-10 sm:px-10 sm:pt-14 lg:px-16 lg:pt-16" style={{ perspective: 1400 }}>
+              <motion.div
+                style={{ rotateX, y, scale, opacity, transformOrigin: '50% 100%' }}
+                className="relative mx-auto max-w-4xl"
+              >
+                {/* Floating callouts */}
+                {CALLOUTS.map((c, i) => (
+                  <motion.div
+                    key={c.label}
+                    initial={reduceMotion ? false : { opacity: 0, x: c.side === 'left' ? -12 : 12 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: '-15% 0px' }}
+                    transition={{ duration: 0.4, delay: 0.25 + i * 0.12, ease: [0.23, 1, 0.32, 1] }}
+                    className={`result-callout absolute z-10 hidden lg:block ${
+                      c.side === 'left' ? '-left-14 xl:-left-24' : '-right-14 xl:-right-24'
+                    }`}
+                    style={{ top: c.top }}
+                  >
+                    <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-faint">{c.label}</p>
+                    <p className="mt-1 text-[15px] font-medium tracking-[-0.01em] text-white">{c.value}</p>
+                  </motion.div>
+                ))}
+
+                {/* Window */}
+                <div className="overflow-hidden rounded-t-xl border border-b-0 border-line-strong bg-base">
+                  <div className="relative flex h-9 items-center border-b border-line-soft bg-[#0e0e10] px-3">
+                    <span aria-hidden="true" className="flex items-center gap-1.5">
+                      <span className="h-2.5 w-2.5 rounded-full bg-[#3f3f46]" />
+                      <span className="h-2.5 w-2.5 rounded-full bg-[#3f3f46]" />
+                      <span className="h-2.5 w-2.5 rounded-full bg-[#3f3f46]" />
+                    </span>
+                    <span className="pointer-events-none absolute inset-x-0 truncate px-16 text-center font-mono text-[11px] text-faint">
+                      app.codeverity.com/dashboard/assessments/asm_01JABC123
+                    </span>
+                  </div>
+                  <Image
+                    src="/images/result/assessment-full.webp"
+                    alt="Completed assessment in the Codeverity dashboard: score 9.2 out of 10, 92% confidence, three model assessments and the reassessment summary"
+                    width={1800}
+                    height={1575}
+                    sizes="(min-width: 1024px) 896px, 100vw"
+                    className="block h-auto w-full"
+                  />
+                </div>
+              </motion.div>
             </div>
 
-            <div className="grid lg:grid-cols-2">
-              <div className="border-b border-line p-6 lg:border-b-0 lg:border-r">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-medium tracking-[-0.03em] text-white">9.2</span>
-                  <span className="font-mono text-[13px] text-faint">/ 10</span>
-                </div>
-                <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.16em] text-faint">Score</p>
-
-                <ul className="mt-8 space-y-3">
-                  {scoreBreakdown.map((item) => (
-                    <li key={item.label} className="flex items-center gap-4">
-                      <span className="w-36 shrink-0 text-[13px] text-muted">{item.label}</span>
-                      <span className="h-1 flex-1 overflow-hidden rounded-full bg-line-soft">
-                        <span className="block h-full bg-accent" style={{ width: `${item.value * 10}%` }} />
-                      </span>
-                      <span className="w-10 shrink-0 text-right font-mono text-[12px] text-white">
-                        {item.value.toFixed(1)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="mt-8 border-t border-line pt-6">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">Feedback</p>
-                  <p className="mt-3 text-sm leading-relaxed text-muted">
-                    Your implementation fails when the list contains only negative numbers, because{' '}
-                    <span className="font-mono text-[13px] text-white">max_num</span> is initialized to 0. Initialize
-                    it with the first element instead, and handle the empty-list case explicitly.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex flex-col">
-                <div className="flex items-center justify-between border-b border-line px-6 py-3">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">Suggested code</p>
-                  <p className="font-mono text-[11px] text-faint">main.py</p>
-                </div>
-                <pre className="flex-1 overflow-x-auto px-6 py-5 font-mono text-[12.5px] leading-6 text-muted">
-                  <code>{suggestedCode}</code>
-                </pre>
-                <div className="flex items-center justify-between border-t border-line px-6 py-4">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">Confidence</p>
-                  <p className="font-mono text-[13px] text-white">92%</p>
-                </div>
-              </div>
-            </div>
+            {/* Bottom fade so the screenshot exits cleanly into the frame edge */}
+            <div aria-hidden="true" className="result-stage__fade pointer-events-none absolute inset-x-0 bottom-0 h-40" />
           </div>
+        </Reveal>
+
+        <Reveal delay={0.1}>
+          <ul className="mx-auto mt-10 grid max-w-3xl gap-x-8 gap-y-4 text-sm leading-relaxed text-muted sm:grid-cols-3">
+            <li>
+              <span className="text-white">Score and confidence</span> you can show students directly or gate on.
+            </li>
+            <li>
+              <span className="text-white">Per-model reasoning</span> so you can see where the models agreed and where they did not.
+            </li>
+            <li>
+              <span className="text-white">One reconciled prescription</span> chosen against your evaluation criteria.
+            </li>
+          </ul>
         </Reveal>
       </div>
     </section>

@@ -180,7 +180,7 @@ export interface FooterLink {
   href: string;
   /** Opens in a new tab and shows the external-link marker. */
   external?: boolean;
-  /** Social mark rendered before the label. */
+  
   icon?: 'x' | 'linkedin';
 }
 

@@ -100,7 +100,7 @@ export default function AssessmentDetailsPage() {
             <h2 className="font-mono text-[11px] uppercase tracking-[0.14em] text-faint">Submission</h2>
             <span className="font-mono text-[11.5px] text-muted">{assessment.language}</span>
           </div>
-          <CodePre code={assessment.code} />
+          <CodePre code={assessment.code} lineNumbers className="!px-4 !py-4 !text-[12.5px] !leading-[1.75]" />
         </div>
 
         <div className="overflow-hidden rounded-xl border border-line bg-surface lg:col-span-2">

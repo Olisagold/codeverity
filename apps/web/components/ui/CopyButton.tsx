@@ -6,9 +6,11 @@ import { CheckIcon, CopyIcon } from 'lucide-react';
 interface CopyButtonProps {
   value: string;
   label?: string;
+  /** Render just the icon (label stays as the accessible name). */
+  iconOnly?: boolean;
 }
 
-export function CopyButton({ value, label = 'Copy' }: CopyButtonProps) {
+export function CopyButton({ value, label = 'Copy', iconOnly = false }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
@@ -29,11 +31,11 @@ export function CopyButton({ value, label = 'Copy' }: CopyButtonProps) {
       className="flex items-center gap-1.5 rounded-md px-2 py-1 font-mono text-[11px] uppercase tracking-[0.12em] text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
     >
       {copied ? (
-        <CheckIcon aria-hidden="true" className="h-3.5 w-3.5 text-ok" />
+        <CheckIcon aria-hidden="true" className={iconOnly ? 'h-4 w-4 text-ok' : 'h-3.5 w-3.5 text-ok'} />
       ) : (
-        <CopyIcon aria-hidden="true" className="h-3.5 w-3.5" />
+        <CopyIcon aria-hidden="true" className={iconOnly ? 'h-4 w-4' : 'h-3.5 w-3.5'} />
       )}
-      {copied ? 'Copied' : label}
+      {iconOnly ? null : copied ? 'Copied' : label}
     </button>
   );
 }

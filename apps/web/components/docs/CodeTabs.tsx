@@ -15,9 +15,9 @@ export function CodeTabs({ tabs, className = '' }: CodeTabsProps) {
   const current = tabs[active];
 
   return (
-    <div className={`overflow-hidden code-frame rounded-xl border border-line ${className}`}>
-      <div role="tablist" aria-label="Code examples" className="code-frame__header flex items-center justify-between border-b border-line pl-1 pr-2">
-        <div className="flex items-center">
+    <div className={`code-frame overflow-hidden border border-line ${className}`}>
+      <div role="tablist" aria-label="Code examples" className="code-frame__header flex items-center justify-between gap-4 px-6">
+        <div className="flex items-center gap-6 overflow-x-auto no-scrollbar">
           {tabs.map((tab, index) => (
             <button
               key={tab.label}
@@ -25,16 +25,13 @@ export function CodeTabs({ tabs, className = '' }: CodeTabsProps) {
               role="tab"
               aria-selected={index === active}
               onClick={() => setActive(index)}
-              className={`relative px-3 py-2.5 font-mono text-[12px] transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent ${
-                index === active ? 'text-white' : 'text-faint hover:text-muted'
-              }`}
+              className="code-tab whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {tab.label}
-              {index === active ? <span aria-hidden="true" className="absolute inset-x-2 -bottom-px h-px bg-accent" /> : null}
             </button>
           ))}
         </div>
-        <CopyButton value={current.code} />
+        <CopyButton value={current.code} iconOnly />
       </div>
       <CodePre code={current.code} />
     </div>

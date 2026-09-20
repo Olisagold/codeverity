@@ -3,7 +3,7 @@ import { highlightLines } from '@/lib/utils/highlight';
 
 interface CodePreProps {
   code: string;
-  /** Show a line-number gutter. Defaults to on for blocks with more than one line. */
+  /** Show a line-number gutter. Off by default. */
   lineNumbers?: boolean;
   className?: string;
 }
@@ -14,7 +14,7 @@ interface CodePreProps {
  */
 export function CodePre({ code, lineNumbers, className = '' }: CodePreProps) {
   const lines = highlightLines(code);
-  const showNumbers = lineNumbers ?? lines.length > 1;
+  const showNumbers = lineNumbers ?? false;
 
   return (
     <pre className={`code-pre ${showNumbers ? 'code-pre--numbered' : ''} ${className}`} tabIndex={0}>

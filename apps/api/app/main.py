@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.health import router as health_router
 from app.api.v1.router import api_router
 from app.core.config import get_settings
+from app.db.redis import get_redis
 from app.db.session import engine
 
 
@@ -14,6 +15,12 @@ from app.db.session import engine
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     yield
     await engine.dispose()
+    # `get_redis()` is `lru_cache`d, so its connections stay bound to this
+    # loop unless we close them and drop the cached client here — otherwise
+    # the next event loop to use it (e.g. the next test module's TestClient)
+    # crashes with "Event loop is closed".
+    await get_redis().aclose()
+    get_redis.cache_clear()
 
 
 def create_app() -> FastAPI:

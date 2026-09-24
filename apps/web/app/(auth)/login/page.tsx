@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle2Icon, Loader2Icon } from 'lucide-react';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { SocialButtons } from '@/components/auth/SocialButtons';
@@ -11,12 +11,19 @@ import { PasswordField } from '@/components/ui/PasswordField';
 
 type Status = 'idle' | 'loading' | 'success';
 
-export default function LoginPage() {
+const GOOGLE_ERROR_MESSAGES: Record<string, string> = {
+  missing_code: 'Google sign-in was cancelled or did not return a code. Try again.',
+  google_auth_failed: "Google sign-in didn't go through. Try again, or use your email and password.",
+};
+
+function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [status, setStatus] = useState<Status>('idle');
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const googleError = GOOGLE_ERROR_MESSAGES[searchParams.get('error') ?? ''];
 
   useEffect(() => {
     if (status !== 'success') return;
@@ -53,6 +60,12 @@ export default function LoginPage() {
       }
     >
       <SocialButtons action="Continue" />
+
+      {googleError ? (
+        <p className="mt-4 text-center text-[13px] text-[#EF4444]" role="alert">
+          {googleError}
+        </p>
+      ) : null}
 
       <div className="my-7 flex items-center gap-4" aria-hidden="true">
         <span className="h-px flex-1 bg-line-soft" />
@@ -115,5 +128,13 @@ export default function LoginPage() {
         </div>
       </form>
     </AuthLayout>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }

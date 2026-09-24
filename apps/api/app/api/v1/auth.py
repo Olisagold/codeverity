@@ -21,7 +21,7 @@ from app.services.auth.user_resolution import (
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-async def _issue_tokens_and_redirect(user) -> RedirectResponse:
+async def _issue_tokens_and_redirect(user: User) -> RedirectResponse:
     """Issue our own tokens for a resolved user and hand the browser back to
     the frontend with a one-time code instead of the raw tokens.
     """

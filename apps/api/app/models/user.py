@@ -11,6 +11,7 @@ from app.db.base import Base
 class AuthProvider(enum.StrEnum):
     password = "password"
     google = "google"
+    github = "github"
 
 
 class UserRole(enum.StrEnum):
@@ -34,6 +35,10 @@ class User(Base):
     # Google's stable per-user id ("sub" claim). Unique and nullable so
     # password-only users simply don't have one.
     google_sub: Mapped[str | None] = mapped_column(String(255), unique=True, index=True)
+
+    # GitHub's numeric account id, stored as a string. Unique and nullable for
+    # the same reason as `google_sub`.
+    github_id: Mapped[str | None] = mapped_column(String(255), unique=True, index=True)
     email_verified: Mapped[bool] = mapped_column(Boolean, default=False)
 
     role: Mapped[UserRole] = mapped_column(

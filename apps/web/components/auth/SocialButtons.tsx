@@ -36,10 +36,10 @@ export function SocialButtons({ action }: SocialButtonsProps) {
         <GoogleIcon />
         {action} with Google
       </a>
-      <button type="button" disabled className={`${classes} cursor-not-allowed opacity-50`}>
+      <a href={`${API_URL}/v1/auth/github/login`} className={classes}>
         <GithubIcon aria-hidden="true" className="h-4 w-4" />
         {action} with GitHub
-      </button>
+      </a>
     </div>
   );
 }

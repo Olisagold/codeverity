@@ -29,11 +29,11 @@ export async function GET(request: NextRequest) {
       cache: 'no-store',
     });
     if (!response.ok) {
-      return NextResponse.redirect(new URL('/login?error=google_auth_failed', request.url));
+      return NextResponse.redirect(new URL('/login?error=auth_failed', request.url));
     }
     tokens = await response.json();
   } catch {
-    return NextResponse.redirect(new URL('/login?error=google_auth_failed', request.url));
+    return NextResponse.redirect(new URL('/login?error=auth_failed', request.url));
   }
 
   const redirect = NextResponse.redirect(new URL('/dashboard', request.url));

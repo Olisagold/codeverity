@@ -11,9 +11,9 @@ import { PasswordField } from '@/components/ui/PasswordField';
 
 type Status = 'idle' | 'loading' | 'success';
 
-const GOOGLE_ERROR_MESSAGES: Record<string, string> = {
-  missing_code: 'Google sign-in was cancelled or did not return a code. Try again.',
-  google_auth_failed: "Google sign-in didn't go through. Try again, or use your email and password.",
+const AUTH_ERROR_MESSAGES: Record<string, string> = {
+  missing_code: 'Sign-in was cancelled or did not return a code. Try again.',
+  auth_failed: "Sign-in didn't go through. Try again, or use your email and password.",
 };
 
 function LoginForm() {
@@ -23,7 +23,7 @@ function LoginForm() {
   const [status, setStatus] = useState<Status>('idle');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const googleError = GOOGLE_ERROR_MESSAGES[searchParams.get('error') ?? ''];
+  const authError = AUTH_ERROR_MESSAGES[searchParams.get('error') ?? ''];
 
   useEffect(() => {
     if (status !== 'success') return;
@@ -61,9 +61,9 @@ function LoginForm() {
     >
       <SocialButtons action="Continue" />
 
-      {googleError ? (
+      {authError ? (
         <p className="mt-4 text-center text-[13px] text-[#EF4444]" role="alert">
-          {googleError}
+          {authError}
         </p>
       ) : null}
 

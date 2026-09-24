@@ -56,7 +56,7 @@ async def _resolve_or_create_user(
         return existing
 
     display_name = name or email.split("@")[0]
-    organization = Organization(name=f"{display_name}'s Team", slug=_slugify(display_name))
+    organization = Organization(name=f"{display_name}'s Team", slug=slugify(display_name))
     user = User(
         email=email,
         name=name,

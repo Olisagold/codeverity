@@ -140,7 +140,7 @@ User-Agent: Codeverity/1.0`;
             ))}
           </div>
 
-          <CodePre code={tab === 'request' ? selected.request : tab === 'response' ? selected.response : headers} />
+          <CodePre code={tab === 'request' ? selected.request : tab === 'response' ? selected.response : headers} className="!px-5 !py-4 !text-[12.5px] !leading-[1.75]" />
         </section>
       ) : null}
     </>

@@ -352,7 +352,7 @@ export function DeveloperSection() {
                   exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -4 }}
                   transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
                 >
-                  <CodePre code={code} className="min-h-[420px] !px-5 !py-5" />
+                  <CodePre code={code} lineNumbers className="min-h-[420px] !px-5 !py-5 !text-[12.5px] !leading-[1.75]" />
                 </motion.div>
               </AnimatePresence>
             </div>

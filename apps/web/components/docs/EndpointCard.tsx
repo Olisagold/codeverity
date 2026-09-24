@@ -20,20 +20,19 @@ export function EndpointCard({ method, path, description, request, response, sta
   const current = request[active];
 
   return (
-    <div className="code-frame overflow-hidden rounded-xl border border-line">
-      <div className="code-frame__header flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3">
-        <div className="flex min-w-0 items-center gap-2.5">
+    <div className="flex flex-col gap-5">
+      <div>
+        <div className="flex min-w-0 flex-wrap items-center gap-2.5">
           <MethodBadge method={method} />
-          <code className="truncate font-mono text-[13px] text-white">{path}</code>
+          <code className="truncate font-mono text-[14px] text-white">{path}</code>
         </div>
-        <CopyButton value={current.code} />
+        {description ? <p className="mt-3 text-[14.5px] leading-relaxed text-muted">{description}</p> : null}
       </div>
 
-      {description ? <p className="border-b border-line px-4 py-3 text-[13.5px] leading-relaxed text-muted">{description}</p> : null}
-
-      <div className="grid lg:grid-cols-2">
-        <div className="border-b border-line lg:border-b-0 lg:border-r">
-          <div role="tablist" aria-label="Request examples" className="flex items-center border-b border-line pl-1">
+      {/* Request */}
+      <div className="code-frame overflow-hidden border border-line">
+        <div role="tablist" aria-label="Request examples" className="code-frame__header flex items-center justify-between gap-4 px-6">
+          <div className="flex items-center gap-6 overflow-x-auto no-scrollbar">
             {request.map((sample, index) => (
               <button
                 key={sample.label}
@@ -41,25 +40,27 @@ export function EndpointCard({ method, path, description, request, response, sta
                 role="tab"
                 aria-selected={index === active}
                 onClick={() => setActive(index)}
-                className={`relative px-3 py-2.5 font-mono text-[12px] transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent ${
-                  index === active ? 'text-white' : 'text-faint hover:text-muted'
-                }`}
+                className="code-tab whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {sample.label}
-                {index === active ? <span aria-hidden="true" className="absolute inset-x-2 -bottom-px h-px bg-accent" /> : null}
               </button>
             ))}
           </div>
-          <CodePre code={current.code} className="h-full" />
+          <CopyButton value={current.code} iconOnly />
         </div>
+        <CodePre code={current.code} />
+      </div>
 
-        <div>
-          <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
-            <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-faint">Response</span>
-            <span className="font-mono text-[11px] text-ok">{status}</span>
+      {/* Response */}
+      <div className="code-frame overflow-hidden border border-line">
+        <div className="code-frame__header flex items-center justify-between gap-4 px-6">
+          <div className="flex items-center gap-3">
+            <span className="code-frame__label">Response</span>
+            <span className="font-mono text-[12px] text-ok">{status}</span>
           </div>
-          <CodePre code={response} className="h-full" />
+          <CopyButton value={response} iconOnly />
         </div>
+        <CodePre code={response} />
       </div>
     </div>
   );

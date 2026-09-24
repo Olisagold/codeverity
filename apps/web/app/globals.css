@@ -1,5 +1,5 @@
 /* @import url() FONT IMPORTS MUST ALWAYS BE AT THE VERY TOP OF THIS FILE, ABOVE THE TAILWIND IMPORTS — DO NOT DELETE THIS COMMENT */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap');
 
 /* CRITICAL: THE FOLLOWING TAILWIND IMPORTS MUST NEVER BE DELETED OR REORDERED — DO NOT DELETE THIS COMMENT */
 @import 'tailwindcss/base';
@@ -43,23 +43,23 @@ body {
    the pure-black surface: muted base text, warm strings, cool keywords.
    --------------------------------------------------------------------------- */
 :root {
-  --code-bg: #09090b;
-  --code-fg: #d4d4d8;
+  --code-bg: #0b0b0c;
+  --code-fg: #d9d9de;
   --code-gutter: #3f3f46;
   --code-gutter-border: #18181b;
   --tok-comment: #6b7280;
-  --tok-string: #f0abfc;
-  --tok-property: #93c5fd;
-  --tok-number: #fdba74;
-  --tok-literal: #fb923c;
-  --tok-keyword: #c4b5fd;
-  --tok-method: #6ee7b7;
-  --tok-flag: #a5b4fc;
-  --tok-variable: #fcd34d;
-  --tok-function: #7dd3fc;
-  --tok-type: #5eead4;
-  --tok-url: #a5f3fc;
-  --tok-punctuation: #71717a;
+  --tok-string: #e8b48f;
+  --tok-property: #8fc1e8;
+  --tok-number: #a9d18e;
+  --tok-literal: #6fa8ff;
+  --tok-keyword: #f4f4f5;
+  --tok-method: #f4f4f5;
+  --tok-flag: #6fa8ff;
+  --tok-variable: #e8b48f;
+  --tok-function: #d9d9de;
+  --tok-type: #8fc1e8;
+  --tok-url: #e8b48f;
+  --tok-punctuation: #8a8a93;
   --tok-operator: #a1a1aa;
 }
 
@@ -67,12 +67,12 @@ body {
   position: relative;
   margin: 0;
   overflow-x: auto;
-  padding: 14px 16px;
+  padding: 22px 26px;
   background: var(--code-bg);
   color: var(--code-fg);
-  font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 12.5px;
-  line-height: 1.7;
+  font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 14px;
+  line-height: 1.9;
   font-variant-ligatures: none;
   tab-size: 2;
   scrollbar-width: thin;
@@ -126,6 +126,7 @@ body {
 .tok-literal { color: var(--tok-literal); }
 .tok-keyword { color: var(--tok-keyword); }
 .tok-method { color: var(--tok-method); font-weight: 500; }
+.tok-keyword { font-weight: 500; }
 .tok-flag { color: var(--tok-flag); }
 .tok-variable { color: var(--tok-variable); }
 .tok-function { color: var(--tok-function); }
@@ -136,9 +137,34 @@ body {
 
 .code-frame {
   background: var(--code-bg);
+  border-radius: 16px;
 }
 .code-frame__header {
-  background: #0c0c0e;
+  background: var(--code-bg);
+  border-bottom: 1px solid #1c1c1f;
+}
+.code-tab {
+  position: relative;
+  padding: 14px 0 12px;
+  font-size: 14px;
+  color: #8a8a93;
+  transition: color 150ms ease-out;
+}
+.code-tab:hover { color: #d9d9de; }
+.code-tab[aria-selected='true'] { color: #3b82f6; }
+.code-tab[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: #3b82f6;
+}
+.code-frame__label {
+  padding: 14px 0 12px;
+  font-size: 14px;
+  color: #d9d9de;
 }
 
 /* ---------------------------------------------------------------------------
@@ -210,7 +236,7 @@ body {
   --arch-node-line: #27272a;
 }
 .arch text {
-  font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 .arch-label { font-size: 13px; fill: #ffffff; }
 .arch-caption { font-size: 10.5px; fill: #71717a; }

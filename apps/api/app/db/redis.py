@@ -1,0 +1,11 @@
+"""Shared async Redis client, built once from `REDIS_URL`."""
+from functools import lru_cache
+
+from redis.asyncio import Redis
+
+from app.core.config import get_settings
+
+
+@lru_cache
+def get_redis() -> Redis:
+    return Redis.from_url(get_settings().redis_url)

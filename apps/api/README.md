@@ -7,7 +7,7 @@
 | Phase | Scope | Status |
 |---|---|---|
 | 0 | Scaffold, Docker, health checks | Done |
-| 1 | Auth, organizations, API keys | In progress: Google and GitHub sign in done |
+| 1 | Auth, organizations, API keys | In progress: Google, GitHub, and email/password sign in done |
 | 2 | Assessment CRUD, job queue | Not started |
 | 3 | Multi model orchestration | Not started |
 | 4 | Webhooks | Not started |
@@ -54,13 +54,14 @@ apps/api/
 │   ├── models/            SQLAlchemy models: organization, user
 │   ├── schemas/           Pydantic request and response shapes
 │   ├── services/
-│   │   ├── auth/           Google and GitHub OAuth, user resolution, state and exchange codes
+│   │   ├── auth/           OAuth, OTP codes, user resolution, state and exchange codes
+│   │   ├── email/          Sendlib client for the signup OTP email
 │   │   └── orchestration/  Model dispatch and reassessment (Phase 3, empty)
 │   ├── api/
 │   │   ├── health.py      Unversioned health checks
 │   │   └── v1/
 │   │       ├── router.py   Versioned API routes
-│   │       └── auth.py     Google and GitHub sign in endpoints
+│   │       └── auth.py     Google, GitHub, and email/password sign in endpoints
 │   └── worker/             Background job worker (Phase 2, empty)
 ├── alembic/                Migrations
 ├── tests/
@@ -80,6 +81,7 @@ apps/api/
 - Pydantic Settings for configuration
 - pytest and ruff for testing and linting
 - Docker locally, Render or Railway in production, Neon and Upstash for managed data
+- Sendlib for the signup OTP email
 
 <br/>
 
@@ -99,11 +101,9 @@ The dashboard already has UI for this. The data model follows what it expects.
 
 - `organizations` table: name, slug, created at. Done.
 - `users` table: email, password hash, auth provider, Google sub, GitHub id, role. Done.
-- JWT session auth for login, signup, and password reset. JWT issuing is done
-  (`app/core/security.py`); password login itself is not built yet.
+- JWT session auth for login, signup, and password reset. Done, except password reset itself.
 - `api_keys` table: name, hashed secret, environment, last used. Not started.
 - API key auth for the public API. Not started.
-- Endpoints for email/password auth and API key management. Not started.
 
 <br/>
 
@@ -123,6 +123,21 @@ The backend owns the OAuth handshake, not the frontend, since each provider is j
 - The "Continue with Google" and "Continue with GitHub" buttons in `SocialButtons.tsx` link straight to `/v1/auth/{provider}/login`
 - `app/(auth)/auth/callback/route.ts` calls `/v1/auth/exchange` and sets the session as an httpOnly cookie
 - `middleware.ts` redirects `/dashboard/*` to `/login` when that cookie is missing (presence only, not signature/expiry, since the API doesn't verify tokens on any route yet either)
+
+<br/>
+
+### Email/Password Sign Up and Login (Done)
+
+Signup collects name, organization, email, and password like the signup form always has, but the account starts unverified. A 6-digit code goes out by email through [Sendlib](https://sendlib.samueltuoyo.com/docs), and the frontend doesn't get a session until that code is confirmed. Implemented in `app/services/auth/otp.py`, `app/services/email/sendlib.py`, and `app/api/v1/auth.py`, covered by `tests/test_password_auth.py`.
+
+**Flow:** `POST /v1/auth/signup` creates the user (or, if they signed up before but never verified, updates the same unverified row) and emails the code. `POST /v1/auth/verify-otp` checks it, marks the account verified, and returns tokens directly as JSON, since this is a same-origin form submit rather than a cross-site redirect. `POST /v1/auth/login` does the same after checking the password. The code lives in Redis for 10 minutes, one-time use, capped at 5 guesses.
+
+**Frontend wiring (Done):**
+- `signup/page.tsx` submits the form, then shows a code-entry step
+- `login/page.tsx` submits real credentials instead of the old mocked delay
+- `app/api/auth/{signup,login,verify-otp}/route.ts` proxy to the API; the latter two set the same httpOnly session cookie the OAuth callback does, via the shared `setSessionCookies` helper in `lib/auth/session.ts`
+
+**Not handled yet:** forgot/reset password, and resending a code without resubmitting the whole signup form.
 
 <br/>
 

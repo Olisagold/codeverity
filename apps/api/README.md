@@ -7,7 +7,7 @@
 | Phase | Scope | Status |
 |---|---|---|
 | 0 | Scaffold, Docker, health checks | Done |
-| 1 | Auth, organizations, API keys | In progress: Google sign in done |
+| 1 | Auth, organizations, API keys | In progress: Google and GitHub sign in done |
 | 2 | Assessment CRUD, job queue | Not started |
 | 3 | Multi model orchestration | Not started |
 | 4 | Webhooks | Not started |
@@ -54,13 +54,13 @@ apps/api/
 │   ├── models/            SQLAlchemy models: organization, user
 │   ├── schemas/           Pydantic request and response shapes
 │   ├── services/
-│   │   ├── auth/           Google OAuth, user resolution, state and exchange codes
+│   │   ├── auth/           Google and GitHub OAuth, user resolution, state and exchange codes
 │   │   └── orchestration/  Model dispatch and reassessment (Phase 3, empty)
 │   ├── api/
 │   │   ├── health.py      Unversioned health checks
 │   │   └── v1/
 │   │       ├── router.py   Versioned API routes
-│   │       └── auth.py     Google sign in endpoints
+│   │       └── auth.py     Google and GitHub sign in endpoints
 │   └── worker/             Background job worker (Phase 2, empty)
 ├── alembic/                Migrations
 ├── tests/
@@ -98,7 +98,7 @@ apps/api/
 The dashboard already has UI for this. The data model follows what it expects.
 
 - `organizations` table: name, slug, created at. Done.
-- `users` table: email, password hash, auth provider, Google sub, role. Done.
+- `users` table: email, password hash, auth provider, Google sub, GitHub id, role. Done.
 - JWT session auth for login, signup, and password reset. JWT issuing is done
   (`app/core/security.py`); password login itself is not built yet.
 - `api_keys` table: name, hashed secret, environment, last used. Not started.
@@ -107,21 +107,22 @@ The dashboard already has UI for this. The data model follows what it expects.
 
 <br/>
 
-### Google Sign In (Done)
+### Google and GitHub Sign In (Done)
 
-The backend owns the OAuth handshake, not the frontend, since Google is just another way into the same user table. Implemented in `app/services/auth/` and `app/api/v1/auth.py`, covered by `tests/test_google_auth.py`.
+The backend owns the OAuth handshake, not the frontend, since each provider is just another way into the same user table. Both follow the same flow through a shared resolver, implemented in `app/services/auth/` and `app/api/v1/auth.py`, covered by `tests/test_google_auth.py` and `tests/test_github_auth.py`.
 
-**Flow:** the browser hits `/v1/auth/google/login`, which sends it to Google. Google calls back to `/v1/auth/google/callback`, where the API exchanges the code, reads the profile, and resolves the user. It then redirects to the frontend with a one time code, which the frontend exchanges for real tokens via `POST /v1/auth/exchange`.
+**Flow:** the browser hits `/v1/auth/{provider}/login`, which sends it to Google or GitHub. The provider calls back to `/v1/auth/{provider}/callback`, where the API exchanges the code, reads the profile, and resolves the user. It then redirects to the frontend with a one time code, which the frontend exchanges for real tokens via `POST /v1/auth/exchange`. Both providers share this callback and exchange step, so the frontend doesn't need to know which one was used.
 
 **On callback:**
-- A known Google account logs in.
-- A new Google account creates a user and auto creates an organization named after them.
-- A new Google account matching an existing verified email links to that account instead of duplicating it. An existing, unverified match is rejected with a 409 rather than linked.
+- A known account (by Google sub or GitHub id) logs in.
+- A new account creates a user and auto creates an organization named after them.
+- A new account matching an existing verified email links to that account instead of duplicating it. An existing, unverified match is rejected with a 409 rather than linked.
+- GitHub only: a user with no verified email on their GitHub account is rejected with a 409, since GitHub doesn't always return one on the base profile.
 
-**Still open on the frontend:**
-- Wire the "Continue with Google" button in `SocialButtons.tsx` to `/v1/auth/google/login`
-- An `app/(auth)/auth/callback` route handler that calls `/v1/auth/exchange` and sets the session as an httpOnly cookie
-- A real check in `middleware.ts` (currently a no-op) on `/dashboard/*`
+**Frontend wiring (Done):**
+- The "Continue with Google" and "Continue with GitHub" buttons in `SocialButtons.tsx` link straight to `/v1/auth/{provider}/login`
+- `app/(auth)/auth/callback/route.ts` calls `/v1/auth/exchange` and sets the session as an httpOnly cookie
+- `middleware.ts` redirects `/dashboard/*` to `/login` when that cookie is missing (presence only, not signature/expiry, since the API doesn't verify tokens on any route yet either)
 
 <br/>
 

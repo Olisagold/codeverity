@@ -52,14 +52,22 @@ def _cleanup_user(email: str) -> None:
     _run_db(_do)
 
 
+welcome_sent: list[str] = []
+
+
 def _mock_email(monkeypatch) -> list[str]:
-    """Replaces send_otp_email; returns a list that receives each sent code."""
+    """Replaces both senders; returns a list that receives each sent OTP code."""
     sent_codes: list[str] = []
+    welcome_sent.clear()
 
     async def fake_send_otp_email(*, to: str, name: str, code: str) -> None:
         sent_codes.append(code)
 
+    async def fake_send_welcome_email(*, to: str, name: str, organization: str) -> None:
+        welcome_sent.append(to)
+
     monkeypatch.setattr(auth_routes, "send_otp_email", fake_send_otp_email)
+    monkeypatch.setattr(auth_routes, "send_welcome_email", fake_send_welcome_email)
     return sent_codes
 
 
@@ -117,9 +125,11 @@ def test_verify_otp_then_login_flow(client, monkeypatch) -> None:
         )
         assert login_before_verify.status_code == 403
 
+        assert welcome_sent == []
         verify = client.post("/v1/auth/verify-otp", json={"email": email, "code": code})
         assert verify.status_code == 200
         assert verify.json()["access_token"]
+        assert welcome_sent == [email]
 
         replay = client.post("/v1/auth/verify-otp", json={"email": email, "code": code})
         assert replay.status_code == 400

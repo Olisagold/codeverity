@@ -28,6 +28,13 @@ class Settings(BaseSettings):
 
     sendlib_api_key: str = ""
     sendlib_from_email: str = ""
+    email_assets_url: str = (
+        "https://raw.githubusercontent.com/Olisagold/codeverity/main/apps/web/public/icons"
+    )
+
+    instagram_url: str = "https://instagram.com"
+    x_url: str = "https://x.com"
+    linkedin_url: str = "https://linkedin.com"
 
     @property
     def cors_origins(self) -> list[str]:

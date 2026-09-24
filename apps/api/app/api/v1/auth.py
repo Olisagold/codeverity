@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -32,7 +32,7 @@ from app.services.auth.user_resolution import (
     resolve_or_create_github_user,
     resolve_or_create_user,
 )
-from app.services.email.sendlib import send_otp_email
+from app.services.email.sendlib import send_otp_email, send_welcome_email
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -161,7 +161,11 @@ async def signup(payload: SignupRequest, db: AsyncSession = Depends(get_db)) -> 
 
 
 @router.post("/verify-otp", response_model=TokenPair)
-async def verify_otp(payload: VerifyOtpRequest, db: AsyncSession = Depends(get_db)) -> TokenPair:
+async def verify_otp(
+    payload: VerifyOtpRequest,
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db),
+) -> TokenPair:
     if not await otp.verify_code(payload.email, payload.code):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid or expired code.")
 
@@ -172,6 +176,14 @@ async def verify_otp(payload: VerifyOtpRequest, db: AsyncSession = Depends(get_d
 
     user.email_verified = True
     await db.commit()
+
+    organization = await db.get(Organization, user.organization_id)
+    background_tasks.add_task(
+        send_welcome_email,
+        to=user.email,
+        name=user.name or user.email.split("@")[0],
+        organization=organization.name if organization else "Your organization",
+    )
 
     return _issue_tokens(user)
 

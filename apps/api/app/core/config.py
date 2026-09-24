@@ -28,6 +28,9 @@ class Settings(BaseSettings):
 
     sendlib_api_key: str = ""
     sendlib_from_email: str = ""
+    email_logo_url: str = (
+        "https://raw.githubusercontent.com/Olisagold/codeverity/main/apps/web/public/icons/logo.png"
+    )
 
     @property
     def cors_origins(self) -> list[str]:

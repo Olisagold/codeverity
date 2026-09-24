@@ -1,5 +1,6 @@
 import React from 'react';
 import { GithubIcon } from 'lucide-react';
+import { API_URL } from '@/lib/auth/session';
 
 function GoogleIcon() {
   return (
@@ -31,11 +32,11 @@ export function SocialButtons({ action }: SocialButtonsProps) {
 
   return (
     <div className="grid gap-3 sm:grid-cols-2">
-      <button type="button" className={classes}>
+      <a href={`${API_URL}/v1/auth/google/login`} className={classes}>
         <GoogleIcon />
         {action} with Google
-      </button>
-      <button type="button" className={classes}>
+      </a>
+      <button type="button" disabled className={`${classes} cursor-not-allowed opacity-50`}>
         <GithubIcon aria-hidden="true" className="h-4 w-4" />
         {action} with GitHub
       </button>

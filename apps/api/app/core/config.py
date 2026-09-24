@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     google_client_secret: str = ""
     google_redirect_uri: str = "http://localhost:8000/v1/auth/google/callback"
 
+    github_client_id: str = ""
+    github_client_secret: str = ""
+    github_redirect_uri: str = "http://localhost:8000/v1/auth/github/callback"
+
     frontend_url: str = "http://localhost:3000"
 
     @property

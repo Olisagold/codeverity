@@ -8,12 +8,12 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
 
 
-class AuthProvider(str, enum.Enum):
+class AuthProvider(enum.StrEnum):
     password = "password"
     google = "google"
 
 
-class UserRole(str, enum.Enum):
+class UserRole(enum.StrEnum):
     owner = "owner"
     member = "member"
 
@@ -36,7 +36,9 @@ class User(Base):
     google_sub: Mapped[str | None] = mapped_column(String(255), unique=True, index=True)
     email_verified: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    role: Mapped[UserRole] = mapped_column(Enum(UserRole, native_enum=False, length=20), default=UserRole.owner)
+    role: Mapped[UserRole] = mapped_column(
+        Enum(UserRole, native_enum=False, length=20), default=UserRole.owner
+    )
     organization_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("organizations.id"))
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

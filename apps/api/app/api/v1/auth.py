@@ -21,7 +21,9 @@ async def google_login() -> RedirectResponse:
 
 
 @router.get("/google/callback")
-async def google_callback(code: str, state: str, db: AsyncSession = Depends(get_db)) -> RedirectResponse:
+async def google_callback(
+    code: str, state: str, db: AsyncSession = Depends(get_db)
+) -> RedirectResponse:
     """Google redirects here with a code. Resolve the user, issue our own
     tokens, and hand the browser back to the frontend with a one-time code
     instead of the raw tokens.

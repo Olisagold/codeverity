@@ -1,4 +1,4 @@
-.PHONY: up down build logs test api-up api-logs api-shell api-test api-lint
+.PHONY: up down build logs test api-up api-logs api-shell api-test api-lint api-migrate api-migration
 
 up:
 	docker compose up -d
@@ -30,3 +30,10 @@ api-test:
 
 api-lint:
 	docker compose exec api ruff check .
+
+api-migrate:
+	docker compose exec api alembic upgrade head
+
+# usage: make api-migration name="add api keys table"
+api-migration:
+	docker compose exec api alembic revision --autogenerate -m "$(name)"

@@ -7,7 +7,7 @@
 | Phase | Scope | Status |
 |---|---|---|
 | 0 | Scaffold, Docker, health checks | Done |
-| 1 | Auth, organizations, API keys | Not started |
+| 1 | Auth, organizations, API keys | In progress: Google sign in done |
 | 2 | Assessment CRUD, job queue | Not started |
 | 3 | Multi model orchestration | Not started |
 | 4 | Webhooks | Not started |
@@ -44,22 +44,31 @@ See [assessment-lifecycle.png](docs/diagrams/assessment-lifecycle.png) for that 
 apps/api/
 ├── app/
 │   ├── main.py          App factory and router wiring
-│   ├── core/config.py   Settings from environment variables
-│   ├── db/               Session and declarative base
-│   ├── models/            SQLAlchemy models, one file per domain
+│   ├── core/
+│   │   ├── config.py     Settings from environment variables
+│   │   └── security.py   JWT issuing and verification
+│   ├── db/
+│   │   ├── session.py     Postgres session
+│   │   ├── redis.py       Shared Redis client
+│   │   └── base.py        Declarative base and model import hub
+│   ├── models/            SQLAlchemy models: organization, user
 │   ├── schemas/           Pydantic request and response shapes
-│   ├── services/          Business logic, called from routes
-│   │   └── orchestration/ Model dispatch and reassessment
+│   ├── services/
+│   │   ├── auth/           Google OAuth, user resolution, state and exchange codes
+│   │   └── orchestration/  Model dispatch and reassessment (Phase 3, empty)
 │   ├── api/
 │   │   ├── health.py      Unversioned health checks
-│   │   └── v1/router.py   Versioned API routes
-│   └── worker/             Background job worker
+│   │   └── v1/
+│   │       ├── router.py   Versioned API routes
+│   │       └── auth.py     Google sign in endpoints
+│   └── worker/             Background job worker (Phase 2, empty)
+├── alembic/                Migrations
 ├── tests/
 ├── docs/diagrams/          Architecture diagrams
 └── Dockerfile
 ```
 
-`models`, `schemas`, `services`, and `worker` are empty for now. Each holds a docstring explaining its purpose, and fills in as the phases below get built.
+`services/orchestration` and `worker` are still empty placeholders for later phases. Everything else above is real, working code.
 
 <br/>
 
@@ -88,30 +97,31 @@ apps/api/
 
 The dashboard already has UI for this. The data model follows what it expects.
 
-- `organizations` table: name, slug, created at
-- `users` table: email, password hash, auth provider, Google sub, role
-- JWT session auth for login, signup, and password reset
-- `api_keys` table: name, hashed secret, environment, last used
-- API key auth for the public API
-- Endpoints for auth and API key management
+- `organizations` table: name, slug, created at. Done.
+- `users` table: email, password hash, auth provider, Google sub, role. Done.
+- JWT session auth for login, signup, and password reset. JWT issuing is done
+  (`app/core/security.py`); password login itself is not built yet.
+- `api_keys` table: name, hashed secret, environment, last used. Not started.
+- API key auth for the public API. Not started.
+- Endpoints for email/password auth and API key management. Not started.
 
 <br/>
 
-### Google Sign In
+### Google Sign In (Done)
 
-The "Continue with Google" button is currently decorative. The backend owns the OAuth handshake, not the frontend, since Google is just another way into the same user table.
+The backend owns the OAuth handshake, not the frontend, since Google is just another way into the same user table. Implemented in `app/services/auth/` and `app/api/v1/auth.py`, covered by `tests/test_google_auth.py`.
 
-**Flow:** the browser hits `/v1/auth/google/login`, which sends it to Google. Google calls back to `/v1/auth/google/callback`, where the API exchanges the code, reads the profile, and resolves the user. It then redirects to the frontend with a one time code, which the frontend exchanges for real tokens and stores as an httpOnly cookie.
+**Flow:** the browser hits `/v1/auth/google/login`, which sends it to Google. Google calls back to `/v1/auth/google/callback`, where the API exchanges the code, reads the profile, and resolves the user. It then redirects to the frontend with a one time code, which the frontend exchanges for real tokens via `POST /v1/auth/exchange`.
 
 **On callback:**
 - A known Google account logs in.
 - A new Google account creates a user and auto creates an organization named after them.
-- A new Google account matching an existing verified email links to that account instead of duplicating it.
+- A new Google account matching an existing verified email links to that account instead of duplicating it. An existing, unverified match is rejected with a 409 rather than linked.
 
-**To build:**
-- Google client config in `.env`
-- Login, callback, and exchange endpoints
-- Frontend callback route and a real auth check in `middleware.ts`
+**Still open on the frontend:**
+- Wire the "Continue with Google" button in `SocialButtons.tsx` to `/v1/auth/google/login`
+- An `app/(auth)/auth/callback` route handler that calls `/v1/auth/exchange` and sets the session as an httpOnly cookie
+- A real check in `middleware.ts` (currently a no-op) on `/dashboard/*`
 
 <br/>
 
@@ -156,7 +166,8 @@ The core of the product. See [assessment-lifecycle.png](docs/diagrams/assessment
 
 ## Phase 6: Migrations and Deploy
 
-- Alembic for migrations
+- Alembic for migrations. Done: set up in `alembic/`, first migration creates
+  `organizations` and `users`. New models just need `alembic revision --autogenerate`.
 - Deploy config for Render or Railway
 - Point production at Neon and Upstash
 - CORS locked to real origins
@@ -167,10 +178,12 @@ The core of the product. See [assessment-lifecycle.png](docs/diagrams/assessment
 ## Local Development
 
 ```bash
-make api-up      # build and start api, worker, db, redis
-make api-logs    # follow logs
-make api-test    # run tests
-make down        # stop everything
+make api-up                          # build and start api, worker, db, redis
+make api-logs                        # follow logs
+make api-test                        # run tests
+make api-migrate                     # apply pending migrations
+make api-migration name="add x"      # generate a new migration from model changes
+make down                            # stop everything
 ```
 
 `GET localhost:8000/health/ready` should return ok once the stack is up. Docs live at `localhost:8000/docs`.

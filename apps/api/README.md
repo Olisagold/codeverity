@@ -96,7 +96,9 @@ The dashboard already has UI for this (`apps/web/app/(dashboard)/dashboard/setti
 `.../api-keys`), so the data model below follows what it expects.
 
 - [ ] `organizations` table — name, slug, created_at
-- [ ] `users` table — email, password hash, organization membership, role (owner/member)
+- [ ] `users` table — email, password_hash (nullable — Google users have none),
+      auth_provider (`password`/`google`), google_sub (unique, nullable),
+      email_verified, organization membership, role (owner/member)
 - [ ] Session auth for the dashboard (login, signup, forgot/reset password) — likely
       JWT access token + refresh token, matching `JWT_SECRET` / `JWT_EXPIRES_IN` in `.env`
 - [ ] `api_keys` table — id, org, name, hashed secret, environment (`live`/`test`),
@@ -105,6 +107,40 @@ The dashboard already has UI for this (`apps/web/app/(dashboard)/dashboard/setti
 - [ ] Endpoints: `POST /v1/auth/login`, `POST /v1/auth/signup`,
       `POST /v1/auth/forgot-password`, `POST /v1/auth/reset-password`
 - [ ] Endpoints: `GET/POST /v1/api-keys`, `DELETE /v1/api-keys/{id}`
+
+### Google sign-in
+
+The dashboard's "Continue with Google" button
+([SocialButtons.tsx](../web/components/auth/SocialButtons.tsx)) is currently
+decorative. The backend owns the whole OAuth handshake — not Next.js/Auth.js —
+since Google is just another way to authenticate into the same `users` table as
+password login, not a separate identity store.
+
+Flow: browser → `GET /v1/auth/google/login` (redirects to Google, with a signed
+`state` for CSRF) → Google → `GET /v1/auth/google/callback` (exchanges the code
+server-to-server via **Authlib**, fetches the Google profile) → FastAPI resolves
+the user → redirects to a frontend callback URL with a short-lived, one-time code
+→ the frontend exchanges that code for real tokens via `POST /v1/auth/exchange`,
+which sets them as an httpOnly cookie. The raw JWT never touches browser JS or a
+URL bar.
+
+User resolution on callback:
+- Known `google_sub` → log in, issue our JWT.
+- New `google_sub`, no matching email → create the user, **auto-create an
+  organization** named from their Google display name (e.g. "Olisa's Team", owner
+  role, renameable later in Settings) — skips the manual signup form's org-name
+  step entirely.
+- New `google_sub`, matching an existing password account, and Google reports
+  `email_verified` → link `google_sub` onto that existing user instead of creating
+  a duplicate.
+
+- [ ] `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` / `GOOGLE_REDIRECT_URI` config
+- [ ] `GET /v1/auth/google/login`, `GET /v1/auth/google/callback`,
+      `POST /v1/auth/exchange`
+- [ ] Frontend: wire `SocialButtons`' Google button to the login endpoint, add an
+      `app/(auth)/auth/callback` route handler for the exchange, and make
+      `middleware.ts` (currently a no-op) check the session cookie on
+      `/dashboard/*`
 
 ## Phase 2 — Assessments (core resource)
 

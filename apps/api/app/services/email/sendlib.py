@@ -1,16 +1,16 @@
-"""Sendlib (sendlib.samueltuoyo.com): sends the signup OTP through its
-built-in "otp" template, which takes `name` and `code`.
-"""
 import httpx
 
 from app.core.config import get_settings
+from app.services.auth.otp import OTP_TTL_SECONDS
+from app.services.email.templates import OTP_SUBJECT, render_otp_email
 
 SEND_URL = "https://sendlib.samueltuoyo.com/api/send"
 
 
 async def send_otp_email(*, to: str, name: str, code: str) -> None:
     settings = get_settings()
-    payload: dict = {"to": to, "template": "otp", "data": {"name": name, "code": code}}
+    html, text = render_otp_email(name=name, code=code, expires_minutes=OTP_TTL_SECONDS // 60)
+    payload: dict = {"to": to, "subject": OTP_SUBJECT, "html": html, "text": text}
     if settings.sendlib_from_email:
         payload["from"] = settings.sendlib_from_email
 

@@ -5,8 +5,20 @@ language models in parallel, runs an independent reassessment ("judge") pass ove
 their output, and returns one validated result to the integrating platform.
 
 This document is the build roadmap: what exists today, what's next, and the target
-shape of the API. See [`docs/diagrams/`](docs/diagrams/) for the system architecture
-and assessment lifecycle diagrams referenced below.
+shape of the API.
+
+## System architecture
+
+![Codeverity system architecture](docs/diagrams/system-architecture.png)
+
+Vercel hosts the Next.js dashboard; Render or Railway runs the FastAPI API and the
+job worker in Docker; Neon (Postgres) and Upstash (Redis) are the managed data
+services. The worker fans a submission out to several LLM providers in parallel,
+then runs an independent reassessment ("judge") pass before persisting the final
+result and firing a webhook. See
+[assessment-lifecycle.png](docs/diagrams/assessment-lifecycle.png) for that request
+flow in detail, and [`docs/diagrams/`](docs/diagrams/) for the editable `.excalidraw`
+sources.
 
 ## Status: Phase 0 complete
 

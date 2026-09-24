@@ -12,5 +12,7 @@ class Base(DeclarativeBase):
 
 
 # Import model modules below as they're added, so their tables register on
-# Base.metadata, e.g.:
-# from app.models import organization, user, api_key, assessment, webhook  # noqa: F401
+# Base.metadata. Import order doesn't matter; SQLAlchemy resolves forward
+# references (e.g. Organization.users -> "User") once every module here has
+# been imported.
+from app.models import organization, user  # noqa: F401,E402

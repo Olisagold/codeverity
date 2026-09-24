@@ -1,225 +1,176 @@
-# apps/api — Codeverity API
+# Codeverity API
 
-FastAPI backend for Codeverity. It accepts a code submission, sends it to several
-language models in parallel, runs an independent reassessment ("judge") pass over
-their output, and returns one validated result to the integrating platform.
+<br/>
 
-This document is the build roadmap: what exists today, what's next, and the target
-shape of the API.
+## Status at a Glance
 
-## System architecture
+| Phase | Scope | Status |
+|---|---|---|
+| 0 | Scaffold, Docker, health checks | Done |
+| 1 | Auth, organizations, API keys | Not started |
+| 2 | Assessment CRUD, job queue | Not started |
+| 3 | Multi model orchestration | Not started |
+| 4 | Webhooks | Not started |
+| 5 | Usage, logs, rate limiting | Not started |
+| 6 | Migrations, deploy, hardening | Not started |
+
+<br/>
+
+## What This Is
+
+Codeverity is a FastAPI backend for multi model code assessment.
+
+It takes a code submission, sends it to several language models at once, runs an independent judge pass over their output, then returns one validated result to the integrating platform.
+
+This file is the build roadmap. It tracks what exists, what is next, and the shape of the API to come.
+
+<br/>
+
+## System Architecture
 
 ![Codeverity system architecture](docs/diagrams/system-architecture.png)
 
-Vercel hosts the Next.js dashboard; Render or Railway runs the FastAPI API and the
-job worker in Docker; Neon (Postgres) and Upstash (Redis) are the managed data
-services. The worker fans a submission out to several LLM providers in parallel,
-then runs an independent reassessment ("judge") pass before persisting the final
-result and firing a webhook. See
-[assessment-lifecycle.png](docs/diagrams/assessment-lifecycle.png) for that request
-flow in detail, and [`docs/diagrams/`](docs/diagrams/) for the editable `.excalidraw`
-sources.
+Vercel hosts the frontend. Render or Railway runs the API and worker in Docker. Neon and Upstash hold Postgres and Redis.
 
-## Project layout
+The worker fans a submission out to several models, runs an independent judge pass, then persists the result and fires a webhook.
+
+See [assessment-lifecycle.png](docs/diagrams/assessment-lifecycle.png) for that flow, and [docs/diagrams](docs/diagrams/) for the editable sources.
+
+<br/>
+
+## Project Layout
 
 ```
 apps/api/
 ├── app/
-│   ├── main.py                    App factory, middleware, router wiring
-│   ├── core/
-│   │   └── config.py              Settings, read from environment variables
-│   ├── db/
-│   │   ├── session.py             Async SQLAlchemy engine + session
-│   │   └── base.py                Declarative base; model import hub for Alembic
-│   ├── models/                    SQLAlchemy ORM models, one module per domain
-│   ├── schemas/                   Pydantic request/response schemas
-│   ├── services/                  Business logic, called from routes
-│   │   └── orchestration/         Multi-model dispatch + reassessment (Phase 3)
-│   │       └── providers/         One adapter per LLM provider
+│   ├── main.py          App factory and router wiring
+│   ├── core/config.py   Settings from environment variables
+│   ├── db/               Session and declarative base
+│   ├── models/            SQLAlchemy models, one file per domain
+│   ├── schemas/           Pydantic request and response shapes
+│   ├── services/          Business logic, called from routes
+│   │   └── orchestration/ Model dispatch and reassessment
 │   ├── api/
-│   │   ├── deps.py                Shared FastAPI dependencies (db session, auth)
-│   │   ├── health.py              Unversioned /health, /health/ready
-│   │   └── v1/
-│   │       └── router.py          Versioned /v1 routes, aggregated here
-│   └── worker/                    Background job worker (separate process/container)
-│       └── tasks/                 One module per job type
+│   │   ├── health.py      Unversioned health checks
+│   │   └── v1/router.py   Versioned API routes
+│   └── worker/             Background job worker
 ├── tests/
-├── docs/diagrams/                 Architecture diagrams (source + rendered)
-├── Dockerfile
-├── requirements.txt / requirements-dev.txt
-└── pyproject.toml                 pytest + ruff config
+├── docs/diagrams/          Architecture diagrams
+└── Dockerfile
 ```
 
-`models/`, `schemas/`, `services/`, and `worker/` are currently empty — each holds
-only a docstring explaining its purpose. They're filled in as the phases below are
-built, so a new module always has an obvious home instead of getting dropped into
-`app/api` alongside the routes.
+`models`, `schemas`, `services`, and `worker` are empty for now. Each holds a docstring explaining its purpose, and fills in as the phases below get built.
 
-## Status: Phase 0 complete
+<br/>
 
-The service currently runs, connects to Postgres and Redis, and has no business
-logic yet. Everything past this point is planned.
+## Tech Stack
 
-| Phase | Scope | Status |
-|---|---|---|
-| 0 | Project scaffold, Docker, health checks | ✅ Done |
-| 1 | Auth, organizations, API keys | 🔲 Not started |
-| 2 | Assessment CRUD + job queue | 🔲 Not started |
-| 3 | Multi-model orchestration + reassessment | 🔲 Not started |
-| 4 | Webhooks | 🔲 Not started |
-| 5 | Usage, logs, rate limiting | 🔲 Not started |
-| 6 | Migrations, deploy, hardening | 🔲 Not started |
+- FastAPI and Uvicorn for the web server
+- SQLAlchemy and asyncpg for the database
+- Redis for the job queue
+- Pydantic Settings for configuration
+- pytest and ruff for testing and linting
+- Docker locally, Render or Railway in production, Neon and Upstash for managed data
 
-## Tech stack
+<br/>
 
-- **FastAPI** + **Uvicorn** — async web framework and server
-- **SQLAlchemy 2.0** (async) + **asyncpg** — database access
-- **Redis** — job queue and caching
-- **Pydantic Settings** — configuration from environment variables
-- **pytest**, **ruff** — testing and linting
-- **Docker** — local development via `docker-compose.yml` at the repo root; Render
-  or Railway in production, with Neon (Postgres) and Upstash (Redis) as managed
-  services. See [system-architecture.png](docs/diagrams/system-architecture.png).
+## Phase 0: Scaffold (Done)
 
-## Phase 0 — Scaffold (done)
+- Dockerfile wired into the repo's docker-compose
+- Settings read from `.env`
+- Async database session
+- `GET /health` and `GET /health/ready`
+- pytest and ruff configured
 
-- [x] `Dockerfile`, wired into the repo's `docker-compose.yml`
-- [x] `app/core/config.py` — settings from `.env`
-- [x] `app/db/session.py` — async SQLAlchemy engine + session
-- [x] `GET /health` — liveness
-- [x] `GET /health/ready` — checks Postgres and Redis are reachable
-- [x] `pytest` + `ruff` configured, one passing test
+<br/>
 
-## Phase 1 — Auth, organizations, API keys
+## Phase 1: Auth, Organizations, API Keys
 
-The dashboard already has UI for this (`apps/web/app/(dashboard)/dashboard/settings`,
-`.../api-keys`), so the data model below follows what it expects.
+The dashboard already has UI for this. The data model follows what it expects.
 
-- [ ] `organizations` table — name, slug, created_at
-- [ ] `users` table — email, password_hash (nullable — Google users have none),
-      auth_provider (`password`/`google`), google_sub (unique, nullable),
-      email_verified, organization membership, role (owner/member)
-- [ ] Session auth for the dashboard (login, signup, forgot/reset password) — likely
-      JWT access token + refresh token, matching `JWT_SECRET` / `JWT_EXPIRES_IN` in `.env`
-- [ ] `api_keys` table — id, org, name, hashed secret, environment (`live`/`test`),
-      last_used_at, active
-- [ ] API key auth dependency for `Authorization: Bearer sk_live_...` on the public API
-- [ ] Endpoints: `POST /v1/auth/login`, `POST /v1/auth/signup`,
-      `POST /v1/auth/forgot-password`, `POST /v1/auth/reset-password`
-- [ ] Endpoints: `GET/POST /v1/api-keys`, `DELETE /v1/api-keys/{id}`
+- `organizations` table: name, slug, created at
+- `users` table: email, password hash, auth provider, Google sub, role
+- JWT session auth for login, signup, and password reset
+- `api_keys` table: name, hashed secret, environment, last used
+- API key auth for the public API
+- Endpoints for auth and API key management
 
-### Google sign-in
+<br/>
 
-The dashboard's "Continue with Google" button
-([SocialButtons.tsx](../web/components/auth/SocialButtons.tsx)) is currently
-decorative. The backend owns the whole OAuth handshake — not Next.js/Auth.js —
-since Google is just another way to authenticate into the same `users` table as
-password login, not a separate identity store.
+### Google Sign In
 
-Flow: browser → `GET /v1/auth/google/login` (redirects to Google, with a signed
-`state` for CSRF) → Google → `GET /v1/auth/google/callback` (exchanges the code
-server-to-server via **Authlib**, fetches the Google profile) → FastAPI resolves
-the user → redirects to a frontend callback URL with a short-lived, one-time code
-→ the frontend exchanges that code for real tokens via `POST /v1/auth/exchange`,
-which sets them as an httpOnly cookie. The raw JWT never touches browser JS or a
-URL bar.
+The "Continue with Google" button is currently decorative. The backend owns the OAuth handshake, not the frontend, since Google is just another way into the same user table.
 
-User resolution on callback:
-- Known `google_sub` → log in, issue our JWT.
-- New `google_sub`, no matching email → create the user, **auto-create an
-  organization** named from their Google display name (e.g. "Olisa's Team", owner
-  role, renameable later in Settings) — skips the manual signup form's org-name
-  step entirely.
-- New `google_sub`, matching an existing password account, and Google reports
-  `email_verified` → link `google_sub` onto that existing user instead of creating
-  a duplicate.
+**Flow:** the browser hits `/v1/auth/google/login`, which sends it to Google. Google calls back to `/v1/auth/google/callback`, where the API exchanges the code, reads the profile, and resolves the user. It then redirects to the frontend with a one time code, which the frontend exchanges for real tokens and stores as an httpOnly cookie.
 
-- [ ] `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` / `GOOGLE_REDIRECT_URI` config
-- [ ] `GET /v1/auth/google/login`, `GET /v1/auth/google/callback`,
-      `POST /v1/auth/exchange`
-- [ ] Frontend: wire `SocialButtons`' Google button to the login endpoint, add an
-      `app/(auth)/auth/callback` route handler for the exchange, and make
-      `middleware.ts` (currently a no-op) check the session cookie on
-      `/dashboard/*`
+**On callback:**
+- A known Google account logs in.
+- A new Google account creates a user and auto creates an organization named after them.
+- A new Google account matching an existing verified email links to that account instead of duplicating it.
 
-## Phase 2 — Assessments (core resource)
+**To build:**
+- Google client config in `.env`
+- Login, callback, and exchange endpoints
+- Frontend callback route and a real auth check in `middleware.ts`
 
-Matches the shape already defined in `apps/web/types/dashboard.ts` and the docs
-content in `apps/web/lib/docsContent/coreApi.ts`.
+<br/>
 
-- [ ] `assessments` table — id, org, status (`queued`/`processing`/`completed`/`failed`),
-      language, assignment (title, requirements), submission code, score, confidence,
-      processing_seconds, timestamps
-- [ ] `POST /v1/assessments` — validate input, create row with status `queued`,
-      push a job onto the Redis queue, return `202 Accepted`
-- [ ] `GET /v1/assessments/{id}` — current status
-- [ ] `GET /v1/assessments/{id}/result` — final feedback once completed
-- [ ] `GET /v1/assessments` — list, paginated, filterable by status
-- [ ] A worker process (RQ or Celery) that consumes the queue — separate container
-      from the API, sharing the same image
+## Phase 2: Assessments
 
-## Phase 3 — Multi-model orchestration + reassessment
+Matches the shapes already defined in the frontend.
 
-This is the core product logic. See
-[assessment-lifecycle.png](docs/diagrams/assessment-lifecycle.png) for the full flow.
+- `assessments` table: status, language, assignment, submission, score
+- `POST /v1/assessments` creates a row and queues a job
+- `GET /v1/assessments/{id}` and `.../result`
+- A worker process that consumes the queue
 
-- [ ] Model client abstraction — one interface, adapters for each provider
-      (e.g. OpenAI, Gemini, Llama), so adding a model doesn't touch orchestration code
-- [ ] Fan out one submission to N models in parallel (`asyncio.gather`), each scored
-      against the assignment's requirements
-- [ ] Independent reassessment ("judge") stage: given the models' outputs, resolve
-      disagreements and produce one final score, summary, and recommendation
-- [ ] Persist per-model results plus the judge's final result; move status to
-      `completed`, or `failed` with an error reason if every model call fails
-- [ ] Timeout and partial-failure handling — one slow/broken model shouldn't fail
-      the whole assessment
-- [ ] Retry policy for transient provider errors
+<br/>
 
-## Phase 4 — Webhooks
+## Phase 3: Multi Model Orchestration
 
-Matches `apps/web/app/(dashboard)/dashboard/webhooks` and the webhook docs page.
+The core of the product. See [assessment-lifecycle.png](docs/diagrams/assessment-lifecycle.png).
 
-- [ ] `webhook_endpoints` table — org, url, active, subscribed events
-- [ ] `webhook_deliveries` table — event id, endpoint, payload, response status, timestamp
-- [ ] Emit `assessment.completed` / `assessment.failed` events when an assessment
-      finishes
-- [ ] Delivery worker with retries (exponential backoff) on non-2xx responses
-- [ ] `GET/POST /v1/webhooks`, `DELETE /v1/webhooks/{id}`, delivery log endpoint
-- [ ] HMAC signing of webhook payloads so receivers can verify authenticity
+- One interface, one adapter per model provider
+- Fan out to N models in parallel
+- An independent judge pass that resolves disagreement into one result
+- Timeout and retry handling, so one bad model does not fail the whole run
 
-## Phase 5 — Usage, logs, rate limiting
+<br/>
 
-Matches `apps/web/app/(dashboard)/dashboard/usage` and `.../logs`.
+## Phase 4: Webhooks
 
-- [ ] Request logging middleware — method, path, status, duration, API key used
-- [ ] `GET /v1/usage` — request/assessment counts over 7d/30d/90d, per the
-      `SeriesPoint` shape the dashboard already expects
-- [ ] `GET /v1/logs` — recent request log, paginated
-- [ ] Per-key rate limiting backed by Redis (the dashboard already shows `429`s in
-      its mock log data)
+- `webhook_endpoints` and `webhook_deliveries` tables
+- Fire `assessment.completed` and `assessment.failed`
+- Retry deliveries with backoff
+- Sign payloads with HMAC
 
-## Phase 6 — Migrations, deploy, hardening
+<br/>
 
-- [ ] Add Alembic; first migration creates the Phase 1–5 tables
-- [ ] `render.yaml` (or Railway config) for one-command deploys of the API + worker
-- [ ] Point production `DATABASE_URL` at Neon (pooled connection) and `REDIS_URL`
-      at Upstash; disable asyncpg's prepared-statement cache for the pooled connection
-- [ ] Structured logging + basic error tracking
-- [ ] CORS locked down to the actual frontend origin(s) in production
-- [ ] A backend CI workflow (lint + test), mirroring
-      [`.github/workflows/frontend-ci.yml`](../../.github/workflows/frontend-ci.yml)
+## Phase 5: Usage, Logs, Rate Limiting
 
-## Local development
+- Request logging middleware
+- `GET /v1/usage` and `GET /v1/logs`
+- Per key rate limiting backed by Redis
+
+<br/>
+
+## Phase 6: Migrations and Deploy
+
+- Alembic for migrations
+- Deploy config for Render or Railway
+- Point production at Neon and Upstash
+- CORS locked to real origins
+- A backend CI workflow
+
+<br/>
+
+## Local Development
 
 ```bash
-# from the repo root
-make api-up      # build + start api, worker (once it exists), db, redis
+make api-up      # build and start api, worker, db, redis
 make api-logs    # follow logs
-make api-test    # run pytest inside the container
-make api-lint    # run ruff inside the container
+make api-test    # run tests
 make down        # stop everything
 ```
 
-`GET http://localhost:8000/health/ready` should return
-`{"status":"ok","checks":{"database":"ok","redis":"ok"}}` once the stack is up.
-Interactive docs: `http://localhost:8000/docs`.
+`GET localhost:8000/health/ready` should return ok once the stack is up. Docs live at `localhost:8000/docs`.

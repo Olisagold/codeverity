@@ -20,6 +20,41 @@ result and firing a webhook. See
 flow in detail, and [`docs/diagrams/`](docs/diagrams/) for the editable `.excalidraw`
 sources.
 
+## Project layout
+
+```
+apps/api/
+├── app/
+│   ├── main.py                    App factory, middleware, router wiring
+│   ├── core/
+│   │   └── config.py              Settings, read from environment variables
+│   ├── db/
+│   │   ├── session.py             Async SQLAlchemy engine + session
+│   │   └── base.py                Declarative base; model import hub for Alembic
+│   ├── models/                    SQLAlchemy ORM models, one module per domain
+│   ├── schemas/                   Pydantic request/response schemas
+│   ├── services/                  Business logic, called from routes
+│   │   └── orchestration/         Multi-model dispatch + reassessment (Phase 3)
+│   │       └── providers/         One adapter per LLM provider
+│   ├── api/
+│   │   ├── deps.py                Shared FastAPI dependencies (db session, auth)
+│   │   ├── health.py              Unversioned /health, /health/ready
+│   │   └── v1/
+│   │       └── router.py          Versioned /v1 routes, aggregated here
+│   └── worker/                    Background job worker (separate process/container)
+│       └── tasks/                 One module per job type
+├── tests/
+├── docs/diagrams/                 Architecture diagrams (source + rendered)
+├── Dockerfile
+├── requirements.txt / requirements-dev.txt
+└── pyproject.toml                 pytest + ruff config
+```
+
+`models/`, `schemas/`, `services/`, and `worker/` are currently empty — each holds
+only a docstring explaining its purpose. They're filled in as the phases below are
+built, so a new module always has an obvious home instead of getting dropped into
+`app/api` alongside the routes.
+
 ## Status: Phase 0 complete
 
 The service currently runs, connects to Postgres and Redis, and has no business

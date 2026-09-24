@@ -20,10 +20,11 @@ function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [formError, setFormError] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>('idle');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const authError = AUTH_ERROR_MESSAGES[searchParams.get('error') ?? ''];
+  const authError = formError ?? AUTH_ERROR_MESSAGES[searchParams.get('error') ?? ''];
 
   useEffect(() => {
     if (status !== 'success') return;
@@ -31,8 +32,9 @@ function LoginForm() {
     return () => window.clearTimeout(timer);
   }, [status, router]);
 
-  function handleSubmit(event: React.FormEvent) {
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
+    setFormError(null);
     const nextErrors: { email?: string; password?: string } = {};
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) nextErrors.email = 'Enter a valid email address.';
     if (password.length < 8) nextErrors.password = 'Passwords are at least 8 characters.';
@@ -40,7 +42,23 @@ function LoginForm() {
     if (Object.keys(nextErrors).length > 0) return;
 
     setStatus('loading');
-    window.setTimeout(() => setStatus('success'), 900);
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        setFormError(data?.detail ?? 'Incorrect email or password.');
+        setStatus('idle');
+        return;
+      }
+      setStatus('success');
+    } catch {
+      setFormError('Something went wrong. Try again.');
+      setStatus('idle');
+    }
   }
 
   return (

@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db
 from app.core.config import get_settings
@@ -133,7 +132,9 @@ async def signup(payload: SignupRequest, db: AsyncSession = Depends(get_db)) -> 
 
     if existing is not None:
         if existing.email_verified:
-            raise HTTPException(status.HTTP_409_CONFLICT, "An account with this email already exists.")
+            raise HTTPException(
+                status.HTTP_409_CONFLICT, "An account with this email already exists."
+            )
         existing.name = payload.name
         existing.password_hash = hash_password(payload.password)
         await db.commit()
@@ -180,7 +181,9 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)) -> To
     result = await db.execute(select(User).where(User.email == payload.email))
     user = result.scalar_one_or_none()
 
-    if user is None or user.password_hash is None or not verify_password(payload.password, user.password_hash):
+    valid = user is not None and user.password_hash is not None
+    valid = valid and verify_password(payload.password, user.password_hash)
+    if not valid:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Incorrect email or password.")
     if not user.email_verified:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Verify your email before signing in.")

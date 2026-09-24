@@ -2,12 +2,14 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { CheckCircle2Icon, Loader2Icon } from 'lucide-react';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { SocialButtons } from '@/components/auth/SocialButtons';
 import { TextField } from '@/components/ui/TextField';
 import { PasswordField } from '@/components/ui/PasswordField';
 
+type Step = 'form' | 'otp';
 type Status = 'idle' | 'loading' | 'success';
 
 interface Errors {
@@ -19,6 +21,7 @@ interface Errors {
 }
 
 export default function SignUpPage() {
+  const [step, setStep] = useState<Step>('form');
   const [name, setName] = useState('');
   const [organization, setOrganization] = useState('');
   const [email, setEmail] = useState('');
@@ -27,7 +30,11 @@ export default function SignUpPage() {
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>('idle');
 
-  function handleSubmit(event: React.FormEvent) {
+  const [code, setCode] = useState('');
+  const [codeError, setCodeError] = useState<string | undefined>();
+  const router = useRouter();
+
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     const nextErrors: Errors = {};
     if (name.trim().length < 2) nextErrors.name = 'Enter your full name.';
@@ -39,20 +46,66 @@ export default function SignUpPage() {
     if (Object.keys(nextErrors).length > 0) return;
 
     setStatus('loading');
-    window.setTimeout(() => setStatus('success'), 900);
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, organization, email, password }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        setErrors({ email: data?.detail ?? 'Could not create your account. Try again.' });
+        setStatus('idle');
+        return;
+      }
+      setStatus('idle');
+      setStep('otp');
+    } catch {
+      setErrors({ email: 'Something went wrong. Try again.' });
+      setStatus('idle');
+    }
   }
 
-  if (status === 'success') {
+  async function handleVerify(event: React.FormEvent) {
+    event.preventDefault();
+    setCodeError(undefined);
+    if (!/^\d{6}$/.test(code)) {
+      setCodeError('Enter the 6-digit code from your email.');
+      return;
+    }
+
+    setStatus('loading');
+    try {
+      const response = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        setCodeError(data?.detail ?? 'Invalid or expired code.');
+        setStatus('idle');
+        return;
+      }
+      setStatus('success');
+      router.push('/dashboard');
+    } catch {
+      setCodeError('Something went wrong. Try again.');
+      setStatus('idle');
+    }
+  }
+
+  if (step === 'otp') {
     return (
       <AuthLayout
         title="Check your inbox"
-        subtitle={`We sent a verification link to ${email}. Confirm it to generate your test API key.`}
+        subtitle={`We sent a 6-digit code to ${email}.`}
         footer={
           <>
             Wrong address?{' '}
             <button
               type="button"
-              onClick={() => setStatus('idle')}
+              onClick={() => setStep('form')}
               className="text-white underline-offset-4 transition-colors duration-150 ease-out hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
               Use a different email
@@ -60,17 +113,37 @@ export default function SignUpPage() {
           </>
         }
       >
-        <div className="rounded-xl border border-line bg-surface p-6">
-          <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-ok">
-            <CheckCircle2Icon aria-hidden="true" className="h-3.5 w-3.5" />
-            Account created
-          </p>
-          <p className="mt-4 text-[14px] leading-relaxed text-muted">
-            Once verified, your organization receives a test key in the format{' '}
-            <span className="font-mono text-[13px] text-white">sk_test_···</span> with unlimited development
-            assessments.
-          </p>
-        </div>
+        <form onSubmit={handleVerify} noValidate className="space-y-5">
+          <TextField
+            id="code"
+            label="Verification code"
+            value={code}
+            onChange={(value) => setCode(value.replace(/\D/g, '').slice(0, 6))}
+            placeholder="123456"
+            autoComplete="one-time-code"
+            error={codeError}
+          />
+
+          <button
+            type="submit"
+            disabled={status !== 'idle'}
+            className="flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-white text-[15px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted disabled:cursor-not-allowed disabled:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+          >
+            {status === 'loading' ? (
+              <>
+                <Loader2Icon aria-hidden="true" className="h-4 w-4 animate-spin" />
+                Verifying
+              </>
+            ) : status === 'success' ? (
+              <>
+                <CheckCircle2Icon aria-hidden="true" className="h-4 w-4" />
+                Verified
+              </>
+            ) : (
+              'Verify email'
+            )}
+          </button>
+        </form>
       </AuthLayout>
     );
   }

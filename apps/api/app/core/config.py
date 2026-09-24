@@ -13,6 +13,15 @@ class Settings(BaseSettings):
     database_url: str = "postgresql://postgres:postgres@localhost:5432/codeverity"
     redis_url: str = "redis://localhost:6379/0"
 
+    jwt_secret: str = "change-me"
+    jwt_expires_in: str = "7d"
+
+    google_client_id: str = ""
+    google_client_secret: str = ""
+    google_redirect_uri: str = "http://localhost:8000/v1/auth/google/callback"
+
+    frontend_url: str = "http://localhost:3000"
+
     @property
     def cors_origins(self) -> list[str]:
         return [origin.strip() for origin in self.api_cors_origins.split(",") if origin.strip()]

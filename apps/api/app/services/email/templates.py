@@ -9,10 +9,10 @@ OTP_SUBJECT = "Your Codeverity verification code"
 _OTP_TEMPLATE = Template((Path(__file__).parent / "html" / "otp.html").read_text())
 
 _DIGIT_CELL = (
-    '<td align="center" width="44" height="56" bgcolor="#000000" '
-    'style="border:1px solid #27272A;border-radius:10px;'
+    '<td align="center" width="44" height="56" bgcolor="#FFFFFF" '
+    'style="border:1px solid #E4E4E7;border-radius:10px;'
     "font-family:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,monospace;"
-    'font-size:26px;font-weight:600;color:#FFFFFF;">{}</td>'
+    'font-size:26px;font-weight:600;color:#09090B;">{}</td>'
 )
 _DIGIT_GAP = '<td width="8"></td>'
 
@@ -26,7 +26,6 @@ def render_otp_email(*, name: str, code: str, expires_minutes: int) -> tuple[str
         digits=_DIGIT_GAP.join(_DIGIT_CELL.format(digit) for digit in code),
         expires_minutes=expires_minutes,
         app_url=settings.frontend_url.rstrip("/"),
-        logo_url=settings.email_logo_url,
     )
     text = (
         f"Hi {name},\n\n"

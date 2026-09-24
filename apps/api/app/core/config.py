@@ -26,6 +26,9 @@ class Settings(BaseSettings):
 
     frontend_url: str = "http://localhost:3000"
 
+    sendlib_api_key: str = ""
+    sendlib_from_email: str = ""
+
     @property
     def cors_origins(self) -> list[str]:
         return [origin.strip() for origin in self.api_cors_origins.split(",") if origin.strip()]

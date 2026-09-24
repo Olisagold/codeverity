@@ -8,6 +8,7 @@ import re
 import time
 from datetime import timedelta
 
+import bcrypt
 import jwt
 
 from app.core.config import get_settings
@@ -54,3 +55,11 @@ def decode_token(token: str) -> dict:
     """Decode and verify a token. Raises `jwt.PyJWTError` if invalid or expired."""
     settings = get_settings()
     return jwt.decode(token, settings.jwt_secret, algorithms=["HS256"])
+
+
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+
+
+def verify_password(password: str, password_hash: str) -> bool:
+    return bcrypt.checkpw(password.encode(), password_hash.encode())

@@ -1,7 +1,4 @@
 """Turning a verified OAuth profile (Google or GitHub) into a `User` row."""
-import re
-import secrets
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,6 +6,7 @@ from app.models.organization import Organization
 from app.models.user import AuthProvider, User, UserRole
 from app.services.auth.github import GithubProfile
 from app.services.auth.google import GoogleProfile
+from app.services.auth.slug import slugify
 
 # Which User column holds each provider's stable account id.
 _PROVIDER_ID_COLUMN = {
@@ -21,11 +19,6 @@ class EmailNotVerifiedError(Exception):
     """An OAuth email collides with an existing account, but the provider
     hasn't verified it. We won't silently link the two accounts on that
     basis."""
-
-
-def _slugify(value: str) -> str:
-    slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
-    return f"{slug or 'org'}-{secrets.token_hex(3)}"
 
 
 async def _resolve_or_create_user(

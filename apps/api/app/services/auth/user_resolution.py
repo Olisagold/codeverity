@@ -1,4 +1,4 @@
-"""Turning a verified Google profile into a `User` row."""
+"""Turning a verified OAuth profile (Google or GitHub) into a `User` row."""
 import re
 import secrets
 
@@ -7,12 +7,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.organization import Organization
 from app.models.user import AuthProvider, User, UserRole
+from app.services.auth.github import GithubProfile
 from app.services.auth.google import GoogleProfile
+
+# Which User column holds each provider's stable account id.
+_PROVIDER_ID_COLUMN = {
+    AuthProvider.google: User.google_sub,
+    AuthProvider.github: User.github_id,
+}
 
 
 class EmailNotVerifiedError(Exception):
-    """A Google email collides with an existing account, but Google hasn't
-    verified it. We won't silently link the two accounts on that basis."""
+    """An OAuth email collides with an existing account, but the provider
+    hasn't verified it. We won't silently link the two accounts on that
+    basis."""
 
 
 def _slugify(value: str) -> str:
@@ -20,43 +28,75 @@ def _slugify(value: str) -> str:
     return f"{slug or 'org'}-{secrets.token_hex(3)}"
 
 
-async def resolve_or_create_user(db: AsyncSession, profile: GoogleProfile) -> User:
-    """Log in, link, or create a user for a Google profile.
+async def _resolve_or_create_user(
+    db: AsyncSession,
+    *,
+    provider: AuthProvider,
+    provider_id: str,
+    email: str,
+    email_verified: bool,
+    name: str | None,
+) -> User:
+    """Log in, link, or create a user for an OAuth profile.
 
-    - A known `google_sub` logs straight in.
-    - An unknown `google_sub` matching an existing, Google-verified email links
-      onto that account instead of creating a duplicate.
+    - A known provider id logs straight in.
+    - An unknown provider id matching an existing, provider-verified email
+      links onto that account instead of creating a duplicate.
     - Otherwise this is a first-time signup: create the user and an
       organization named after them.
     """
-    result = await db.execute(select(User).where(User.google_sub == profile.sub))
+    id_column = _PROVIDER_ID_COLUMN[provider]
+
+    result = await db.execute(select(User).where(id_column == provider_id))
     user = result.scalar_one_or_none()
     if user is not None:
         return user
 
-    result = await db.execute(select(User).where(User.email == profile.email))
+    result = await db.execute(select(User).where(User.email == email))
     existing = result.scalar_one_or_none()
     if existing is not None:
-        if not profile.email_verified:
-            raise EmailNotVerifiedError(profile.email)
-        existing.google_sub = profile.sub
+        if not email_verified:
+            raise EmailNotVerifiedError(email)
+        setattr(existing, id_column.key, provider_id)
         await db.commit()
         await db.refresh(existing)
         return existing
 
-    display_name = profile.name or profile.email.split("@")[0]
+    display_name = name or email.split("@")[0]
     organization = Organization(name=f"{display_name}'s Team", slug=_slugify(display_name))
     user = User(
-        email=profile.email,
-        name=profile.name,
-        auth_provider=AuthProvider.google,
-        google_sub=profile.sub,
-        email_verified=profile.email_verified,
+        email=email,
+        name=name,
+        auth_provider=provider,
+        email_verified=email_verified,
         role=UserRole.owner,
         organization=organization,
     )
+    setattr(user, id_column.key, provider_id)
     db.add(organization)
     db.add(user)
     await db.commit()
     await db.refresh(user)
     return user
+
+
+async def resolve_or_create_user(db: AsyncSession, profile: GoogleProfile) -> User:
+    return await _resolve_or_create_user(
+        db,
+        provider=AuthProvider.google,
+        provider_id=profile.sub,
+        email=profile.email,
+        email_verified=profile.email_verified,
+        name=profile.name,
+    )
+
+
+async def resolve_or_create_github_user(db: AsyncSession, profile: GithubProfile) -> User:
+    return await _resolve_or_create_user(
+        db,
+        provider=AuthProvider.github,
+        provider_id=profile.id,
+        email=profile.email,
+        email_verified=profile.email_verified,
+        name=profile.name,
+    )

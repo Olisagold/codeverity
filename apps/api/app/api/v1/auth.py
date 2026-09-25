@@ -15,13 +15,17 @@ from app.models.organization import Organization
 from app.models.user import AuthProvider, User, UserRole
 from app.schemas.auth import (
     ExchangeRequest,
+    ForgotPasswordRequest,
+    ForgotPasswordResponse,
     LoginRequest,
+    ResetPasswordRequest,
+    ResetPasswordResponse,
     SignupRequest,
     SignupResponse,
     TokenPair,
     VerifyOtpRequest,
 )
-from app.services.auth import oauth_state, otp
+from app.services.auth import oauth_state, otp, password_reset
 from app.services.auth.github import NoVerifiedEmailError
 from app.services.auth.github import build_authorize_url as build_github_authorize_url
 from app.services.auth.github import fetch_profile as fetch_github_profile
@@ -32,7 +36,11 @@ from app.services.auth.user_resolution import (
     resolve_or_create_github_user,
     resolve_or_create_user,
 )
-from app.services.email.sendlib import send_otp_email, send_welcome_email
+from app.services.email.sendlib import (
+    send_otp_email,
+    send_password_reset_email,
+    send_welcome_email,
+)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -201,6 +209,59 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)) -> To
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Verify your email before signing in.")
 
     return _issue_tokens(user)
+
+
+@router.post("/forgot-password", response_model=ForgotPasswordResponse)
+async def forgot_password(
+    payload: ForgotPasswordRequest,
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db),
+) -> ForgotPasswordResponse:
+    """Email a single-use reset link. Always answers the same way whether or
+    not the address has an account, so the endpoint can't be used to check
+    which emails are registered.
+    """
+    result = await db.execute(select(User).where(User.email == payload.email))
+    user = result.scalar_one_or_none()
+
+    if user is not None:
+        token = await password_reset.create_token(user.email)
+        background_tasks.add_task(
+            send_password_reset_email,
+            to=user.email,
+            name=user.name or user.email.split("@")[0],
+            token=token,
+        )
+
+    return ForgotPasswordResponse(
+        message="If an account exists for that email, a reset link is on its way."
+    )
+
+
+@router.post("/reset-password", response_model=ResetPasswordResponse)
+async def reset_password(
+    payload: ResetPasswordRequest, db: AsyncSession = Depends(get_db)
+) -> ResetPasswordResponse:
+    """Swap a valid reset token for a new password. Following the emailed
+    link proves control of the inbox, so an unverified account gets verified
+    here too.
+    """
+    email = await password_reset.consume_token(payload.token)
+    if email is None:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, "This reset link is invalid or has expired."
+        )
+
+    result = await db.execute(select(User).where(User.email == email))
+    user = result.scalar_one_or_none()
+    if user is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No account found for this email.")
+
+    user.password_hash = hash_password(payload.password)
+    user.email_verified = True
+    await db.commit()
+
+    return ResetPasswordResponse(message="Your password has been updated.")
 
 
 @router.post("/exchange", response_model=TokenPair)

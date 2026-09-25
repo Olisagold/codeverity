@@ -2,10 +2,13 @@ import httpx
 
 from app.core.config import get_settings
 from app.services.auth.otp import OTP_TTL_SECONDS
+from app.services.auth.password_reset import RESET_TTL_SECONDS
 from app.services.email.templates import (
     OTP_SUBJECT,
+    PASSWORD_RESET_SUBJECT,
     WELCOME_SUBJECT,
     render_otp_email,
+    render_password_reset_email,
     render_welcome_email,
 )
 
@@ -35,3 +38,11 @@ async def send_otp_email(*, to: str, name: str, code: str) -> None:
 async def send_welcome_email(*, to: str, name: str, organization: str) -> None:
     html, text = render_welcome_email(name=name, organization=organization)
     await _send(to=to, subject=WELCOME_SUBJECT, html=html, text=text)
+
+
+async def send_password_reset_email(*, to: str, name: str, token: str) -> None:
+    reset_url = f"{get_settings().frontend_url.rstrip('/')}/reset-password?token={token}"
+    html, text = render_password_reset_email(
+        name=name, reset_url=reset_url, expires_minutes=RESET_TTL_SECONDS // 60
+    )
+    await _send(to=to, subject=PASSWORD_RESET_SUBJECT, html=html, text=text)

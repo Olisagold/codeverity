@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from html import escape
 from pathlib import Path
 from string import Template
@@ -6,19 +7,13 @@ from app.core.config import get_settings
 
 OTP_SUBJECT = "Your Codeverity verification code"
 WELCOME_SUBJECT = "Welcome to Codeverity"
+PASSWORD_RESET_SUBJECT = "Reset your Codeverity password"
 
 _HTML_DIR = Path(__file__).parent / "html"
 _BASE = Template((_HTML_DIR / "base.html").read_text())
 _OTP = Template((_HTML_DIR / "otp.html").read_text())
 _WELCOME = Template((_HTML_DIR / "welcome.html").read_text())
-
-_DIGIT_CELL = (
-    '<td align="center" width="44" height="56" bgcolor="#FFFFFF" '
-    'style="border:1px solid #E4E4E7;border-radius:10px;'
-    "font-family:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,monospace;"
-    'font-size:26px;font-weight:600;color:#09090B;">{}</td>'
-)
-_DIGIT_GAP = '<td width="8"></td>'
+_PASSWORD_RESET = Template((_HTML_DIR / "password_reset.html").read_text())
 
 
 def _app_url() -> str:
@@ -34,16 +29,14 @@ def _layout(*, subject: str, preview: str, body: str, footer_note: str) -> str:
         footer_note=footer_note,
         app_url=_app_url(),
         assets_url=settings.email_assets_url.rstrip("/"),
-        instagram_url=settings.instagram_url,
-        x_url=settings.x_url,
-        linkedin_url=settings.linkedin_url,
+        year=datetime.now(UTC).year,
     )
 
 
 def render_otp_email(*, name: str, code: str, expires_minutes: int) -> tuple[str, str]:
     body = _OTP.substitute(
         name=escape(name),
-        digits=_DIGIT_GAP.join(_DIGIT_CELL.format(digit) for digit in code),
+        code=escape(code),
         expires_minutes=expires_minutes,
     )
     html = _layout(
@@ -81,5 +74,30 @@ def render_welcome_email(*, name: str, organization: str) -> tuple[str, str]:
         "3. Add a webhook to get notified when results are ready.\n\n"
         f"Dashboard: {app_url}/dashboard\n"
         f"Quickstart: {app_url}/docs/quickstart"
+    )
+    return html, text
+
+
+def render_password_reset_email(
+    *, name: str, reset_url: str, expires_minutes: int
+) -> tuple[str, str]:
+    body = _PASSWORD_RESET.substitute(
+        name=escape(name),
+        reset_url=escape(reset_url, quote=True),
+        expires_minutes=expires_minutes,
+    )
+    html = _layout(
+        subject=PASSWORD_RESET_SUBJECT,
+        preview=f"Choose a new password. This link expires in {expires_minutes} minutes.",
+        body=body,
+        footer_note="If you did not request a password reset, you can ignore this email.",
+    )
+    text = (
+        f"Hi {name},\n\n"
+        "We received a request to reset the password for your Codeverity account. "
+        f"Open this link to choose a new one:\n\n{reset_url}\n\n"
+        f"It expires in {expires_minutes} minutes and can only be used once.\n\n"
+        "If you didn't request a password reset, you can safely ignore this email. "
+        "Your password won't change."
     )
     return html, text

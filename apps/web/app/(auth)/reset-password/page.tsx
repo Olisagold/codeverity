@@ -3,16 +3,23 @@
 import React, { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { CheckCircle2Icon, Loader2Icon } from 'lucide-react';
+import { Loader2Icon } from 'lucide-react';
 import { AuthLayout } from '@/components/auth/AuthLayout';
+import { AuthNotice } from '@/components/auth/AuthNotice';
 import { PasswordField } from '@/components/ui/PasswordField';
 
-type Status = 'idle' | 'loading' | 'success';
+type Status = 'idle' | 'loading' | 'success' | 'invalid';
 
 interface Errors {
   password?: string;
   confirm?: string;
 }
+
+const LINK_CLASS =
+  'text-white underline-offset-4 transition-colors duration-150 ease-out hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black';
+
+const PRIMARY_BUTTON_CLASS =
+  'flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-white text-[15px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted disabled:cursor-not-allowed disabled:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black';
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -21,7 +28,34 @@ function ResetPasswordForm() {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [errors, setErrors] = useState<Errors>({});
-  const [status, setStatus] = useState<Status>('idle');
+  const [formError, setFormError] = useState<string | null>(null);
+  const [status, setStatus] = useState<Status>(token ? 'idle' : 'invalid');
+
+  async function submitReset() {
+    setStatus('loading');
+    setFormError(null);
+    try {
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, password }),
+      });
+      if (response.status === 400 || response.status === 404) {
+        setStatus('invalid');
+        return;
+      }
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        setFormError(typeof data?.detail === 'string' ? data.detail : 'Something went wrong. Try again.');
+        setStatus('idle');
+        return;
+      }
+      setStatus('success');
+    } catch {
+      setFormError('Something went wrong. Try again.');
+      setStatus('idle');
+    }
+  }
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -30,34 +64,76 @@ function ResetPasswordForm() {
     if (confirm !== password) nextErrors.confirm = 'Passwords do not match.';
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
-
-    setStatus('loading');
-    window.setTimeout(() => setStatus('success'), 900);
+    void submitReset();
   }
+
+  const signInFooter = (
+    <>
+      Remember your password?{' '}
+      <Link href="/login" className={LINK_CLASS}>
+        Sign in
+      </Link>
+    </>
+  );
 
   if (status === 'success') {
     return (
       <AuthLayout
-        title="Password updated"
-        subtitle="Your password has been changed successfully."
+        title="Choose a new password"
+        subtitle="Your account is secured with the new password"
         footer={
-          <Link
-            href="/login"
-            className="text-white underline-offset-4 transition-colors duration-150 ease-out hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-          >
-            Continue to sign in
-          </Link>
+          <>
+            Need help?{' '}
+            <Link href="/docs/authentication" className={LINK_CLASS}>
+              Read the docs
+            </Link>
+          </>
         }
       >
-        <div className="rounded-xl border border-line bg-surface p-6">
-          <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-ok">
-            <CheckCircle2Icon aria-hidden="true" className="h-3.5 w-3.5" />
-            Password reset
-          </p>
-          <p className="mt-4 text-[14px] leading-relaxed text-muted">
-            Sign in with your new password to access your dashboard.
-          </p>
-        </div>
+        <AuthNotice
+          tone="success"
+          title="Password updated"
+          action={
+            <Link href="/login" className={PRIMARY_BUTTON_CLASS}>
+              Continue to sign in
+            </Link>
+          }
+        >
+          <p>Your password has been changed successfully.</p>
+          <p>Sign in with your new password to continue.</p>
+        </AuthNotice>
+      </AuthLayout>
+    );
+  }
+
+  if (status === 'invalid') {
+    return (
+      <AuthLayout
+        title="Choose a new password"
+        subtitle="Reset links work once and expire after 30 minutes"
+        footer={signInFooter}
+      >
+        <AuthNotice
+          tone="error"
+          title={token ? 'This link has expired' : 'This link is incomplete'}
+          action={
+            <Link href="/forgot-password" className={PRIMARY_BUTTON_CLASS}>
+              Request a new link
+            </Link>
+          }
+        >
+          {token ? (
+            <>
+              <p>This reset link is invalid, has already been used, or has expired.</p>
+              <p>Request a new one and we&apos;ll email it to you right away.</p>
+            </>
+          ) : (
+            <>
+              <p>This reset link is missing its token.</p>
+              <p>Open the link from your email again, or request a new one.</p>
+            </>
+          )}
+        </AuthNotice>
       </AuthLayout>
     );
   }
@@ -65,22 +141,8 @@ function ResetPasswordForm() {
   return (
     <AuthLayout
       title="Choose a new password"
-      subtitle={
-        token
-          ? 'Enter a new password for your account.'
-          : 'This reset link is missing a token. Request a new one if the link has expired.'
-      }
-      footer={
-        <>
-          Remembered it?{' '}
-          <Link
-            href="/login"
-            className="text-white underline-offset-4 transition-colors duration-150 ease-out hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-          >
-            Sign in
-          </Link>
-        </>
-      }
+      subtitle="Enter a new password for your account"
+      footer={signInFooter}
     >
       <form onSubmit={handleSubmit} noValidate className="space-y-5">
         <PasswordField
@@ -102,11 +164,13 @@ function ResetPasswordForm() {
           error={errors.confirm}
         />
 
-        <button
-          type="submit"
-          disabled={status !== 'idle'}
-          className="flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-white text-[15px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted disabled:cursor-not-allowed disabled:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-        >
+        {formError ? (
+          <p className="text-center text-[13px] text-[#EF4444]" role="alert">
+            {formError}
+          </p>
+        ) : null}
+
+        <button type="submit" disabled={status !== 'idle'} className={PRIMARY_BUTTON_CLASS}>
           {status === 'loading' ? (
             <>
               <Loader2Icon aria-hidden="true" className="h-4 w-4 animate-spin" />

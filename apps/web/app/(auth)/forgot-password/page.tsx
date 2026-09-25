@@ -2,16 +2,43 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { CheckCircle2Icon, Loader2Icon } from 'lucide-react';
+import { Loader2Icon } from 'lucide-react';
 import { AuthLayout } from '@/components/auth/AuthLayout';
+import { AuthNotice } from '@/components/auth/AuthNotice';
 import { TextField } from '@/components/ui/TextField';
 
 type Status = 'idle' | 'loading' | 'success';
 
+const LINK_CLASS =
+  'text-white underline-offset-4 transition-colors duration-150 ease-out hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black';
+
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | undefined>();
+  const [formError, setFormError] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>('idle');
+
+  async function requestLink() {
+    setStatus('loading');
+    setFormError(null);
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        setFormError(typeof data?.detail === 'string' ? data.detail : 'Something went wrong. Try again.');
+        setStatus('idle');
+        return;
+      }
+      setStatus('success');
+    } catch {
+      setFormError('Something went wrong. Try again.');
+      setStatus('idle');
+    }
+  }
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -20,37 +47,40 @@ export default function ForgotPasswordPage() {
       return;
     }
     setError(undefined);
-    setStatus('loading');
-    window.setTimeout(() => setStatus('success'), 900);
+    void requestLink();
   }
+
+  const footer = (
+    <>
+      Remember your password?{' '}
+      <Link href="/login" className={LINK_CLASS}>
+        Sign in
+      </Link>
+    </>
+  );
 
   if (status === 'success') {
     return (
       <AuthLayout
-        title="Check your inbox"
-        subtitle={`We sent a password reset link to ${email}.`}
-        footer={
-          <>
-            Wrong address?{' '}
+        title="Reset your password"
+        subtitle="Enter your email and we'll send you a reset link"
+        footer={footer}
+      >
+        <AuthNotice tone="success" title="Check your email">
+          <p>We&apos;ve sent a password reset link to your email address.</p>
+          <p>Click the link to reset your password.</p>
+          <p className="mt-6 text-[13.5px] text-faint">
+            Didn&apos;t get it? Check your spam folder or{' '}
             <button
               type="button"
               onClick={() => setStatus('idle')}
-              className="text-white underline-offset-4 transition-colors duration-150 ease-out hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              className="text-muted underline-offset-4 transition-colors duration-150 ease-out hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
-              Use a different email
+              try another email
             </button>
-          </>
-        }
-      >
-        <div className="rounded-xl border border-line bg-surface p-6">
-          <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-ok">
-            <CheckCircle2Icon aria-hidden="true" className="h-3.5 w-3.5" />
-            Reset link sent
+            .
           </p>
-          <p className="mt-4 text-[14px] leading-relaxed text-muted">
-            Follow the link in the email to choose a new password. The link expires in 30 minutes.
-          </p>
-        </div>
+        </AuthNotice>
       </AuthLayout>
     );
   }
@@ -58,18 +88,8 @@ export default function ForgotPasswordPage() {
   return (
     <AuthLayout
       title="Reset your password"
-      subtitle="Enter your email and we'll send you a link to reset your password."
-      footer={
-        <>
-          Remembered it?{' '}
-          <Link
-            href="/login"
-            className="text-white underline-offset-4 transition-colors duration-150 ease-out hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-          >
-            Sign in
-          </Link>
-        </>
-      }
+      subtitle="Enter your email and we'll send you a reset link"
+      footer={footer}
     >
       <form onSubmit={handleSubmit} noValidate className="space-y-5">
         <TextField
@@ -82,6 +102,12 @@ export default function ForgotPasswordPage() {
           autoComplete="email"
           error={error}
         />
+
+        {formError ? (
+          <p className="text-center text-[13px] text-[#EF4444]" role="alert">
+            {formError}
+          </p>
+        ) : null}
 
         <button
           type="submit"

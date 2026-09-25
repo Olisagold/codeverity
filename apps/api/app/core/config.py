@@ -34,6 +34,7 @@ class Settings(BaseSettings):
 
     instagram_url: str = "https://instagram.com"
     x_url: str = "https://x.com"
+    github_url: str = "https://github.com"
     linkedin_url: str = "https://linkedin.com"
 
     @property

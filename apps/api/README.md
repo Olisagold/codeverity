@@ -137,7 +137,20 @@ Signup collects name, organization, email, and password like the signup form alw
 - `login/page.tsx` submits real credentials instead of the old mocked delay
 - `app/api/auth/{signup,login,verify-otp}/route.ts` proxy to the API; the latter two set the same httpOnly session cookie the OAuth callback does, via the shared `setSessionCookies` helper in `lib/auth/session.ts`
 
-**Not handled yet:** forgot/reset password, and resending a code without resubmitting the whole signup form.
+**Not handled yet:** resending a code without resubmitting the whole signup form.
+
+<br/>
+
+### Forgot / Reset Password (Done)
+
+A single-use reset link emailed to the account holder. Implemented in `app/services/auth/password_reset.py`, `app/services/email/sendlib.py`, and `app/api/v1/auth.py`, covered by `tests/test_password_reset.py`.
+
+**Flow:** `POST /v1/auth/forgot-password` takes an email and always returns the same 200 message, whether or not an account exists, so it can't be used to check which emails are registered. If there is an account, a random token goes out by email as `{FRONTEND_URL}/reset-password?token=...`. Only the SHA-256 of the token is kept in Redis (30 minutes, one-time use), and requesting a new link revokes the previous one. `POST /v1/auth/reset-password` takes the token and a new password, sets the password, and marks the account verified, since following the emailed link proves control of the inbox. It returns a message rather than tokens, so the user signs in with the new password afterwards.
+
+**Frontend wiring (Done):**
+- `forgot-password/page.tsx` submits the email and shows a "check your email" state
+- `reset-password/page.tsx` reads the token from the URL, submits the new password, and shows a dedicated state for a missing, used, or expired link with a way to request a new one
+- `app/api/auth/{forgot-password,reset-password}/route.ts` proxy to the API; neither sets a session cookie
 
 <br/>
 

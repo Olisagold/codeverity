@@ -29,6 +29,9 @@ def _layout(*, subject: str, preview: str, body: str, footer_note: str) -> str:
         footer_note=footer_note,
         app_url=_app_url(),
         assets_url=settings.email_assets_url.rstrip("/"),
+        x_url=settings.x_url,
+        linkedin_url=settings.linkedin_url,
+        github_url=settings.github_url,
         year=datetime.now(UTC).year,
     )
 

@@ -29,6 +29,25 @@ services:
       redis:
         condition: service_healthy
 
+  worker:
+    build:
+      context: ./apps/api
+      args:
+        INSTALL_DEV: "true"
+    command: python -m app.worker
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/codeverity
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - ./apps/api:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
   db:
     image: postgres:16-alpine
     environment:

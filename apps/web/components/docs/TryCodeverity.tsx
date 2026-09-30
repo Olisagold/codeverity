@@ -9,7 +9,7 @@ const phaseOrder: Phase[] = ['queued', 'assessing', 'reassessing', 'completed'];
 
 const stages = [
   { phase: 'queued', label: 'Queued', detail: 'Assessment accepted' },
-  { phase: 'assessing', label: 'Model assessments', detail: 'OpenAI · Gemini · Llama' },
+  { phase: 'assessing', label: 'Model assessments', detail: 'ChatGPT · Gemini · DeepSeek' },
   { phase: 'reassessing', label: 'Reassessment', detail: 'Scored against criteria' },
   { phase: 'completed', label: 'Final result', detail: 'Returned to your platform' },
 ] as const;

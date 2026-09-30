@@ -1,25 +1,5 @@
 import type { DocPage } from '@/types/docs';
 
-const assessmentDiagram = `             Submission
-                  │
-                  ▼
-         Assessment Engine
-                  │
-    ┌─────────────┼─────────────┐
-    ▼             ▼             ▼
- Model A       Model B       Model C
-    │             │             │
-    └─────────────┼─────────────┘
-                  ▼
-           Reassessment
-                  │
-                  ▼
-           Final Result`;
-
-const reassessmentDiagram = `Assessment A ──┐
-Assessment B ──┼──>  Reassessment  ──>  Final Result
-Assessment C ──┘`;
-
 export const conceptPages: DocPage[] = [
   {
     slug: 'concepts/assessment',
@@ -29,7 +9,7 @@ export const conceptPages: DocPage[] = [
       'Codeverity uses multiple independent model assessments before applying a reassessment stage to the generated feedback.',
     blocks: [
       { type: 'heading', id: 'pipeline', text: 'The assessment pipeline' },
-      { type: 'diagram', art: assessmentDiagram },
+      { type: 'custom', component: 'requestFlow' },
       {
         type: 'paragraph',
         text: 'Each model receives the same submission, assignment requirements, and language. No model sees another model’s output during the assessment stage, so the assessments stay independent.',
@@ -99,7 +79,7 @@ export const conceptPages: DocPage[] = [
       'Reassessment is the stage in which Codeverity evaluates independently generated model assessments before producing the final feedback.',
     blocks: [
       { type: 'heading', id: 'flow', text: 'How reassessment works' },
-      { type: 'diagram', art: reassessmentDiagram },
+      { type: 'custom', component: 'reassessment' },
       {
         type: 'list',
         ordered: true,

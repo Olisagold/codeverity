@@ -11,7 +11,7 @@ import { InlineText } from './InlineText';
 import { TryCodeverity } from './TryCodeverity';
 import { ApiKeysMock } from './ApiKeysMock';
 import { StatusFlow } from './StatusFlow';
-import { RequestFlow } from './RequestFlow';
+import { AbstractionCompare, AsyncLifecycle, ExperimentConfigs, IntegrationSteps, ReassessmentConverge, RequestFlow } from './Diagrams';
 import type { DocBlock } from '@/types/docs';
 
 function renderBlock(block: DocBlock, index: number) {
@@ -107,6 +107,11 @@ function renderBlock(block: DocBlock, index: number) {
       if (block.component === 'playground') return <TryCodeverity key={index} />;
       if (block.component === 'apiKeys') return <ApiKeysMock key={index} />;
       if (block.component === 'requestFlow') return <RequestFlow key={index} />;
+      if (block.component === 'abstraction') return <AbstractionCompare key={index} />;
+      if (block.component === 'reassessment') return <ReassessmentConverge key={index} />;
+      if (block.component === 'experiments') return <ExperimentConfigs key={index} />;
+      if (block.component === 'integrationSteps') return <IntegrationSteps key={index} />;
+      if (block.component === 'asyncLifecycle') return <AsyncLifecycle key={index} />;
       return <StatusFlow key={index} />;
     default:
       return null;

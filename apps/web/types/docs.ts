@@ -27,7 +27,19 @@ export type DocBlock =
   | { type: 'callout'; tone: 'info' | 'warning'; title?: string; text: string }
   | { type: 'cards'; cards: { title: string; text: string; to: string }[] }
   | { type: 'definitions'; items: { term: string; text: string }[] }
-  | { type: 'custom'; component: 'playground' | 'apiKeys' | 'statusFlow' | 'requestFlow' };
+  | {
+      type: 'custom';
+      component:
+        | 'playground'
+        | 'apiKeys'
+        | 'statusFlow'
+        | 'requestFlow'
+        | 'abstraction'
+        | 'reassessment'
+        | 'experiments'
+        | 'integrationSteps'
+        | 'asyncLifecycle';
+    };
 
 export interface DocPage {
   slug: string;

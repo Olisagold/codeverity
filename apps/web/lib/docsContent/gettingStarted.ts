@@ -1,15 +1,5 @@
 import type { DocPage } from '@/types/docs';
 
-const abstractionDiagram = `Without Codeverity              With Codeverity
-
-Your Platform                   Your Platform
-  ├── OpenAI integration              │
-  ├── Gemini integration              ▼
-  ├── Llama integration         Codeverity API
-  ├── result normalization
-  ├── assessment comparison
-  └── feedback refinement`;
-
 export const gettingStartedPages: DocPage[] = [
   {
     slug: 'introduction',
@@ -36,7 +26,7 @@ export const gettingStartedPages: DocPage[] = [
         type: 'paragraph',
         text: 'Codeverity abstracts the complexity of working with multiple language models behind a single API. Instead of building and maintaining separate model integrations, result normalization, assessment comparison, and feedback refinement, your application talks to one endpoint.',
       },
-      { type: 'diagram', art: abstractionDiagram },
+      { type: 'custom', component: 'abstraction' },
       { type: 'heading', id: 'core-concepts', text: 'Core concepts' },
       {
         type: 'definitions',

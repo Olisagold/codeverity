@@ -1,27 +1,5 @@
 import type { DocPage } from '@/types/docs';
 
-const asyncDiagram = `POST /v1/assessments
-        ↓
-   202 Accepted
-        ↓
- status: queued
-        ↓
- status: processing
-        ↓
- status: completed`;
-
-const integrationDiagram = `1. Create API key
-        ↓
-2. Submit assignment + code
-        ↓
-3. Receive assessment ID
-        ↓
-4. Wait for completion
-        ↓
-5. Retrieve result
-        ↓
-6. Display feedback to student`;
-
 export const guidePages: DocPage[] = [
   {
     slug: 'guides/first-assessment',
@@ -30,7 +8,7 @@ export const guidePages: DocPage[] = [
     description: 'A complete integration walkthrough, from API key to feedback shown to a student.',
     blocks: [
       { type: 'heading', id: 'flow', text: 'Integration flow' },
-      { type: 'diagram', art: integrationDiagram },
+      { type: 'custom', component: 'integrationSteps' },
       { type: 'heading', id: 'submit', text: '1. Submit the submission' },
       {
         type: 'tabs',
@@ -106,7 +84,7 @@ submission.save()`,
     description: 'Assessment processing requires multiple model calls and therefore runs asynchronously.',
     blocks: [
       { type: 'heading', id: 'lifecycle', text: 'Request lifecycle' },
-      { type: 'diagram', art: asyncDiagram },
+      { type: 'custom', component: 'asyncLifecycle' },
       { type: 'heading', id: 'polling', text: 'Option 1 — Polling' },
       {
         type: 'paragraph',

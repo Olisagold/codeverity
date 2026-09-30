@@ -5,7 +5,7 @@ import { ArrowUpRightIcon, CheckIcon } from 'lucide-react';
 import { Panel } from '@/components/ui/Panel';
 
 const stages = [
-  { label: 'Independent assessments', detail: 'OpenAI · Gemini · Llama' },
+  { label: 'Independent assessments', detail: 'ChatGPT · Gemini · DeepSeek' },
   { label: 'Reassessment engine', detail: 'Evaluated against criteria' },
   { label: 'Validated feedback', detail: 'Returned to your platform' },
 ];

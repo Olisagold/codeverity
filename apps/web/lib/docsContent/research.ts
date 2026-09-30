@@ -1,14 +1,5 @@
 import type { DocPage } from '@/types/docs';
 
-const experimentDiagram = `Experiment A            Experiment B            Experiment C
-Single LLM              Multiple LLMs           Multiple LLMs
-     │                       │                       │
-     ▼                       ▼                       ▼
- Feedback           Independent Feedback        Reassessment
-                                                     │
-                                                     ▼
-                                              Final Feedback`;
-
 export const researchPages: DocPage[] = [
   {
     slug: 'research/methodology',
@@ -18,7 +9,7 @@ export const researchPages: DocPage[] = [
       'Codeverity is designed to investigate whether multi-model assessment combined with reassessment can improve the quality of AI-generated programming feedback.',
     blocks: [
       { type: 'heading', id: 'configurations', text: 'Experimental configurations' },
-      { type: 'diagram', art: experimentDiagram },
+      { type: 'custom', component: 'experiments' },
       {
         type: 'paragraph',
         text: 'Each configuration receives identical submissions and assignment requirements, so differences in the generated feedback can be attributed to the assessment strategy rather than the input.',

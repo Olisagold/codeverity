@@ -94,10 +94,11 @@ export const referencePages: DocPage[] = [
         language: 'json',
         label: 'Assessment',
         code: `{
-  "id": "asm_01JABC123",
+  "id": "asm_01J9Z3K4X8QH7N2V5T6B0C1D2E",
   "status": "processing",
   "language": "python",
-  "created_at": "2026-09-18T12:00:00Z"
+  "created_at": "2026-09-18T12:00:00Z",
+  "completed_at": null
 }`,
       },
       { type: 'heading', id: 'result', text: 'Result' },
@@ -136,6 +137,7 @@ export const referencePages: DocPage[] = [
           ['feedback.summary', 'string', 'Explanation written for the student'],
           ['feedback.issues', 'array', 'Problems identified in the submission'],
           ['feedback.suggestions', 'array', 'Recommended changes'],
+          ['simulated', 'boolean', 'True when the result is a placeholder from a test key, before model assessment is enabled'],
         ],
       },
       { type: 'heading', id: 'event', text: 'Webhook event' },

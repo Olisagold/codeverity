@@ -39,6 +39,32 @@ function DocLink({ href, children }: { href: string; children: React.ReactNode }
 /** Newest first. Add each new release at the top. */
 const RELEASES: Release[] = [
   {
+    version: '0.7.0',
+    date: 'Sep 30, 2026',
+    title: 'Assessments API',
+    body: (
+      <>
+        Submit code with <Code>POST /v1/assessments</Code>, check progress with{' '}
+        <Code>GET /v1/assessments/{'{id}'}</Code>, and fetch the outcome from <Code>.../result</Code>. Assessments are
+        queued and processed in the background by a worker.
+      </>
+    ),
+    link: { label: 'Assessments', href: '/docs/api/assessments' },
+    fixes: [
+      {
+        lead: 'Simulated results',
+        text: (
+          <>
+            Until model assessment ships, test keys get a placeholder result marked <Code>"simulated": true</Code>, and
+            live keys fail with <Code>ORCHESTRATION_UNAVAILABLE</Code>.
+          </>
+        ),
+      },
+      { lead: 'Separate data', text: 'Test keys and live keys never see each other\'s assessments.' },
+      { lead: 'Retries', text: 'If a worker stops mid-assessment, another picks it up. After three attempts it is marked failed.' },
+    ],
+  },
+  {
     version: '0.6.0',
     date: 'Sep 30, 2026',
     title: 'API key authentication',

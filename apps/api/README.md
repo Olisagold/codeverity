@@ -8,7 +8,7 @@
 |---|---|---|
 | 0 | Scaffold, Docker, health checks | Done |
 | 1 | Auth, organizations, API keys | Done |
-| 2 | Assessment CRUD, job queue | Not started |
+| 2 | Assessment CRUD, job queue | Done (simulated results until Phase 3) |
 | 3 | Multi model orchestration | Not started |
 | 4 | Webhooks | Not started |
 | 5 | Usage, logs, rate limiting | Not started |
@@ -187,14 +187,26 @@ which attach the httpOnly session cookie as a bearer token.
 
 <br/>
 
-## Phase 2: Assessments
+## Phase 2: Assessments (Done)
 
-Matches the shapes already defined in the frontend.
+Matches the shapes in the docs (`/docs/api/assessments`).
 
-- `assessments` table: status, language, assignment, submission, score
-- `POST /v1/assessments` creates a row and queues a job
-- `GET /v1/assessments/{id}` and `.../result`
-- A worker process that consumes the queue
+- `assessments` table: public id (`asm_<ULID>`), organization, key, environment,
+  language, assignment, submission, status, attempts, result fields, error
+  fields, timestamps. The environment is copied from the key so test and live
+  data stay separate.
+- `POST /v1/assessments` validates and saves the submission as `queued`, and
+  returns `202`. Auth is `Depends(get_api_caller)`.
+- `GET /v1/assessments/{id}` returns status. `GET .../result` returns `200`
+  with the result, `409` while queued or processing, `422` with a `code` when
+  it failed. Lookups are scoped to organization and environment.
+- The worker (`python -m app.worker`, its own container) claims jobs straight
+  from Postgres with `FOR UPDATE SKIP LOCKED`, so a saved assessment can't be
+  lost and any number of workers can run. Jobs stuck in `processing` for 10
+  minutes are retried, up to 3 attempts, then marked failed.
+- `app/services/orchestration/processor.py` is where Phase 3 plugs in. Until
+  then, test keys get a result marked `simulated: true` and live keys fail with
+  `ORCHESTRATION_UNAVAILABLE`, so no production caller gets a made-up grade.
 
 <br/>
 

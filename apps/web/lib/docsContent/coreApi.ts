@@ -7,6 +7,12 @@ export const coreApiPages: DocPage[] = [
     title: 'Assessments',
     description: 'Assessments are the primary resource in the Codeverity API.',
     blocks: [
+      {
+        type: 'callout',
+        tone: 'info',
+        title: 'Model assessment is not enabled yet',
+        text: 'Until the multi-model pipeline ships, assessments created with a test key return a simulated result with `"simulated": true` so you can build your integration end to end. Assessments created with a live key fail with the code `ORCHESTRATION_UNAVAILABLE`.',
+      },
       { type: 'heading', id: 'lifecycle', text: 'Assessment lifecycle' },
       { type: 'custom', component: 'statusFlow' },
       { type: 'heading', id: 'create', text: 'Create an assessment' },
@@ -60,9 +66,11 @@ export const coreApiPages: DocPage[] = [
           },
         ],
         response: `{
-  "id": "asm_01JABC123",
+  "id": "asm_01J9Z3K4X8QH7N2V5T6B0C1D2E",
   "status": "queued",
-  "created_at": "2026-09-18T12:00:00Z"
+  "language": "python",
+  "created_at": "2026-09-18T12:00:00Z",
+  "completed_at": null
 }`,
       },
       { type: 'subheading', text: 'Request parameters' },
@@ -93,9 +101,11 @@ export const coreApiPages: DocPage[] = [
           },
         ],
         response: `{
-  "id": "asm_01JABC123",
+  "id": "asm_01J9Z3K4X8QH7N2V5T6B0C1D2E",
   "status": "processing",
-  "created_at": "2026-09-18T12:00:00Z"
+  "language": "python",
+  "created_at": "2026-09-18T12:00:00Z",
+  "completed_at": null
 }`,
       },
       {
@@ -127,11 +137,48 @@ export const coreApiPages: DocPage[] = [
   "status": "completed",
   "score": 9.2,
   "confidence": 0.92,
+  "criteria": {
+    "correctness": 9.5,
+    "relevance": 9.0,
+    "actionability": 9.2,
+    "specificity": 9.4,
+    "pedagogical_fit": 8.8
+  },
   "feedback": {
     "summary": "...",
     "issues": [],
     "suggestions": []
-  }
+  },
+  "simulated": false
+}`,
+      },
+      {
+        type: 'table',
+        columns: ['Status code', 'When'],
+        rows: [
+          ['200', 'The assessment completed. The body is the result.'],
+          ['409', 'The assessment is still `queued` or `processing`. Try again later or wait for the webhook.'],
+          ['422', 'The assessment failed. The body includes a `code` and a `detail` explaining why.'],
+          ['404', 'No assessment with that id for this key. Test keys and live keys see separate data.'],
+        ],
+      },
+      {
+        type: 'code',
+        language: 'json',
+        label: '409 · not finished',
+        code: `{
+  "detail": "The assessment has not finished yet.",
+  "status": "processing"
+}`,
+      },
+      {
+        type: 'code',
+        language: 'json',
+        label: '422 · failed',
+        code: `{
+  "detail": "Model assessment is not enabled yet. Use a test key to receive a simulated result.",
+  "status": "failed",
+  "code": "ORCHESTRATION_UNAVAILABLE"
 }`,
       },
     ],

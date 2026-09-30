@@ -15,4 +15,4 @@ class Base(DeclarativeBase):
 # Base.metadata. Import order doesn't matter; SQLAlchemy resolves forward
 # references (e.g. Organization.users -> "User") once every module here has
 # been imported.
-from app.models import organization, user  # noqa: F401,E402
+from app.models import api_key, organization, user  # noqa: F401,E402

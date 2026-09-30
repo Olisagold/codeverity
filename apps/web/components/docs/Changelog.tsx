@@ -39,6 +39,22 @@ function DocLink({ href, children }: { href: string; children: React.ReactNode }
 /** Newest first. Add each new release at the top. */
 const RELEASES: Release[] = [
   {
+    version: '0.6.0',
+    date: 'Oct 1, 2026',
+    title: 'API key authentication',
+    body: (
+      <>
+        The public API now accepts API keys. Send your key as <Code>Authorization: Bearer sk_live_…</Code> and call{' '}
+        <Code>GET /v1/me</Code> to confirm it works and see which organization it belongs to.
+      </>
+    ),
+    link: { label: 'Authentication', href: '/docs/authentication' },
+    fixes: [
+      { lead: 'Revocation', text: 'Revoked keys are rejected on their very next request.' },
+      { lead: 'Last used', text: 'The dashboard now shows when each key was last used, updated at most once a minute.' },
+    ],
+  },
+  {
     version: '0.5.0',
     date: 'Sep 30, 2026',
     title: 'API keys',

@@ -3,9 +3,13 @@
 - ``get_db``: request-scoped database session.
 - ``get_current_user``: resolves the dashboard user from a session access
   token (``Authorization: Bearer <jwt>``). Used by dashboard routes such as
-  API key management. The public API authenticates with API keys instead.
+  API key management.
+- ``get_api_caller``: resolves the organization calling the public API from an
+  API key (``Authorization: Bearer sk_live_...``). Used by public endpoints
+  such as assessments.
 """
 import uuid
+from dataclasses import dataclass
 
 import jwt
 from fastapi import Depends, HTTPException, status
@@ -14,7 +18,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import decode_token
 from app.db.session import get_db
+from app.models.api_key import ApiKey, ApiKeyEnvironment
 from app.models.user import User
+from app.services import api_keys as key_service
 
 _bearer = HTTPBearer(auto_error=False)
 
@@ -49,4 +55,41 @@ async def get_current_user(
     return user
 
 
-__all__ = ["get_current_user", "get_db"]
+@dataclass(frozen=True)
+class ApiCaller:
+    """Who is calling the public API: the key used and the organization it belongs to."""
+
+    api_key: ApiKey
+
+    @property
+    def organization_id(self) -> uuid.UUID:
+        return self.api_key.organization_id
+
+    @property
+    def environment(self) -> ApiKeyEnvironment:
+        return self.api_key.environment
+
+    @property
+    def is_live(self) -> bool:
+        return self.api_key.environment == ApiKeyEnvironment.live
+
+
+def _api_key_error(detail: str) -> HTTPException:
+    return HTTPException(
+        status.HTTP_401_UNAUTHORIZED, detail, headers={"WWW-Authenticate": "Bearer"}
+    )
+
+
+async def get_api_caller(
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
+    db: AsyncSession = Depends(get_db),
+) -> ApiCaller:
+    if credentials is None:
+        raise _api_key_error("Missing API key. Send it as 'Authorization: Bearer sk_...'.")
+    api_key = await key_service.authenticate(db, credentials.credentials)
+    if api_key is None:
+        raise _api_key_error("Invalid API key.")
+    return ApiCaller(api_key=api_key)
+
+
+__all__ = ["ApiCaller", "get_api_caller", "get_current_user", "get_db"]

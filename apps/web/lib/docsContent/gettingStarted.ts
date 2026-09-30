@@ -240,12 +240,42 @@ assessment = response.json()`,
         type: 'paragraph',
         text: 'Keys prefixed with `sk_live_` are for production traffic from your platform.',
       },
+      { type: 'heading', id: 'check-key', text: 'Check your key' },
+      {
+        type: 'paragraph',
+        text: 'Call `GET /v1/me` to confirm a key works. It returns the organization the key belongs to and a masked copy of the key. The full key is never returned after creation.',
+      },
+      {
+        type: 'code',
+        language: 'bash',
+        label: 'Request',
+        code: `curl https://api.codeverity.com/v1/me \\
+  -H "Authorization: Bearer $CODEVERITY_API_KEY"`,
+      },
+      {
+        type: 'code',
+        language: 'json',
+        label: '200 OK',
+        code: `{
+  "organization": {
+    "id": "b7dbb439-54fc-4617-a34d-c03c955df537",
+    "name": "Acme Academy",
+    "slug": "acme-academy"
+  },
+  "api_key": {
+    "id": "c16ca26d-f82e-41aa-b745-88d9609c9729",
+    "name": "Production",
+    "environment": "live",
+    "masked": "sk_live_••••••BbnV"
+  }
+}`,
+      },
       { type: 'heading', id: 'security', text: 'Security' },
       {
         type: 'callout',
         tone: 'warning',
         title: 'Never commit live API keys to source control',
-        text: 'Call the Codeverity API from your server, store keys in environment variables, and revoke any key that may have been exposed.',
+        text: 'Call the Codeverity API from your server, store keys in environment variables, and revoke any key that may have been exposed. Revoked keys stop working immediately.',
       },
       {
         type: 'list',
@@ -255,15 +285,25 @@ assessment = response.json()`,
           'Rotate keys when a team member with access leaves.',
         ],
       },
+      { type: 'heading', id: 'errors', text: 'Authentication errors' },
+      {
+        type: 'paragraph',
+        text: 'A request without a key, or with a key that is malformed, unknown or revoked, gets `401 Unauthorized`. The response does not say which check failed.',
+      },
       {
         type: 'code',
         language: 'json',
-        label: '401 Unauthorized',
+        label: '401 · missing key',
         code: `{
-  "error": {
-    "code": "INVALID_API_KEY",
-    "message": "API key is missing or invalid."
-  }
+  "detail": "Missing API key. Send it as 'Authorization: Bearer sk_...'."
+}`,
+      },
+      {
+        type: 'code',
+        language: 'json',
+        label: '401 · invalid or revoked key',
+        code: `{
+  "detail": "Invalid API key."
 }`,
       },
     ],

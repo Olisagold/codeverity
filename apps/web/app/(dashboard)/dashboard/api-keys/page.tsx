@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { PlusIcon, TriangleAlertIcon } from 'lucide-react';
+import { Loader2Icon, PlusIcon, TriangleAlertIcon } from 'lucide-react';
 import { PageHeader } from '@/components/dashboard/PageHeader';
 import { DataTable, type Column } from '@/components/dashboard/DataTable';
 import { StatusBadge } from '@/components/dashboard/StatusBadge';
@@ -10,42 +10,91 @@ import { RowMenu } from '@/components/dashboard/RowMenu';
 import { Modal } from '@/components/dashboard/Modal';
 import { EmptyState } from '@/components/dashboard/EmptyState';
 import { CopyButton } from '@/components/ui/CopyButton';
-import { apiKeys as seedKeys } from '@/lib/dashboard';
+import { ApiKeyError, createApiKey, listApiKeys, revokeApiKey } from '@/lib/apiKeys';
 import type { ApiKey } from '@/types/dashboard';
 
-const generatedSecret = 'sk_live_2Xq8Vd41LmR7hTzP0aYcNfJb93Ke';
-
 export default function ApiKeysPage() {
-  const [keys, setKeys] = useState<ApiKey[]>(seedKeys);
+  const [keys, setKeys] = useState<ApiKey[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [revokeTarget, setRevokeTarget] = useState<ApiKey | null>(null);
+  const [revoking, setRevoking] = useState(false);
+  const [revokeError, setRevokeError] = useState<string | null>(null);
   const [createdKey, setCreatedKey] = useState<string | null>(null);
   const [name, setName] = useState('Production');
   const [environment, setEnvironment] = useState<'test' | 'live'>('live');
   const [description, setDescription] = useState('');
   const router = useRouter();
 
-  function handleCreate() {
-    const key: ApiKey = {
-      id: `key_${Math.random().toString(36).slice(2, 7)}`,
-      name: name.trim() || 'Untitled key',
-      masked: `${environment === 'live' ? 'sk_live' : 'sk_test'}_••••••${generatedSecret.slice(-4)}`,
-      environment,
-      description,
-      lastUsed: 'Never',
-      created: 'Just now',
-      requests: 0,
-      assessments: 0,
-      active: true,
+  useEffect(() => {
+    let cancelled = false;
+    listApiKeys()
+      .then((data) => {
+        if (!cancelled) setKeys(data);
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) setLoadError(error instanceof ApiKeyError ? error.message : 'Could not load API keys.');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
     };
-    setKeys((current) => [key, ...current]);
-    setCreateOpen(false);
-    setCreatedKey(environment === 'live' ? generatedSecret : generatedSecret.replace('sk_live', 'sk_test'));
-    setName('Production');
-    setDescription('');
+  }, []);
+
+  function openCreate() {
+    setCreateError(null);
+    setCreateOpen(true);
   }
 
-  function revoke(id: string) {
-    setKeys((current) => current.filter((key) => key.id !== id));
+  async function handleCreate() {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      setCreateError('Give the key a name.');
+      return;
+    }
+    setCreating(true);
+    setCreateError(null);
+    try {
+      const { apiKey, secret } = await createApiKey({
+        name: trimmed,
+        environment,
+        description: description.trim() || undefined,
+      });
+      setKeys((current) => [apiKey, ...current]);
+      setCreateOpen(false);
+      setCreatedKey(secret);
+      setName('Production');
+      setDescription('');
+    } catch (error) {
+      setCreateError(error instanceof ApiKeyError ? error.message : 'Could not create the API key.');
+    } finally {
+      setCreating(false);
+    }
+  }
+
+  function askRevoke(key: ApiKey) {
+    setRevokeError(null);
+    setRevokeTarget(key);
+  }
+
+  async function confirmRevoke() {
+    if (!revokeTarget) return;
+    setRevoking(true);
+    setRevokeError(null);
+    try {
+      await revokeApiKey(revokeTarget.id);
+      setKeys((current) => current.filter((key) => key.id !== revokeTarget.id));
+      setRevokeTarget(null);
+    } catch (error) {
+      setRevokeError(error instanceof ApiKeyError ? error.message : 'Could not revoke the API key.');
+    } finally {
+      setRevoking(false);
+    }
   }
 
   const columns: Column<ApiKey>[] = [
@@ -92,8 +141,7 @@ export default function ApiKeysPage() {
         <RowMenu
           items={[
             { label: 'View details', onSelect: () => router.push(`/dashboard/api-keys/${row.id}`) },
-            { label: 'Rename', onSelect: () => router.push(`/dashboard/api-keys/${row.id}`) },
-            { label: 'Revoke', onSelect: () => revoke(row.id), danger: true },
+            { label: 'Revoke', onSelect: () => askRevoke(row), danger: true },
           ]}
         />
       ),
@@ -108,7 +156,7 @@ export default function ApiKeysPage() {
         actions={
           <button
             type="button"
-            onClick={() => setCreateOpen(true)}
+            onClick={openCreate}
             className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-[13px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
           >
             <PlusIcon aria-hidden="true" className="h-3.5 w-3.5" />
@@ -117,6 +165,18 @@ export default function ApiKeysPage() {
         }
       />
 
+      {loadError ? (
+        <p role="alert" className="mb-4 rounded-lg border border-[#EF4444]/40 px-4 py-3 text-[13px] text-[#EF4444]">
+          {loadError}
+        </p>
+      ) : null}
+
+      {loading ? (
+        <div className="flex items-center justify-center gap-2 rounded-xl border border-line bg-surface py-16 text-[13px] text-faint">
+          <Loader2Icon aria-hidden="true" className="h-4 w-4 animate-spin" />
+          Loading API keys
+        </div>
+      ) : (
       <DataTable
         columns={columns}
         rows={keys}
@@ -130,7 +190,7 @@ export default function ApiKeysPage() {
             action={
               <button
                 type="button"
-                onClick={() => setCreateOpen(true)}
+                onClick={openCreate}
                 className="rounded-lg bg-white px-3.5 py-2 text-[13px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
                 Create API key
@@ -139,6 +199,7 @@ export default function ApiKeysPage() {
           />
         }
       />
+      )}
 
       <Modal
         open={createOpen}
@@ -156,9 +217,11 @@ export default function ApiKeysPage() {
             <button
               type="button"
               onClick={handleCreate}
-              className="rounded-lg bg-white px-3 py-1.5 text-[13px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              disabled={creating}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-[13px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted disabled:cursor-not-allowed disabled:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
-              Create key
+              {creating ? <Loader2Icon aria-hidden="true" className="h-3.5 w-3.5 animate-spin" /> : null}
+              {creating ? 'Creating' : 'Create key'}
             </button>
           </>
         }
@@ -172,6 +235,7 @@ export default function ApiKeysPage() {
               id="key-name"
               value={name}
               onChange={(event) => setName(event.target.value)}
+              maxLength={100}
               className="mt-2 h-11 w-full rounded-lg border border-line bg-base px-3 text-[13.5px] text-white placeholder:text-faint transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
@@ -204,10 +268,54 @@ export default function ApiKeysPage() {
               value={description}
               onChange={(event) => setDescription(event.target.value)}
               placeholder="Main production integration"
+              maxLength={255}
               className="mt-2 h-11 w-full rounded-lg border border-line bg-base px-3 text-[13.5px] text-white placeholder:text-faint transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
+
+          {createError ? (
+            <p role="alert" className="text-[13px] text-[#EF4444]">
+              {createError}
+            </p>
+          ) : null}
         </div>
+      </Modal>
+
+      <Modal
+        open={revokeTarget !== null}
+        title="Revoke API key"
+        onClose={() => (revoking ? undefined : setRevokeTarget(null))}
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setRevokeTarget(null)}
+              disabled={revoking}
+              className="rounded-lg border border-line px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:border-line-strong hover:text-white disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={confirmRevoke}
+              disabled={revoking}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#EF4444] px-3 py-1.5 text-[13px] font-medium text-white transition-colors duration-150 ease-out hover:bg-[#DC2626] disabled:cursor-not-allowed disabled:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            >
+              {revoking ? <Loader2Icon aria-hidden="true" className="h-3.5 w-3.5 animate-spin" /> : null}
+              {revoking ? 'Revoking' : 'Revoke key'}
+            </button>
+          </>
+        }
+      >
+        <p className="text-[13.5px] leading-relaxed text-muted">
+          Requests using <span className="font-mono text-[12.5px] text-white">{revokeTarget?.masked}</span> will stop
+          working immediately. This can&apos;t be undone.
+        </p>
+        {revokeError ? (
+          <p role="alert" className="mt-3 text-[13px] text-[#EF4444]">
+            {revokeError}
+          </p>
+        ) : null}
       </Modal>
 
       <Modal

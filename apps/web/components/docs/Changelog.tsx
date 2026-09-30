@@ -1,103 +1,148 @@
 import React from 'react';
+import Link from 'next/link';
+import { ArrowRightIcon } from 'lucide-react';
 
-type Tag = 'API' | 'Dashboard' | 'Accounts' | 'Email' | 'Docs' | 'Infrastructure';
+interface Fix {
+  lead?: string;
+  text: React.ReactNode;
+}
 
-interface Entry {
+interface Release {
+  version: string;
   date: string;
   title: string;
-  tags: Tag[];
-  items: React.ReactNode[];
+  body: React.ReactNode;
+  link?: { label: string; href: string };
+  fixes?: Fix[];
 }
-
-const TAG_STYLES: Record<Tag, string> = {
-  API: 'border-accent/40 text-accent',
-  Dashboard: 'border-line-strong text-muted',
-  Accounts: 'border-line-strong text-muted',
-  Email: 'border-line-strong text-muted',
-  Docs: 'border-line-strong text-muted',
-  Infrastructure: 'border-line-strong text-muted',
-};
 
 function Code({ children }: { children: React.ReactNode }) {
-  return <code className="rounded border border-line bg-base px-1 py-0.5 font-mono text-[12px] text-white">{children}</code>;
+  return (
+    <code className="rounded-md bg-surface-2 px-1.5 py-0.5 font-mono text-[0.88em] text-white ring-1 ring-inset ring-line-soft">
+      {children}
+    </code>
+  );
 }
 
-/** Newest first. Keep entries to things an integrator or dashboard user would notice. */
-const ENTRIES: Entry[] = [
+function DocLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex items-center gap-1 font-medium text-white underline decoration-accent decoration-[1.5px] underline-offset-[5px] transition-colors duration-150 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+    >
+      {children}
+      <ArrowRightIcon aria-hidden="true" className="h-4 w-4" />
+    </Link>
+  );
+}
+
+/** Newest first. Add each new release at the top. */
+const RELEASES: Release[] = [
   {
+    version: '0.5.0',
     date: 'Sep 30, 2026',
     title: 'API keys',
-    tags: ['API', 'Dashboard'],
-    items: [
-      <>Create, list and revoke API keys from the dashboard, backed by <Code>/v1/api-keys</Code>.</>,
-      <>Keys use the <Code>sk_live_…</Code> and <Code>sk_test_…</Code> formats. The full key is shown once at creation and only a hash is stored.</>,
-      <>Revoked keys disappear from the list immediately. Each organization can hold up to 25 active keys.</>,
-      <>Docs diagrams were redrawn with the actual models: ChatGPT, Gemini and DeepSeek for assessment, Claude for reassessment.</>,
+    body: (
+      <>
+        You can now create, list and revoke API keys from the dashboard, backed by <Code>/v1/api-keys</Code>. Keys use
+        the <Code>sk_live_</Code> and <Code>sk_test_</Code> formats. The full key is shown once when you create it, and
+        only a hash is stored.
+      </>
+    ),
+    link: { label: 'API keys', href: '/docs/api-keys' },
+    fixes: [
+      { lead: 'Key limits', text: 'Each organization can hold up to 25 active keys. Revoked keys drop out of the list immediately.' },
+      { lead: 'Row menus', text: 'The actions menu on tables no longer gets clipped on the last row.' },
+      { lead: 'Docs diagrams', text: 'Diagrams now show the real models: ChatGPT, Gemini and DeepSeek for assessment, and Claude for reassessment.' },
     ],
   },
   {
+    version: '0.4.0',
     date: 'Sep 25, 2026',
     title: 'Password reset',
-    tags: ['Accounts', 'Email'],
-    items: [
-      <>Forgot password now sends a single-use reset link by email, and the reset page sets a new password.</>,
-      <>Transactional emails use a simpler plain-text-style layout with social links in the footer.</>,
-    ],
+    body: 'Forgot password now emails a single-use reset link, and the reset page lets you choose a new password.',
+    link: { label: 'Authentication', href: '/docs/authentication' },
+    fixes: [{ lead: 'Email layout', text: 'Transactional emails use a simpler layout with social links in the footer.' }],
   },
   {
+    version: '0.3.0',
     date: 'Sep 24, 2026',
-    title: 'Accounts and API foundation',
-    tags: ['Accounts', 'Email', 'Infrastructure'],
-    items: [
-      <>Sign in with Google, GitHub, or email and password. Each new account gets its own organization.</>,
-      <>Email sign-up is verified with a one-time code, followed by a welcome email.</>,
-      <>The API service is live locally with health checks at <Code>/health</Code> and <Code>/health/ready</Code>, database migrations, and CI for both the API and the web app.</>,
+    title: 'Accounts and sign in',
+    body: (
+      <>
+        Sign in with Google, GitHub, or email and password. Every new account gets its own organization. Email sign-ups
+        are verified with a one-time code, followed by a welcome email.
+      </>
+    ),
+    link: { label: 'Authentication', href: '/docs/authentication' },
+    fixes: [
+      {
+        lead: 'API foundation',
+        text: (
+          <>
+            Health checks at <Code>/health</Code> and <Code>/health/ready</Code>, database migrations, and CI for both
+            the API and the web app.
+          </>
+        ),
+      },
     ],
   },
   {
+    version: '0.2.0',
     date: 'Sep 20, 2026',
-    title: 'Code blocks',
-    tags: ['Docs'],
-    items: [<>Code samples got language tabs, one-click copy and a new syntax theme in Geist Mono.</>],
+    title: 'New code blocks',
+    body: 'Code samples in the docs have language tabs, one-click copy and a new syntax theme set in Geist Mono.',
+    link: { label: 'Quickstart', href: '/docs/quickstart' },
   },
   {
+    version: '0.1.0',
     date: 'Sep 18, 2026',
     title: 'Documentation launched',
-    tags: ['Docs'],
-    items: [<>First version of the docs: getting started, core API, concepts, guides, reference and research.</>],
+    body: 'The first version of the docs: getting started, core API, concepts, guides, reference and research.',
+    link: { label: 'Introduction', href: '/docs/introduction' },
   },
 ];
 
 export function Changelog() {
   return (
-    <ol className="relative">
-      {ENTRIES.map((entry, index) => (
-        <li key={entry.date} className="grid gap-3 pb-10 last:pb-0 md:grid-cols-[140px_1fr] md:gap-8">
-          <div className="md:pt-0.5">
-            <time className="font-mono text-[12px] text-faint">{entry.date}</time>
-            {index === 0 ? (
-              <span className="ml-2 rounded-full border border-ok/40 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-ok md:ml-0 md:mt-2 md:inline-block">
-                Latest
-              </span>
-            ) : null}
+    <ol className="mt-4">
+      {RELEASES.map((release) => (
+        <li
+          key={release.version}
+          id={`v${release.version.replaceAll('.', '-')}`}
+          className="grid scroll-mt-24 gap-5 pb-20 last:pb-0 md:grid-cols-[160px_1fr] md:gap-10"
+        >
+          <div className="flex items-center gap-3 md:flex-col md:items-start md:gap-4">
+            <span className="rounded-lg bg-accent/15 px-2.5 py-1 font-medium text-[16px] tracking-[-0.01em] text-accent">
+              {release.version}
+            </span>
+            <time className="text-[14.5px] text-faint md:pl-1">{release.date}</time>
           </div>
-          <div className="border-line md:border-l md:pl-8">
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-[16px] font-medium tracking-[-0.01em] text-white">{entry.title}</h3>
-              {entry.tags.map((tag) => (
-                <span key={tag} className={`rounded border px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.1em] ${TAG_STYLES[tag]}`}>
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <ul className="mt-3 space-y-2">
-              {entry.items.map((item, itemIndex) => (
-                <li key={itemIndex} className="relative pl-4 text-[14px] leading-relaxed text-muted">
-                  <span aria-hidden="true" className="absolute left-0 top-[10px] h-1 w-1 rounded-full bg-faint" />
-                  {item}
-                </li>
-              ))}
-            </ul>
+
+          <div className="min-w-0">
+            <h2 className="text-[26px] font-medium leading-tight tracking-[-0.02em] text-white">{release.title}</h2>
+            <p className="mt-5 max-w-2xl text-[16px] leading-[1.85] text-muted">{release.body}</p>
+            {release.link ? (
+              <p className="mt-5 text-[16px]">
+                <DocLink href={release.link.href}>{release.link.label}</DocLink>
+              </p>
+            ) : null}
+
+            {release.fixes?.length ? (
+              <>
+                <h3 className="mt-12 text-[22px] font-medium leading-tight tracking-[-0.02em] text-white">
+                  Fixes &amp; improvements
+                </h3>
+                <ol className="mt-5 max-w-2xl list-decimal space-y-3 pl-6 text-[16px] leading-[1.85] text-muted marker:text-faint">
+                  {release.fixes.map((fix, index) => (
+                    <li key={index} className="pl-2">
+                      {fix.lead ? <span className="font-medium text-white">{fix.lead}: </span> : null}
+                      {fix.text}
+                    </li>
+                  ))}
+                </ol>
+              </>
+            ) : null}
           </div>
         </li>
       ))}

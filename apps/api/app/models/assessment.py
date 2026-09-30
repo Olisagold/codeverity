@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.ids import new_id
 from app.db.base import Base
-from app.models.api_key import ApiKeyEnvironment
+from app.models.enums import ApiKeyEnvironment
 
 
 class AssessmentStatus(enum.StrEnum):

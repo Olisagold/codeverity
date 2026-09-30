@@ -1,4 +1,3 @@
-import enum
 import uuid
 from datetime import datetime
 
@@ -6,11 +5,9 @@ from sqlalchemy import DateTime, Enum, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+from app.models.enums import ApiKeyEnvironment
 
-
-class ApiKeyEnvironment(enum.StrEnum):
-    live = "live"
-    test = "test"
+__all__ = ["ApiKey", "ApiKeyEnvironment"]
 
 
 class ApiKey(Base):

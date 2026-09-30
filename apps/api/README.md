@@ -7,7 +7,7 @@
 | Phase | Scope | Status |
 |---|---|---|
 | 0 | Scaffold, Docker, health checks | Done |
-| 1 | Auth, organizations, API keys | In progress: sign in, password reset, and API key management done; API key auth for the public API next |
+| 1 | Auth, organizations, API keys | Done |
 | 2 | Assessment CRUD, job queue | Not started |
 | 3 | Multi model orchestration | Not started |
 | 4 | Webhooks | Not started |
@@ -104,7 +104,7 @@ The dashboard already has UI for this. The data model follows what it expects.
 - JWT session auth for login, signup, and password reset. Done.
 - `api_keys` table: name, hashed secret, environment, last used. Done.
 - Dashboard endpoints to create, list, get, and revoke keys (`/v1/api-keys`). Done.
-- API key auth for the public API. Not started.
+- API key auth for the public API (`get_api_caller`, `GET /v1/me`). Done.
 
 <br/>
 
@@ -155,7 +155,7 @@ A single-use reset link emailed to the account holder. Implemented in `app/servi
 
 <br/>
 
-### API Keys (Done)
+### API Keys and Key Auth (Done)
 
 Keys look like `sk_live_4f9a2c1e_<secret>` or `sk_test_...`. The full key is
 returned once, from `POST /v1/api-keys`, and is never stored or shown again.
@@ -165,8 +165,20 @@ returned once, from `POST /v1/api-keys`, and is never stored or shown again.
 - The full key is stored as a SHA-256 hash. Keys have ~190 bits of randomness,
   so a fast hash is right here; passwords still use bcrypt.
 - `last_four` lets the dashboard show a masked key.
-- Revoking sets `revoked_at`; revoked keys drop out of the list and will be
-  rejected by key auth. At most 25 active keys per organization.
+- Revoking sets `revoked_at`; revoked keys drop out of the list and are
+  rejected by key auth on the next request. At most 25 active keys per
+  organization.
+
+Public endpoints authenticate with `Depends(get_api_caller)` from
+`app/api/deps.py`. It reads `Authorization: Bearer sk_...`, finds the row by
+prefix, compares hashes in constant time, rejects revoked keys, and returns an
+`ApiCaller` with the key, its organization and its environment. Every failure
+is the same `401 Invalid API key.`, so callers can't probe which check failed.
+`last_used_at` is refreshed at most once a minute. `GET /v1/me` is the simplest
+protected endpoint and is handy for checking a key.
+
+All key rules and queries live in `app/services/api_keys.py`; the dashboard
+routes and the auth dependency both call it.
 
 All `/v1/api-keys` routes use the dashboard session (`get_current_user` in
 `app/api/deps.py`) and are scoped to the caller's organization. The dashboard

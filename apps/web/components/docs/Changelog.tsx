@@ -40,7 +40,7 @@ function DocLink({ href, children }: { href: string; children: React.ReactNode }
 const RELEASES: Release[] = [
   {
     version: '0.6.0',
-    date: 'Oct 1, 2026',
+    date: 'Sep 30, 2026',
     title: 'API key authentication',
     body: (
       <>

@@ -1,4 +1,12 @@
-.PHONY: up down build logs test api-up api-logs api-shell api-test api-lint api-migrate api-migration
+.PHONY: up down build logs test api-up api-logs api-shell api-test api-lint api-migrate api-migration dev
+
+dev:
+	docker compose up -d --build api
+	@echo "Waiting for the API..."
+	@until curl -sf http://localhost:8000/health >/dev/null; do sleep 1; done
+	docker compose exec api alembic upgrade head
+	@echo "API: http://localhost:8000   Web: http://localhost:3000"
+	cd apps/web && npm run dev
 
 up:
 	docker compose up -d

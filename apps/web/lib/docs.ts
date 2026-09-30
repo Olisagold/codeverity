@@ -4,6 +4,7 @@ import { conceptPages } from './docsContent/concepts';
 import { guidePages } from './docsContent/guides';
 import { referencePages } from './docsContent/reference';
 import { researchPages } from './docsContent/research';
+import { changelogPages } from './docsContent/changelog';
 import type { DocPage, DocsNavGroup } from '@/types/docs';
 
 export const docsPages: DocPage[] = [
@@ -13,6 +14,7 @@ export const docsPages: DocPage[] = [
   ...guidePages,
   ...referencePages,
   ...researchPages,
+  ...changelogPages,
 ];
 
 export const docsNav: DocsNavGroup[] = [
@@ -67,6 +69,10 @@ export const docsNav: DocsNavGroup[] = [
       { title: 'Methodology', slug: 'research/methodology' },
       { title: 'Evaluation framework', slug: 'research/evaluation-framework' },
     ],
+  },
+  {
+    title: 'Updates',
+    items: [{ title: 'Changelog', slug: 'changelog' }],
   },
 ];
 

@@ -38,7 +38,8 @@ export type DocBlock =
         | 'reassessment'
         | 'experiments'
         | 'integrationSteps'
-        | 'asyncLifecycle';
+        | 'asyncLifecycle'
+        | 'changelog';
     };
 
 export interface DocPage {

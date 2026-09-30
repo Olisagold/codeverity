@@ -27,7 +27,7 @@ export type DocBlock =
   | { type: 'callout'; tone: 'info' | 'warning'; title?: string; text: string }
   | { type: 'cards'; cards: { title: string; text: string; to: string }[] }
   | { type: 'definitions'; items: { term: string; text: string }[] }
-  | { type: 'custom'; component: 'playground' | 'apiKeys' | 'statusFlow' };
+  | { type: 'custom'; component: 'playground' | 'apiKeys' | 'statusFlow' | 'requestFlow' };
 
 export interface DocPage {
   slug: string;

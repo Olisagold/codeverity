@@ -11,6 +11,7 @@ import { InlineText } from './InlineText';
 import { TryCodeverity } from './TryCodeverity';
 import { ApiKeysMock } from './ApiKeysMock';
 import { StatusFlow } from './StatusFlow';
+import { RequestFlow } from './RequestFlow';
 import type { DocBlock } from '@/types/docs';
 
 function renderBlock(block: DocBlock, index: number) {
@@ -105,6 +106,7 @@ function renderBlock(block: DocBlock, index: number) {
     case 'custom':
       if (block.component === 'playground') return <TryCodeverity key={index} />;
       if (block.component === 'apiKeys') return <ApiKeysMock key={index} />;
+      if (block.component === 'requestFlow') return <RequestFlow key={index} />;
       return <StatusFlow key={index} />;
     default:
       return null;

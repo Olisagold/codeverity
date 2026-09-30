@@ -1,21 +1,5 @@
 import type { DocPage } from '@/types/docs';
 
-const introDiagram = `Your Platform
-      │
-      │ API
-      ▼
-  Codeverity
-      │
-      ├── Model A
-      ├── Model B
-      └── Model C
-            │
-            ▼
-      Reassessment
-            │
-            ▼
-      Final Result`;
-
 const abstractionDiagram = `Without Codeverity              With Codeverity
 
 Your Platform                   Your Platform
@@ -46,7 +30,7 @@ export const gettingStartedPages: DocPage[] = [
         ],
       },
       { type: 'heading', id: 'overview', text: 'How a request flows' },
-      { type: 'diagram', art: introDiagram, caption: 'Submit → assess → reassess → result' },
+      { type: 'custom', component: 'requestFlow' },
       { type: 'heading', id: 'what-it-does', text: 'One API for multi-model code assessment' },
       {
         type: 'paragraph',

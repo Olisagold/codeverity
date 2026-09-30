@@ -1,18 +1,63 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { ChevronLeftIcon } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { ChevronLeftIcon, Loader2Icon } from 'lucide-react';
 import { PageHeader } from '@/components/dashboard/PageHeader';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { StatusBadge } from '@/components/dashboard/StatusBadge';
 import { EmptyState } from '@/components/dashboard/EmptyState';
-import { apiKeys } from '@/lib/dashboard';
+import { ApiKeyError, getApiKey, revokeApiKey } from '@/lib/apiKeys';
+import type { ApiKey } from '@/types/dashboard';
 
 export default function ApiKeyDetailsPage() {
   const params = useParams<{ id: string }>();
-  const apiKey = apiKeys.find((item) => item.id === params.id);
+  const router = useRouter();
+  const [apiKey, setApiKey] = useState<ApiKey | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [revoking, setRevoking] = useState(false);
+  const [revokeError, setRevokeError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getApiKey(params.id)
+      .then((data) => {
+        if (!cancelled) setApiKey(data);
+      })
+      .catch(() => {
+        if (!cancelled) setApiKey(null);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [params.id]);
+
+  async function handleRevoke() {
+    if (!apiKey) return;
+    if (!window.confirm(`Revoke ${apiKey.masked}? Requests using it will stop working immediately.`)) return;
+    setRevoking(true);
+    setRevokeError(null);
+    try {
+      await revokeApiKey(apiKey.id);
+      router.push('/dashboard/api-keys');
+    } catch (error) {
+      setRevokeError(error instanceof ApiKeyError ? error.message : 'Could not revoke the API key.');
+      setRevoking(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center gap-2 py-24 text-[13px] text-faint">
+        <Loader2Icon aria-hidden="true" className="h-4 w-4 animate-spin" />
+        Loading API key
+      </div>
+    );
+  }
 
   if (!apiKey) {
     return (
@@ -32,7 +77,10 @@ export default function ApiKeyDetailsPage() {
   }
 
   const facts = [
-    { label: 'Status', value: <StatusBadge status="active" /> },
+    {
+      label: 'Status',
+      value: apiKey.active ? <StatusBadge status="active" /> : <span className="text-faint">Revoked</span>,
+    },
     { label: 'Environment', value: apiKey.environment === 'live' ? 'Production' : 'Test' },
     { label: 'Key', value: <span className="font-mono text-[12.5px] text-white">{apiKey.masked}</span> },
     { label: 'Created', value: apiKey.created },
@@ -67,8 +115,8 @@ export default function ApiKeyDetailsPage() {
       <section className="mt-8">
         <h2 className="mb-3 text-[14.5px] font-medium text-white">Usage</h2>
         <div className="grid gap-3 sm:grid-cols-2">
-          <StatCard label="Requests" value={apiKey.requests.toLocaleString()} detail="all time" />
-          <StatCard label="Assessments" value={apiKey.assessments.toLocaleString()} detail="all time" />
+          <StatCard label="Requests" value="—" detail="not tracked yet" />
+          <StatCard label="Assessments" value="—" detail="not tracked yet" />
         </div>
       </section>
 
@@ -82,11 +130,19 @@ export default function ApiKeyDetailsPage() {
           </p>
           <button
             type="button"
-            className="rounded-lg border border-[#EF4444]/50 px-3 py-1.5 text-[13px] text-[#EF4444] transition-colors duration-150 ease-out hover:border-[#EF4444] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            onClick={handleRevoke}
+            disabled={revoking || !apiKey.active}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[#EF4444]/50 px-3 py-1.5 text-[13px] text-[#EF4444] transition-colors duration-150 ease-out hover:border-[#EF4444] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
-            Revoke API key
+            {revoking ? <Loader2Icon aria-hidden="true" className="h-3.5 w-3.5 animate-spin" /> : null}
+            {apiKey.active ? (revoking ? 'Revoking' : 'Revoke API key') : 'Revoked'}
           </button>
         </div>
+        {revokeError ? (
+          <p role="alert" className="px-5 pb-4 text-[13px] text-[#EF4444]">
+            {revokeError}
+          </p>
+        ) : null}
       </section>
     </>
   );

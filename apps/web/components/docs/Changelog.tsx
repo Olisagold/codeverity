@@ -55,7 +55,7 @@ const RELEASES: Release[] = [
         lead: 'Simulated results',
         text: (
           <>
-            Until model assessment ships, test keys get a placeholder result marked <Code>"simulated": true</Code>, and
+            Until model assessment ships, test keys get a placeholder result marked <Code>{'"simulated": true'}</Code>, and
             live keys fail with <Code>ORCHESTRATION_UNAVAILABLE</Code>.
           </>
         ),

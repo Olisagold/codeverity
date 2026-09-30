@@ -7,7 +7,7 @@
 | Phase | Scope | Status |
 |---|---|---|
 | 0 | Scaffold, Docker, health checks | Done |
-| 1 | Auth, organizations, API keys | In progress: Google, GitHub, and email/password sign in done |
+| 1 | Auth, organizations, API keys | In progress: sign in, password reset, and API key management done; API key auth for the public API next |
 | 2 | Assessment CRUD, job queue | Not started |
 | 3 | Multi model orchestration | Not started |
 | 4 | Webhooks | Not started |
@@ -101,8 +101,9 @@ The dashboard already has UI for this. The data model follows what it expects.
 
 - `organizations` table: name, slug, created at. Done.
 - `users` table: email, password hash, auth provider, Google sub, GitHub id, role. Done.
-- JWT session auth for login, signup, and password reset. Done, except password reset itself.
-- `api_keys` table: name, hashed secret, environment, last used. Not started.
+- JWT session auth for login, signup, and password reset. Done.
+- `api_keys` table: name, hashed secret, environment, last used. Done.
+- Dashboard endpoints to create, list, get, and revoke keys (`/v1/api-keys`). Done.
 - API key auth for the public API. Not started.
 
 <br/>
@@ -154,6 +155,26 @@ A single-use reset link emailed to the account holder. Implemented in `app/servi
 
 <br/>
 
+### API Keys (Done)
+
+Keys look like `sk_live_4f9a2c1e_<secret>` or `sk_test_...`. The full key is
+returned once, from `POST /v1/api-keys`, and is never stored or shown again.
+
+- `prefix` (`sk_<env>_<8 hex>`) is stored in plain text and indexed, so a
+  request finds its key row in one lookup.
+- The full key is stored as a SHA-256 hash. Keys have ~190 bits of randomness,
+  so a fast hash is right here; passwords still use bcrypt.
+- `last_four` lets the dashboard show a masked key.
+- Revoking sets `revoked_at`; revoked keys drop out of the list and will be
+  rejected by key auth. At most 25 active keys per organization.
+
+All `/v1/api-keys` routes use the dashboard session (`get_current_user` in
+`app/api/deps.py`) and are scoped to the caller's organization. The dashboard
+reaches them through Next.js route handlers in `apps/web/app/api/api-keys/`,
+which attach the httpOnly session cookie as a bearer token.
+
+<br/>
+
 ## Phase 2: Assessments
 
 Matches the shapes already defined in the frontend.
@@ -200,7 +221,7 @@ The core of the product. See [assessment-lifecycle.png](docs/diagrams/assessment
 - Deploy config for Render or Railway
 - Point production at Neon and Upstash
 - CORS locked to real origins
-- A backend CI workflow
+- A backend CI workflow. Done: `.github/workflows/backend-ci.yml`.
 
 <br/>
 

@@ -37,9 +37,30 @@ class Settings(BaseSettings):
     github_url: str = "https://github.com"
     linkedin_url: str = "https://linkedin.com"
 
+    # Model providers. A provider with no key is skipped.
+    openai_api_key: str = ""
+    openai_model: str = "gpt-5"
+    # Tried in order; a model that is rate limited or unavailable falls through
+    # to the next, so the free tier keeps working on the cheaper models.
+    gemini_api_key: str = ""
+    gemini_models: str = "gemini-2.5-pro,gemini-2.5-flash,gemini-2.5-flash-lite"
+    deepseek_api_key: str = ""
+    deepseek_model: str = "deepseek-chat"
+    # Reviews the other models' output and produces the final result.
+    anthropic_api_key: str = ""
+    anthropic_model: str = "claude-opus-5-5"
+
+    model_timeout_seconds: float = 90
+    # Fewest successful model assessments needed before the review runs.
+    min_model_results: int = 2
+
     @property
     def cors_origins(self) -> list[str]:
         return [origin.strip() for origin in self.api_cors_origins.split(",") if origin.strip()]
+
+    @property
+    def gemini_model_list(self) -> list[str]:
+        return [model.strip() for model in self.gemini_models.split(",") if model.strip()]
 
     @property
     def async_database_url(self) -> str:

@@ -10,17 +10,11 @@ import { MethodBadge } from '@/components/ui/MethodBadge';
 import { useApi } from '@/hooks/useApi';
 import { errorMessage } from '@/lib/api/client';
 import { listLogs } from '@/lib/api/dashboard';
-import { formatDateTime } from '@/lib/format';
+import { formatDateTime, statusColor } from '@/lib/format';
 import type { LogEntry } from '@/types/api';
 
 const selectClasses =
   'h-8 rounded-lg border border-line bg-surface px-2.5 text-[12.5px] text-muted transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent';
-
-export function statusColor(status: number) {
-  if (status >= 500) return 'text-[#EF4444]';
-  if (status >= 400) return 'text-amber';
-  return 'text-ok';
-}
 
 const columns: Column<LogEntry>[] = [
   {

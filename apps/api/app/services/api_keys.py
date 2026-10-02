@@ -13,6 +13,7 @@ Everything that touches the database lives here, so the dashboard routes and
 the public-API auth dependency share one set of rules. Routes translate the
 exceptions below into HTTP responses.
 """
+
 import hashlib
 import hmac
 import secrets
@@ -40,7 +41,6 @@ class ApiKeyNotFound(Exception):
 
 class ApiKeyLimitReached(Exception):
     """The organization already has MAX_ACTIVE_KEYS active keys."""
-
 
 
 @dataclass(frozen=True)
@@ -77,7 +77,6 @@ def matches(key: str, key_hash: str) -> bool:
 
 def mask(environment: ApiKeyEnvironment, last_four: str) -> str:
     return f"sk_{environment.value}_••••••{last_four}"
-
 
 
 async def list_active(db: AsyncSession, organization_id: uuid.UUID) -> list[ApiKey]:
@@ -136,8 +135,6 @@ async def revoke(db: AsyncSession, api_key: ApiKey) -> None:
     if api_key.revoked_at is None:
         api_key.revoked_at = datetime.now(UTC)
         await db.commit()
-
-
 
 
 async def authenticate(db: AsyncSession, raw_key: str) -> ApiKey | None:

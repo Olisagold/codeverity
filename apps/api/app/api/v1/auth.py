@@ -116,8 +116,7 @@ async def github_callback(
     except NoVerifiedEmailError as exc:
         raise HTTPException(
             status.HTTP_409_CONFLICT,
-            "Your GitHub account has no verified email. Verify an email on "
-            "GitHub and try again.",
+            "Your GitHub account has no verified email. Verify an email on GitHub and try again.",
         ) from exc
 
     try:

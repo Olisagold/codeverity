@@ -259,6 +259,55 @@ def test_worker_completes_test_assessment(client: TestClient, org: Org) -> None:
     assert _load(created["id"]).attempts == 1
 
 
+RUBRIC = {
+    "criteria": [
+        {"name": "Edge cases", "description": "Handles an empty list", "weight": 50},
+        {"name": "Readability", "description": "Clear names", "weight": 50},
+    ],
+    "learner_level": "beginner",
+}
+
+
+def test_simulated_result_includes_rubric_scores(client: TestClient, org: Org) -> None:
+    created = _create(client, org.test, {**PAYLOAD, "rubric": RUBRIC})
+    _drain()
+
+    body = client.get(f"/v1/assessments/{created['id']}/result", headers=_bearer(org.test)).json()
+    assert [s["name"] for s in body["rubric_scores"]] == ["Edge cases", "Readability"]
+    assert body["rubric_score"] == 8.0
+
+
+def test_result_without_rubric_has_null_rubric_fields(client: TestClient, org: Org) -> None:
+    created = _create(client, org.test)
+    _drain()
+
+    body = client.get(f"/v1/assessments/{created['id']}/result", headers=_bearer(org.test)).json()
+    assert body["rubric_score"] is None
+    assert body["rubric_scores"] is None
+
+
+@pytest.mark.parametrize(
+    "rubric",
+    [
+        {**RUBRIC, "criteria": [{**RUBRIC["criteria"][0], "weight": 40}, RUBRIC["criteria"][1]]},
+        {**RUBRIC, "criteria": [RUBRIC["criteria"][0], {**RUBRIC["criteria"][0]}]},
+        {
+            **RUBRIC,
+            "criteria": [{"name": f"c{i}", "description": "d", "weight": 9} for i in range(11)],
+        },
+        {**RUBRIC, "notes": "x" * 1001},
+        {**RUBRIC, "learner_level": "expert"},
+        {**RUBRIC, "criteria": []},
+    ],
+    ids=["weights", "duplicate", "too-many", "long-notes", "bad-level", "empty"],
+)
+def test_create_rejects_invalid_rubric(client: TestClient, org: Org, rubric: dict) -> None:
+    response = client.post(
+        "/v1/assessments", headers=_bearer(org.test), json={**PAYLOAD, "rubric": rubric}
+    )
+    assert response.status_code == 422
+
+
 def test_worker_fails_live_assessment_without_provider_keys(
     client: TestClient, org: Org, monkeypatch: pytest.MonkeyPatch
 ) -> None:

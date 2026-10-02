@@ -3,6 +3,7 @@
 Runs against the real local Postgres, like the other tests. Each test gets its
 own organization, user and key, removed afterwards.
 """
+
 import asyncio
 import uuid
 from collections.abc import Awaitable, Callable, Iterator

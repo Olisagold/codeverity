@@ -3,6 +3,7 @@
 Routes and the worker both go through here. Lookups are always scoped to an
 organization *and* environment, so test keys never see live data.
 """
+
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
@@ -33,6 +34,8 @@ class Outcome:
     criteria: dict[str, float]
     feedback: dict
     model_results: list = field(default_factory=list)
+    rubric_score: float | None = None
+    rubric_scores: list | None = None
 
 
 class ProcessingError(Exception):
@@ -63,6 +66,7 @@ async def create(
         assignment_title=body.assignment.title.strip(),
         assignment_requirements=body.assignment.requirements,
         submission_code=body.submission.code,
+        rubric=body.rubric.model_dump(mode="json") if body.rubric else None,
         status=AssessmentStatus.queued,
     )
     db.add(assessment)
@@ -146,6 +150,8 @@ async def complete(db: AsyncSession, assessment: Assessment, outcome: Outcome) -
     assessment.criteria = outcome.criteria
     assessment.feedback = outcome.feedback
     assessment.model_results = outcome.model_results
+    assessment.rubric_score = outcome.rubric_score
+    assessment.rubric_scores = outcome.rubric_scores
     assessment.error_code = None
     assessment.error_message = None
     assessment.completed_at = datetime.now(UTC)

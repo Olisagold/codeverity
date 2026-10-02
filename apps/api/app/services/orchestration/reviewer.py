@@ -21,6 +21,8 @@ class Review:
     agreement: float
     feedback: dict
     criteria: dict[str, float]
+    # One {score, comment} per rubric criterion, in rubric order. Empty without a rubric.
+    rubric: list[dict]
 
 
 async def review(assessment: Assessment, candidates: list[dict]) -> Review:
@@ -36,7 +38,10 @@ async def review(assessment: Assessment, candidates: list[dict]) -> Review:
             fallbacks="default",
             output_config={
                 "effort": settings.reviewer_effort,
-                "format": {"type": "json_schema", "schema": prompts.REVIEW_SCHEMA},
+                "format": {
+                    "type": "json_schema",
+                    "schema": prompts.review_schema(bool(assessment.rubric)),
+                },
             },
             system=prompts.REVIEWER_SYSTEM,
             messages=[{"role": "user", "content": prompts.reviewer_prompt(assessment, candidates)}],
@@ -58,12 +63,29 @@ async def review(assessment: Assessment, candidates: list[dict]) -> Review:
         for item in data["candidates"]:
             if 0 <= item["index"] < len(candidates):
                 per_candidate[item["index"]] = prompts.clamp_scores(item["criteria"])
+        rubric = _rubric_scores(assessment.rubric, data.get("rubric") or [])
         return Review(
             model=response.model,
             candidate_criteria=per_candidate,
             agreement=min(max(float(data["agreement"]), 0.0), 1.0),
             feedback=data["feedback"],
             criteria=prompts.clamp_scores(data["criteria"]),
+            rubric=rubric,
         )
     except (StopIteration, ValueError, KeyError, TypeError) as exc:
         raise ReviewError("Claude returned an unexpected review format") from exc
+
+
+def _rubric_scores(rubric: dict | None, items: list[dict]) -> list[dict]:
+    if not rubric:
+        return []
+    by_index = {item["index"]: item for item in items}
+    if set(by_index) != set(range(len(rubric["criteria"]))):
+        raise ValueError("rubric scores do not match the rubric")
+    return [
+        {
+            "score": round(min(max(float(by_index[i]["score"]), 0.0), 10.0), 1),
+            "comment": str(by_index[i]["comment"]).strip(),
+        }
+        for i in range(len(rubric["criteria"]))
+    ]

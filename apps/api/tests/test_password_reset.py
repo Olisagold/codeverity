@@ -4,6 +4,7 @@ enumeration, and the new password actually works for login afterwards.
 Emails are monkeypatched; Postgres and Redis are the real local ones, as in
 `test_password_auth.py`.
 """
+
 import uuid
 
 import pytest

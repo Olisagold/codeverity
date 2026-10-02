@@ -1,4 +1,5 @@
 """Enums shared by several models. Kept free of model imports to avoid import cycles."""
+
 import enum
 
 

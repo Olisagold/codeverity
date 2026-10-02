@@ -5,6 +5,7 @@ Only a SHA-256 hash of the token is stored, so a leaked Redis dump can't be
 replayed as a reset link. Requesting a new link revokes the previous one for
 that email, so at most one link per account is live at a time.
 """
+
 import hashlib
 import secrets
 

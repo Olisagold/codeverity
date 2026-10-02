@@ -1,6 +1,7 @@
 """The signup email-verification code: generation, Redis storage, and
 attempt-limited verification.
 """
+
 import secrets
 
 from app.db.redis import get_redis

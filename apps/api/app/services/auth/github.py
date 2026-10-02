@@ -5,6 +5,7 @@ GitHub's `/user` endpoint doesn't reliably return an email (it's null when the
 user has made their email private), so we always follow up with `/user/emails`
 and pick the primary, verified one.
 """
+
 from dataclasses import dataclass
 
 from authlib.integrations.httpx_client import AsyncOAuth2Client

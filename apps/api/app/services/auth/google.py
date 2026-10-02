@@ -1,6 +1,7 @@
 """Google OAuth: building the consent-screen URL, and exchanging an
 authorization code for the signed-in user's profile.
 """
+
 from dataclasses import dataclass
 
 from authlib.integrations.httpx_client import AsyncOAuth2Client

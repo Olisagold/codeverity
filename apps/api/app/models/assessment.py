@@ -48,6 +48,7 @@ class Assessment(Base):
     assignment_title: Mapped[str] = mapped_column(String(200))
     assignment_requirements: Mapped[str] = mapped_column(Text)
     submission_code: Mapped[str] = mapped_column(Text)
+    rubric: Mapped[dict | None] = mapped_column(JSONB)
 
     status: Mapped[AssessmentStatus] = mapped_column(
         Enum(AssessmentStatus, native_enum=False, length=20),
@@ -61,6 +62,8 @@ class Assessment(Base):
     confidence: Mapped[float | None] = mapped_column(Float)
     criteria: Mapped[dict | None] = mapped_column(JSONB)
     feedback: Mapped[dict | None] = mapped_column(JSONB)
+    rubric_score: Mapped[float | None] = mapped_column(Float)
+    rubric_scores: Mapped[list | None] = mapped_column(JSONB)
     # Per-model output, kept for the dashboard and for debugging (Phase 3).
     model_results: Mapped[list | None] = mapped_column(JSONB)
 

@@ -4,6 +4,7 @@ Two token types: a short-lived access token (used as a bearer token on API
 requests) and a longer-lived refresh token (`JWT_EXPIRES_IN` in `.env`, e.g.
 "7d"). Both are HS256, signed with `JWT_SECRET`.
 """
+
 import re
 import time
 from datetime import timedelta

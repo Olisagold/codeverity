@@ -4,6 +4,7 @@ The suffix is a ULID: 48 bits of millisecond timestamp plus 80 random bits,
 Crockford base32 encoded to 26 characters. IDs sort by creation time and are
 safe to expose, unlike sequential integers.
 """
+
 import secrets
 import time
 

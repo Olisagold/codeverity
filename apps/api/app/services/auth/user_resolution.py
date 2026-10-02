@@ -1,4 +1,5 @@
 """Turning a verified OAuth profile (Google or GitHub) into a `User` row."""
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 

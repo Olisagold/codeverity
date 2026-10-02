@@ -8,6 +8,7 @@
   API key (``Authorization: Bearer sk_live_...``). Used by public endpoints
   such as assessments.
 """
+
 import uuid
 from dataclasses import dataclass
 

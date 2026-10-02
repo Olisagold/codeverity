@@ -1,4 +1,5 @@
 """`GET /v1/me`: confirm an API key works and see which organization it belongs to."""
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 

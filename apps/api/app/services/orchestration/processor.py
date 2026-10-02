@@ -62,6 +62,7 @@ async def process(assessment: Assessment) -> Outcome:
         result["criteria"] = criteria
 
     score = round(sum(verdict.criteria.values()) / len(verdict.criteria), 1)
+    rubric_scores = _named(assessment.rubric, verdict.rubric)
     return Outcome(
         score=score,
         confidence=round(0.5 * verdict.agreement + 0.05 * score, 2),
@@ -71,6 +72,8 @@ async def process(assessment: Assessment) -> Outcome:
             *results,
             {"provider": "anthropic", "model": verdict.model, "role": "review"},
         ],
+        rubric_scores=rubric_scores,
+        rubric_score=_weighted(rubric_scores),
     )
 
 
@@ -92,7 +95,30 @@ async def _assess(provider: Provider, prompt: str) -> dict:
     return result
 
 
+def _named(rubric: dict | None, scores: list[dict]) -> list[dict] | None:
+    """Attach each criterion's name and weight to its score."""
+    if not rubric:
+        return None
+    return [
+        {"name": c["name"], "weight": c["weight"], **s}
+        for c, s in zip(rubric["criteria"], scores, strict=True)
+    ]
+
+
+def _weighted(rubric_scores: list[dict] | None) -> float | None:
+    if not rubric_scores:
+        return None
+    return round(sum(s["score"] * s["weight"] for s in rubric_scores) / 100, 1)
+
+
 def _simulated(assessment: Assessment) -> Outcome:
+    rubric_scores = _named(
+        assessment.rubric,
+        [
+            {"score": 8.0, "comment": "Placeholder comment."}
+            for _ in (assessment.rubric or {}).get("criteria", [])
+        ],
+    )
     return Outcome(
         score=8.0,
         confidence=0.5,
@@ -103,4 +129,6 @@ def _simulated(assessment: Assessment) -> Outcome:
             "suggestions": [f"Placeholder suggestion for {assessment.assignment_title}."],
             "simulated": True,
         },
+        rubric_scores=rubric_scores,
+        rubric_score=_weighted(rubric_scores),
     )

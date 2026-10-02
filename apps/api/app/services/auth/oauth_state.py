@@ -7,6 +7,7 @@ Two uses:
 - an exchange code: swapped by the frontend for the real JWTs, so the tokens
   themselves never appear in a URL or browser history.
 """
+
 import secrets
 
 from app.db.redis import get_redis

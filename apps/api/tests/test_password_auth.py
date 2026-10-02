@@ -4,6 +4,7 @@
 a real email through Sendlib. Postgres and Redis are the real local ones from
 docker-compose, since that's what `make api-test` runs against.
 """
+
 import asyncio
 import uuid
 from collections.abc import Awaitable, Callable

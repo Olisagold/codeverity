@@ -5,6 +5,7 @@ scoped to the caller's organization, so one organization can never see or
 revoke another's keys. The rules live in `app.services.api_keys`; this module
 only maps them to HTTP.
 """
+
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status

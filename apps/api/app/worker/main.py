@@ -3,6 +3,7 @@
 Run with ``python -m app.worker``. Any number of workers can run at once;
 `claim_next` uses row locks, so each assessment is processed by one worker.
 """
+
 import asyncio
 import logging
 import signal

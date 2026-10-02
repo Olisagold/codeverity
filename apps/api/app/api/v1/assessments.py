@@ -3,6 +3,7 @@
 Every lookup is scoped to the caller's organization and environment, so test
 keys never see live assessments and vice versa.
 """
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -102,5 +103,7 @@ async def get_assessment_result(
         confidence=assessment.confidence or 0.0,
         criteria=assessment.criteria or {},
         feedback=Feedback(**feedback),
+        rubric_score=assessment.rubric_score,
+        rubric_scores=assessment.rubric_scores,
         simulated=simulated,
     )

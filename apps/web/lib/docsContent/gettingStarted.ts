@@ -159,7 +159,9 @@ assessment = response.json()`,
         code: `{
   "id": "asm_01JABC123",
   "status": "queued",
-  "created_at": "2026-09-18T12:00:00Z"
+  "language": "python",
+  "created_at": "2026-09-18T12:00:00Z",
+  "completed_at": null
 }`,
       },
       {
@@ -181,7 +183,10 @@ assessment = response.json()`,
         ],
         response: `{
   "id": "asm_01JABC123",
-  "status": "completed"
+  "status": "completed",
+  "language": "python",
+  "created_at": "2026-09-18T12:00:00Z",
+  "completed_at": "2026-09-18T12:00:21Z"
 }`,
       },
       { type: 'heading', id: 'get-the-result', text: '4. Get the result' },
@@ -199,16 +204,27 @@ assessment = response.json()`,
         ],
         response: `{
   "assessment_id": "asm_01JABC123",
+  "status": "completed",
   "score": 9.2,
   "confidence": 0.92,
+  "criteria": { "correctness": 9.5, "relevance": 9.0, "actionability": 9.2, "specificity": 9.4, "pedagogical_fit": 8.8 },
   "feedback": {
     "summary": "The solution correctly identifies the maximum value...",
     "issues": [],
     "suggestions": [
       "Consider explicitly handling an empty input list."
     ]
-  }
+  },
+  "rubric_score": null,
+  "rubric_scores": null,
+  "simulated": true
 }`,
+      },
+      {
+        type: 'callout',
+        tone: 'info',
+        title: 'Test keys return simulated results',
+        text: 'With an `sk_test_` key the result is a placeholder marked `"simulated": true`, so you can build without spending credit. Switch to an `sk_live_` key for real feedback.',
       },
       { type: 'heading', id: 'next-steps', text: 'Next steps' },
       {
@@ -233,7 +249,7 @@ assessment = response.json()`,
       { type: 'heading', id: 'test-keys', text: 'Test keys' },
       {
         type: 'paragraph',
-        text: 'Keys prefixed with `sk_test_` are for development and testing. Assessments created with a test key are processed the same way but are not counted towards production usage.',
+        text: 'Keys prefixed with `sk_test_` are for development. Assessments made with a test key return a simulated result and never call the models, so they cost nothing and don’t count toward the daily live limit.',
       },
       { type: 'heading', id: 'live-keys', text: 'Live keys' },
       {

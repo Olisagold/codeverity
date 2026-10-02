@@ -32,7 +32,7 @@ export const docsNav: DocsNavGroup[] = [
       { title: 'Assessments', slug: 'api/assessments' },
       { title: 'Webhooks', slug: 'webhooks' },
       { title: 'API Keys', slug: 'api-keys' },
-      { title: 'Usage', slug: 'usage' },
+      { title: 'Usage and logs', slug: 'usage' },
     ],
   },
   {

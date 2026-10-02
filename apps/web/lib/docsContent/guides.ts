@@ -129,44 +129,33 @@ submission.save()`,
     slug: 'guides/webhooks',
     section: 'Guides',
     title: 'Configure webhooks',
-    description: 'Register an endpoint and verify the events Codeverity sends to it.',
+    description: 'Add an endpoint, verify the events Codeverity sends, and handle retries.',
     blocks: [
-      { type: 'heading', id: 'register', text: '1. Register an endpoint' },
+      { type: 'heading', id: 'register', text: '1. Add an endpoint' },
       {
-        type: 'endpoint',
-        method: 'POST',
-        path: '/v1/webhooks',
-        description: 'Registers a URL to receive assessment events.',
-        status: '201 Created',
-        request: [
-          {
-            label: 'cURL',
-            language: 'bash',
-            code: `curl https://api.codeverity.com/v1/webhooks \\
-  -H "Authorization: Bearer sk_live_xxxxxxxxx" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "url": "https://your-platform.com/webhooks/codeverity",
-    "events": ["assessment.completed", "assessment.failed"]
-  }'`,
-          },
+        type: 'list',
+        ordered: true,
+        items: [
+          'In the dashboard, open **Webhooks** and choose **Add endpoint**.',
+          'Enter your https URL, pick live or test, and choose the events to receive.',
+          'Copy the signing secret. It is shown once; store it as `CODEVERITY_WEBHOOK_SECRET`.',
+          'Use **Send test event** on the endpoint’s page to check your handler receives a `webhook.test` event.',
         ],
-        response: `{
-  "id": "whk_01JABC",
-  "url": "https://your-platform.com/webhooks/codeverity",
-  "events": ["assessment.completed", "assessment.failed"],
-  "secret": "whsec_xxxxxxxxxxxx"
-}`,
       },
       { type: 'heading', id: 'verify', text: '2. Verify the signature' },
       {
         type: 'paragraph',
-        text: 'Each delivery includes a `Codeverity-Signature` header computed with the webhook secret. Reject any request whose signature does not match.',
+        text: 'Each delivery includes `Codeverity-Signature: t=<unix time>,v1=<hex>`. Recompute the HMAC-SHA256 of `"<t>.<raw body>"` with your secret, compare in constant time, and reject anything older than five minutes. The [Webhooks](/docs/webhooks#verify) page has full handlers in JavaScript and Python.',
       },
       { type: 'heading', id: 'retries', text: '3. Handle retries' },
       {
         type: 'paragraph',
-        text: 'Deliveries that do not return a 2xx are retried with exponential backoff. Treat events as idempotent and key them on `id`.',
+        text: 'Deliveries that don’t return 2xx within 10 seconds are retried up to 6 attempts over about 9 hours. Retries keep the same event `id`, so store it and skip events you have already processed.',
+      },
+      { type: 'heading', id: 'rotate', text: '4. Rotate the secret' },
+      {
+        type: 'paragraph',
+        text: 'Use **Rotate secret** on the endpoint’s page if the secret may have leaked. The old secret stops working immediately, so update your server at the same time.',
       },
     ],
   },
@@ -174,31 +163,34 @@ submission.save()`,
     slug: 'guides/errors',
     section: 'Guides',
     title: 'Handle errors',
-    description: 'How to react to validation failures, rate limits, and failed assessments.',
+    description: 'How to react to invalid requests, rate limits, and failed assessments.',
     blocks: [
       { type: 'heading', id: 'shape', text: 'Error shape' },
       {
+        type: 'paragraph',
+        text: 'Errors return a `detail` message. Failed assessments also include a `code`. See [Error codes](/docs/errors) for the full list.',
+      },
+      {
         type: 'code',
         language: 'json',
-        label: 'Error',
+        label: '422 · failed assessment',
         code: `{
-  "error": {
-    "code": "INVALID_REQUEST",
-    "message": "The language field is required."
-  }
+  "detail": "Not enough models returned an assessment. Please submit it again later.",
+  "status": "failed",
+  "code": "MODELS_UNAVAILABLE"
 }`,
       },
       { type: 'heading', id: 'strategy', text: 'Recommended handling' },
       {
         type: 'table',
-        columns: ['Code', 'What to do'],
+        columns: ['Case', 'What to do'],
         rows: [
-          ['INVALID_REQUEST', 'Fix the payload. Do not retry unchanged.'],
-          ['INVALID_API_KEY', 'Check the environment variable and whether the key was revoked.'],
-          ['RESOURCE_NOT_FOUND', 'Verify the assessment id you stored against your submission.'],
-          ['RATE_LIMIT_EXCEEDED', 'Back off and retry after the window resets.'],
-          ['ASSESSMENT_FAILED', 'Surface a neutral message to the student and requeue the submission.'],
-          ['INTERNAL_ERROR', 'Retry with backoff; contact support if it persists.'],
+          ['401', 'Check the key in your environment variables and whether it was revoked.'],
+          ['404', 'Check the assessment ID, and that you use the same environment (live or test) that created it.'],
+          ['422 on create', 'Fix the field named in `detail`. Don’t retry unchanged.'],
+          ['429', 'Wait for `Retry-After` seconds, then retry.'],
+          ['MODELS_UNAVAILABLE, REVIEW_FAILED, PROCESSING_TIMEOUT', 'Submit the code again later as a new assessment.'],
+          ['500 or INTERNAL_ERROR', 'Retry with backoff. If it persists, contact support with the `X-Request-Id`.'],
         ],
       },
       {

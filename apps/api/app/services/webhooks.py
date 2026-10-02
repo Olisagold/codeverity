@@ -147,10 +147,15 @@ async def create_endpoint(
 
 
 async def get_owned(
-    db: AsyncSession, endpoint_id: uuid.UUID, organization_id: uuid.UUID
+    db: AsyncSession, public_id: str, organization_id: uuid.UUID
 ) -> WebhookEndpoint:
-    endpoint = await db.get(WebhookEndpoint, endpoint_id)
-    if endpoint is None or endpoint.organization_id != organization_id:
+    endpoint = await db.scalar(
+        select(WebhookEndpoint).where(
+            WebhookEndpoint.public_id == public_id,
+            WebhookEndpoint.organization_id == organization_id,
+        )
+    )
+    if endpoint is None:
         raise WebhookNotFound
     return endpoint
 
@@ -292,7 +297,7 @@ async def _send(
         "Content-Type": "application/json",
         "User-Agent": "Codeverity-Webhooks/1.0",
         "Codeverity-Event": delivery.event_type,
-        "Codeverity-Delivery": str(delivery.id),
+        "Codeverity-Delivery": delivery.public_id,
         "Codeverity-Signature": sign(endpoint.secret, int(time.time()), body),
     }
     try:

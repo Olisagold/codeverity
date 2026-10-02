@@ -28,11 +28,11 @@ class LogNotFound(Exception):
     pass
 
 
-def _key_ref(key_id: uuid.UUID | None, name: str | None) -> KeyRef | None:
-    return KeyRef(id=key_id, name=name) if key_id and name else None
+def _key_ref(public_id: str | None, name: str | None) -> KeyRef | None:
+    return KeyRef(id=public_id, name=name) if public_id and name else None
 
 
-def _log_out(entry: RequestLog, key_name: str | None) -> LogOut:
+def _log_out(entry: RequestLog, key_public_id: str | None, key_name: str | None) -> LogOut:
     return LogOut(
         id=entry.public_id,
         method=entry.method,
@@ -40,14 +40,14 @@ def _log_out(entry: RequestLog, key_name: str | None) -> LogOut:
         status=entry.status_code,
         duration_ms=entry.duration_ms,
         environment=entry.environment,
-        api_key=_key_ref(entry.api_key_id, key_name),
+        api_key=_key_ref(key_public_id, key_name),
         created_at=entry.created_at,
     )
 
 
 def _logs_query(organization_id: uuid.UUID):
     return (
-        select(RequestLog, ApiKey.name)
+        select(RequestLog, ApiKey.public_id, ApiKey.name)
         .outerjoin(ApiKey, ApiKey.id == RequestLog.api_key_id)
         .where(RequestLog.organization_id == organization_id)
     )
@@ -61,7 +61,7 @@ async def list_logs(
     before: str | None = None,
     status: LogStatus | None = None,
     environment: ApiKeyEnvironment | None = None,
-    api_key_id: uuid.UUID | None = None,
+    api_key_id: str | None = None,
     method: str | None = None,
 ) -> LogPage:
     query = _logs_query(organization_id)
@@ -75,12 +75,12 @@ async def list_logs(
     if environment:
         query = query.where(RequestLog.environment == environment)
     if api_key_id:
-        query = query.where(RequestLog.api_key_id == api_key_id)
+        query = query.where(ApiKey.public_id == api_key_id)
     if method:
         query = query.where(RequestLog.method == method.upper())
 
     rows = (await db.execute(query.order_by(RequestLog.public_id.desc()).limit(limit + 1))).all()
-    page = [_log_out(entry, name) for entry, name in rows[:limit]]
+    page = [_log_out(entry, key_id, name) for entry, key_id, name in rows[:limit]]
     return LogPage(data=page, next_cursor=page[-1].id if len(rows) > limit else None)
 
 
@@ -122,11 +122,11 @@ async def usage(
     keys = await db.execute(
         _scoped(
             RequestLog,
-            select(RequestLog.api_key_id, ApiKey.name, func.count()).outerjoin(
+            select(RequestLog.api_key_id, ApiKey.public_id, ApiKey.name, func.count()).outerjoin(
                 ApiKey, ApiKey.id == RequestLog.api_key_id
             ),
         )
-        .group_by(RequestLog.api_key_id, ApiKey.name)
+        .group_by(RequestLog.api_key_id, ApiKey.public_id, ApiKey.name)
         .order_by(func.count().desc())
     )
 
@@ -167,11 +167,11 @@ async def usage(
         series=series,
         by_key=[
             KeyUsage(
-                api_key=_key_ref(key_id, name),
+                api_key=_key_ref(public_id, name),
                 requests=count,
                 assessments=assessments_by_key.get(key_id, 0),
             )
-            for key_id, name, count in keys.all()
+            for key_id, public_id, name, count in keys.all()
         ],
     )
 

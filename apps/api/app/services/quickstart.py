@@ -21,11 +21,15 @@ async def progress(db: AsyncSession, organization: Organization) -> QuickstartOu
     org_id = organization.id
 
     async def _any(model, *where) -> bool:
-        return bool(await db.scalar(select(exists().where(model.organization_id == org_id, *where))))
+        query = select(exists().where(model.organization_id == org_id, *where))
+        return bool(await db.scalar(query))
 
     first_completed = await db.scalar(
         select(Assessment.public_id)
-        .where(Assessment.organization_id == org_id, Assessment.status == AssessmentStatus.completed)
+        .where(
+            Assessment.organization_id == org_id,
+            Assessment.status == AssessmentStatus.completed,
+        )
         .order_by(Assessment.public_id)
         .limit(1)
     )

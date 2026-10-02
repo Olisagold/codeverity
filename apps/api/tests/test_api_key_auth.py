@@ -126,11 +126,13 @@ def test_valid_key_identifies_organization(client: TestClient, live: Setup) -> N
     assert response.status_code == 200
     body = response.json()
     assert body["organization"] == {
-        "id": str(live.org.id),
+        "id": live.org.public_id,
         "name": live.org.name,
         "slug": live.org.slug,
     }
-    assert body["api_key"]["id"] == str(live.key.id)
+    assert body["api_key"]["id"] == live.key.public_id
+    assert body["api_key"]["id"].startswith("key_")
+    assert body["organization"]["id"].startswith("org_")
     assert body["api_key"]["environment"] == "live"
     assert body["api_key"]["masked"] == f"sk_live_••••••{live.secret[-4:]}"
     assert live.secret not in response.text
@@ -184,7 +186,7 @@ def test_right_prefix_wrong_secret(client: TestClient, live: Setup) -> None:
 def test_revoked_key(client: TestClient, live: Setup) -> None:
     assert client.get("/v1/me", headers=_bearer(live.secret)).status_code == 200
     revoke = client.delete(
-        f"/v1/api-keys/{live.key.id}",
+        f"/v1/api-keys/{live.key.public_id}",
         headers=_bearer(create_access_token(str(live.user.id), str(live.org.id))),
     )
     assert revoke.status_code == 204

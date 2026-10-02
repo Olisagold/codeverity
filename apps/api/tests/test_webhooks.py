@@ -118,6 +118,7 @@ def _create(client: TestClient, user: User, **body) -> dict:
 def test_create_returns_secret_once(client: TestClient, user: User) -> None:
     created = _create(client, user)
     assert created["secret"].startswith("whsec_")
+    assert created["id"].startswith("whk_")
     assert created["events"] == ["assessment.completed", "assessment.failed"]
     assert created["environment"] == "test"
 
@@ -233,7 +234,9 @@ def _finished_assessment(user: User, environment: ApiKeyEnvironment, *, failed: 
 def _deliveries(endpoint_id: str) -> list[WebhookDelivery]:
     async def _do(db: AsyncSession) -> list[WebhookDelivery]:
         result = await db.scalars(
-            select(WebhookDelivery).where(WebhookDelivery.endpoint_id == uuid.UUID(endpoint_id))
+            select(WebhookDelivery)
+            .join(WebhookEndpoint, WebhookEndpoint.id == WebhookDelivery.endpoint_id)
+            .where(WebhookEndpoint.public_id == endpoint_id)
         )
         return list(result)
 
@@ -280,7 +283,9 @@ def test_events_respect_environment_subscription_and_status(client: TestClient, 
 def _future_delivery(endpoint_id: str) -> uuid.UUID:
     async def _do(db: AsyncSession) -> uuid.UUID:
         delivery = WebhookDelivery(
-            endpoint_id=uuid.UUID(endpoint_id),
+            endpoint_id=await db.scalar(
+                select(WebhookEndpoint.id).where(WebhookEndpoint.public_id == endpoint_id)
+            ),
             event_id="evt_test",
             event_type="webhook.test",
             payload={"id": "evt_test", "type": "webhook.test", "data": {}},
@@ -320,6 +325,7 @@ def test_successful_delivery_is_signed(client: TestClient, user: User) -> None:
     assert delivery.delivered_at is not None
     [request] = seen
     assert request.headers["Codeverity-Event"] == "webhook.test"
+    assert request.headers["Codeverity-Delivery"].startswith("dlv_")
     timestamp, signature = (
         part.split("=", 1)[1] for part in request.headers["Codeverity-Signature"].split(",")
     )

@@ -1,4 +1,3 @@
-import uuid
 from datetime import datetime
 
 from pydantic import BaseModel, Field
@@ -13,7 +12,7 @@ class ApiKeyCreate(BaseModel):
 
 
 class ApiKeyOut(BaseModel):
-    id: uuid.UUID
+    id: str
     name: str
     description: str | None
     environment: ApiKeyEnvironment

@@ -130,7 +130,7 @@ def test_create_returns_full_key_once(client: TestClient, user: User) -> None:
     assert body["masked"] == f"sk_live_••••••{key[-4:]}"
 
     # Only the hash is stored, never the key itself.
-    stored = _run_db(lambda db: db.scalar(select(ApiKey).where(ApiKey.id == uuid.UUID(body["id"]))))
+    stored = _run_db(lambda db: db.scalar(select(ApiKey).where(ApiKey.public_id == body["id"])))
     assert stored.key_hash == key_service.hash_key(key)
     assert stored.key_hash != key
     assert stored.prefix == key_service.parse_prefix(key)

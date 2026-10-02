@@ -19,10 +19,10 @@ async def me(
     api_key = caller.api_key
     return MeResponse(
         organization=MeOrganization(
-            id=organization.id, name=organization.name, slug=organization.slug
+            id=organization.public_id, name=organization.name, slug=organization.slug
         ),
         api_key=MeApiKey(
-            id=api_key.id,
+            id=api_key.public_id,
             name=api_key.name,
             environment=api_key.environment,
             masked=keys.mask(api_key.environment, api_key.last_four),

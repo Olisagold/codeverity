@@ -1,4 +1,3 @@
-import uuid
 from datetime import datetime
 from typing import Literal
 
@@ -26,7 +25,7 @@ class WebhookUpdate(BaseModel):
 
 
 class WebhookOut(BaseModel):
-    id: uuid.UUID
+    id: str
     url: str
     environment: ApiKeyEnvironment
     description: str | None
@@ -43,7 +42,7 @@ class WebhookWithSecret(WebhookOut):
 
 
 class DeliveryOut(BaseModel):
-    id: uuid.UUID
+    id: str
     event_id: str
     event_type: str
     payload: dict

@@ -53,7 +53,7 @@ class Org:
     user: User
     test: str
     live: str
-    test_key_id: uuid.UUID
+    test_key_id: str
 
     @property
     def session(self) -> dict[str, str]:
@@ -90,7 +90,7 @@ def _make_org() -> Org:
             name="Prod",
             environment=ApiKeyEnvironment.live,
         )
-        return Org(user=user, test=test, live=live, test_key_id=test_key.id)
+        return Org(user=user, test=test, live=live, test_key_id=test_key.public_id)
 
     return _run_db(_do)
 
@@ -171,7 +171,7 @@ def test_log_filters_and_pagination(client: TestClient, org: Org) -> None:
     assert ids(status="error") == [404, 404]
     assert ids(status="success") == [202]
     assert ids(environment="live") == [404]
-    assert ids(api_key_id=str(org.test_key_id)) == [404, 202]
+    assert ids(api_key_id=org.test_key_id) == [404, 202]
     assert ids(method="post") == [202]
 
     first = client.get("/v1/logs", headers=org.session, params={"limit": 2}).json()

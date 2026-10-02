@@ -123,9 +123,13 @@ async def create(
     return api_key, generated.key
 
 
-async def get_owned(db: AsyncSession, key_id: uuid.UUID, organization_id: uuid.UUID) -> ApiKey:
-    api_key = await db.get(ApiKey, key_id)
-    if api_key is None or api_key.organization_id != organization_id:
+async def get_owned(db: AsyncSession, public_id: str, organization_id: uuid.UUID) -> ApiKey:
+    api_key = await db.scalar(
+        select(ApiKey).where(
+            ApiKey.public_id == public_id, ApiKey.organization_id == organization_id
+        )
+    )
+    if api_key is None:
         raise ApiKeyNotFound
     return api_key
 

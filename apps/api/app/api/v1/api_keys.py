@@ -6,7 +6,6 @@ revoke another's keys. The rules live in `app.services.api_keys`; this module
 only maps them to HTTP.
 """
 
-import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,7 +21,7 @@ router = APIRouter(prefix="/api-keys", tags=["api-keys"])
 
 def _to_out(api_key: ApiKey) -> ApiKeyOut:
     return ApiKeyOut(
-        id=api_key.id,
+        id=api_key.public_id,
         name=api_key.name,
         description=api_key.description,
         environment=api_key.environment,
@@ -33,7 +32,7 @@ def _to_out(api_key: ApiKey) -> ApiKeyOut:
     )
 
 
-async def _owned_or_404(db: AsyncSession, key_id: uuid.UUID, user: User) -> ApiKey:
+async def _owned_or_404(db: AsyncSession, key_id: str, user: User) -> ApiKey:
     try:
         return await keys.get_owned(db, key_id, user.organization_id)
     except keys.ApiKeyNotFound as exc:
@@ -74,7 +73,7 @@ async def create_api_key(
 
 @router.get("/{key_id}", response_model=ApiKeyOut)
 async def get_api_key(
-    key_id: uuid.UUID,
+    key_id: str,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> ApiKeyOut:
@@ -83,7 +82,7 @@ async def get_api_key(
 
 @router.delete("/{key_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def revoke_api_key(
-    key_id: uuid.UUID,
+    key_id: str,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> Response:

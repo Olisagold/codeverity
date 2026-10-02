@@ -1,4 +1,3 @@
-import uuid
 
 from pydantic import BaseModel
 
@@ -6,13 +5,13 @@ from app.models.api_key import ApiKeyEnvironment
 
 
 class MeOrganization(BaseModel):
-    id: uuid.UUID
+    id: str
     name: str
     slug: str
 
 
 class MeApiKey(BaseModel):
-    id: uuid.UUID
+    id: str
     name: str
     environment: ApiKeyEnvironment
     masked: str

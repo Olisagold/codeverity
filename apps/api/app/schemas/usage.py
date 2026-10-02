@@ -1,4 +1,3 @@
-import uuid
 from datetime import date, datetime
 from typing import Literal
 
@@ -11,7 +10,7 @@ LogStatus = Literal["success", "error"]
 
 
 class KeyRef(BaseModel):
-    id: uuid.UUID
+    id: str
     name: str
 
 

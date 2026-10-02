@@ -274,7 +274,7 @@ assessment = requests.post(
 Content-Type: application/json
 User-Agent: Codeverity-Webhooks/1.0
 Codeverity-Event: assessment.completed
-Codeverity-Delivery: 3f0c2a5e-6d7b-4c1e-9a8f-2b4d6e8f0a1c
+Codeverity-Delivery: dlv_01JXYZ5A7B9C1D3E5F7G9H1J3K
 Codeverity-Signature: t=1758196800,v1=5d41402abc4b2a76b9719d911017c592...`,
       },
       {
@@ -408,9 +408,9 @@ async def codeverity_webhook(request: Request):
           },
         ],
         response: `{
-  "organization": { "id": "b7dbb439-...", "name": "Acme Academy", "slug": "acme-academy" },
+  "organization": { "id": "org_01J9Z3K4X8QH7N2V5T6B0C1D2E", "name": "Acme Academy", "slug": "acme-academy" },
   "api_key": {
-    "id": "c16ca26d-...",
+    "id": "key_01J9Z3M2Q7RS4T6V8W0X2Y4Z6A",
     "name": "Production",
     "environment": "live",
     "masked": "sk_live_••••••BbnV"

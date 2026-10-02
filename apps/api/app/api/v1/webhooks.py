@@ -4,7 +4,6 @@ Authenticated with the dashboard session, scoped to the caller's organization.
 The signing secret is returned on creation and rotation only.
 """
 
-import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -27,7 +26,7 @@ router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 def _to_out(endpoint: WebhookEndpoint, last_delivery_at=None) -> WebhookOut:
     return WebhookOut(
         last_delivery_at=last_delivery_at,
-        id=endpoint.id,
+        id=endpoint.public_id,
         url=endpoint.url,
         environment=endpoint.environment,
         description=endpoint.description,
@@ -42,14 +41,25 @@ def _with_secret(endpoint: WebhookEndpoint) -> WebhookWithSecret:
 
 
 def _delivery_out(delivery: WebhookDelivery) -> DeliveryOut:
-    return DeliveryOut.model_validate(delivery, from_attributes=True)
+    return DeliveryOut(
+        id=delivery.public_id,
+        event_id=delivery.event_id,
+        event_type=delivery.event_type,
+        payload=delivery.payload,
+        status=delivery.status,
+        attempts=delivery.attempts,
+        last_status_code=delivery.last_status_code,
+        last_error=delivery.last_error,
+        created_at=delivery.created_at,
+        delivered_at=delivery.delivered_at,
+    )
 
 
 def _bad_url(exc: webhooks.InvalidWebhookUrl) -> HTTPException:
     return HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc))
 
 
-async def _owned_or_404(db: AsyncSession, endpoint_id: uuid.UUID, user: User) -> WebhookEndpoint:
+async def _owned_or_404(db: AsyncSession, endpoint_id: str, user: User) -> WebhookEndpoint:
     try:
         return await webhooks.get_owned(db, endpoint_id, user.organization_id)
     except webhooks.WebhookNotFound as exc:
@@ -92,7 +102,7 @@ async def create_webhook(
 
 @router.get("/{endpoint_id}", response_model=WebhookOut)
 async def get_webhook(
-    endpoint_id: uuid.UUID,
+    endpoint_id: str,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> WebhookOut:
@@ -103,7 +113,7 @@ async def get_webhook(
 
 @router.patch("/{endpoint_id}", response_model=WebhookOut)
 async def update_webhook(
-    endpoint_id: uuid.UUID,
+    endpoint_id: str,
     body: WebhookUpdate,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -120,7 +130,7 @@ async def update_webhook(
 
 @router.delete("/{endpoint_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_webhook(
-    endpoint_id: uuid.UUID,
+    endpoint_id: str,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> Response:
@@ -130,7 +140,7 @@ async def delete_webhook(
 
 @router.post("/{endpoint_id}/rotate-secret", response_model=WebhookWithSecret)
 async def rotate_webhook_secret(
-    endpoint_id: uuid.UUID,
+    endpoint_id: str,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> WebhookWithSecret:
@@ -141,7 +151,7 @@ async def rotate_webhook_secret(
 
 @router.post("/{endpoint_id}/test", response_model=DeliveryOut, status_code=202)
 async def send_test_event(
-    endpoint_id: uuid.UUID,
+    endpoint_id: str,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> DeliveryOut:
@@ -152,7 +162,7 @@ async def send_test_event(
 
 @router.get("/{endpoint_id}/deliveries", response_model=list[DeliveryOut])
 async def list_deliveries(
-    endpoint_id: uuid.UUID,
+    endpoint_id: str,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> list[DeliveryOut]:

@@ -1,4 +1,3 @@
-import uuid
 from datetime import datetime
 from typing import Literal
 
@@ -10,7 +9,7 @@ from app.schemas.assessments import RubricScore
 
 
 class SessionUser(BaseModel):
-    id: uuid.UUID
+    id: str
     name: str
     email: str
     # False for accounts created with Google or GitHub that never set one.
@@ -28,7 +27,7 @@ class Member(BaseModel):
 
 
 class SessionOrganization(BaseModel):
-    id: uuid.UUID
+    id: str
     name: str
     slug: str
     created_at: datetime

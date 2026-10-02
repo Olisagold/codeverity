@@ -15,6 +15,16 @@ export interface Session {
   };
 }
 
+/** Which getting started steps the organization has done. */
+export interface Quickstart {
+  api_key: boolean;
+  assessment: boolean;
+  webhook: boolean;
+  result_viewed: boolean;
+  first_completed_assessment_id: string | null;
+  dismissed: boolean;
+}
+
 export interface AssessmentSummary {
   id: string;
   status: AssessmentStatus;

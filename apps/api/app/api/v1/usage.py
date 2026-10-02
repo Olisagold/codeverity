@@ -1,6 +1,5 @@
 """Dashboard endpoints for request logs and usage. Authenticated with the dashboard session."""
 
-import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,7 +19,7 @@ async def list_logs(
     before: str | None = Query(None, description="`next_cursor` from the previous page."),
     status_filter: LogStatus | None = Query(None, alias="status"),
     environment: ApiKeyEnvironment | None = None,
-    api_key_id: uuid.UUID | None = None,
+    api_key_id: str | None = Query(None, max_length=40),
     method: str | None = Query(None, max_length=10),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

@@ -45,13 +45,13 @@ async def _session(db: AsyncSession, user: User) -> SessionOut:
     )
     return SessionOut(
         user=SessionUser(
-            id=user.id,
+            id=user.public_id,
             name=user.name,
             email=user.email,
             has_password=user.password_hash is not None,
         ),
         organization=SessionOrganization(
-            id=organization.id,
+            id=organization.public_id,
             name=organization.name,
             slug=organization.slug,
             created_at=organization.created_at,

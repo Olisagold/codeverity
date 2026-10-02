@@ -6,6 +6,7 @@ import type {
   Environment,
   LogEntry,
   LogPage,
+  Quickstart,
   Range,
   Session,
   Usage,
@@ -25,6 +26,11 @@ export const updateOrganization = (input: { name?: string; slug?: string }) =>
 
 export const changePassword = (input: { current_password?: string; new_password: string }) =>
   request<void>('/api/v1/dashboard/password', { method: 'POST', body: JSON.stringify(input) });
+
+export const getQuickstart = () => request<Quickstart>('/api/v1/dashboard/quickstart');
+
+export const dismissQuickstart = () =>
+  request<void>('/api/v1/dashboard/quickstart/dismiss', { method: 'POST' });
 
 export async function signOut() {
   try {

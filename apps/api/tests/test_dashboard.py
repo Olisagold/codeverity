@@ -22,7 +22,9 @@ other_org = shared.other_org
 def test_session_returns_user_and_organization(client: TestClient, org: Org) -> None:
     body = client.get("/v1/dashboard/session", headers=org.session).json()
     assert body["user"]["email"] == org.user.email
-    assert body["organization"]["id"] == str(org.user.organization_id)
+    assert body["organization"]["id"].startswith("org_")
+    assert body["user"]["id"].startswith("usr_")
+    assert str(org.user.organization_id) not in str(body)
     assert body["organization"]["members"] == [{"name": "Usage", "email": org.user.email}]
 
 
@@ -179,13 +181,19 @@ def test_quickstart_tracks_each_step(client: TestClient, org: Org, other_org: Or
     assert progress()["first_completed_assessment_id"] == done
     client.get(f"/v1/dashboard/assessments/{done}", headers=org.session)
     assert progress()["result_viewed"] is True
-    assert client.get("/v1/dashboard/quickstart", headers=other_org.session).json()[
-        "result_viewed"
-    ] is False
+    assert (
+        client.get("/v1/dashboard/quickstart", headers=other_org.session).json()["result_viewed"]
+        is False
+    )
 
 
 def test_quickstart_counts_result_fetched_with_api(client: TestClient, org: Org) -> None:
-    done = _add(org, status=AssessmentStatus.completed, score=8.0)
+    done = _add(
+        org,
+        status=AssessmentStatus.completed,
+        score=8.0,
+        feedback={"summary": "Good.", "issues": [], "suggestions": []},
+    )
     response = client.get(f"/v1/assessments/{done}/result", headers=_key(org.test))
     assert response.status_code == 200
     body = client.get("/v1/dashboard/quickstart", headers=org.session).json()

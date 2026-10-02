@@ -12,9 +12,9 @@ import { StatusBadge } from '@/components/dashboard/StatusBadge';
 import { EmptyState } from '@/components/dashboard/EmptyState';
 import { ErrorState } from '@/components/dashboard/ErrorState';
 import { Skeleton } from '@/components/dashboard/Skeleton';
-import { QuickstartCard } from '@/components/dashboard/QuickstartCard';
+import { QuickstartCard, quickstartSteps } from '@/components/dashboard/QuickstartCard';
 import { useApi } from '@/hooks/useApi';
-import { getUsage, listAssessments } from '@/lib/api/dashboard';
+import { dismissQuickstart, getQuickstart, getUsage, listAssessments } from '@/lib/api/dashboard';
 import { formatNumber, formatRelative, percent } from '@/lib/format';
 import { toSeries } from '@/lib/series';
 import type { AssessmentSummary } from '@/types/api';
@@ -44,11 +44,21 @@ const columns: Column<AssessmentSummary>[] = [
 
 export default function DashboardOverviewPage() {
   const [range, setRange] = useState<Range>('7d');
-  const [showQuickstart, setShowQuickstart] = useState(true);
   const router = useRouter();
 
   const usage = useApi(() => getUsage(range), [range], 'Could not load activity.');
   const recent = useApi(() => listAssessments({ limit: 5 }), [], 'Could not load recent assessments.');
+  const quickstart = useApi(getQuickstart, [], 'Could not load quickstart.');
+  const progress = quickstart.data;
+  // Hidden once dismissed or finished. Errors just leave it hidden.
+  const showQuickstart = progress && !progress.dismissed && quickstartSteps(progress).some((step) => !step.done);
+
+  function hideQuickstart() {
+    if (!progress) return;
+    quickstart.setData({ ...progress, dismissed: true });
+    // If saving fails the card just comes back on the next visit.
+    dismissQuickstart().catch(() => undefined);
+  }
   const totals = usage.data?.totals;
 
   return (
@@ -59,7 +69,7 @@ export default function DashboardOverviewPage() {
         actions={<RangeToggle value={range} onChange={setRange} />}
       />
 
-      {showQuickstart ? <QuickstartCard onDismiss={() => setShowQuickstart(false)} /> : null}
+      {progress && showQuickstart ? <QuickstartCard progress={progress} onDismiss={hideQuickstart} /> : null}
 
       {usage.error ? (
         <ErrorState title="Could not load activity." description={usage.error} />

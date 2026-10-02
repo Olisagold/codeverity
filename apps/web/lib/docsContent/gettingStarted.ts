@@ -274,12 +274,12 @@ assessment = response.json()`,
         label: '200 OK',
         code: `{
   "organization": {
-    "id": "b7dbb439-54fc-4617-a34d-c03c955df537",
+    "id": "org_01J9Z3K4X8QH7N2V5T6B0C1D2E",
     "name": "Acme Academy",
     "slug": "acme-academy"
   },
   "api_key": {
-    "id": "c16ca26d-f82e-41aa-b745-88d9609c9729",
+    "id": "key_01J9Z3M2Q7RS4T6V8W0X2Y4Z6A",
     "name": "Production",
     "environment": "live",
     "masked": "sk_live_••••••BbnV"

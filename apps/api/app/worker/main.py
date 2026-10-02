@@ -13,13 +13,15 @@ from collections.abc import Awaitable, Callable
 import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import get_settings
 from app.db.session import SessionLocal, engine
-from app.services import assessments, webhooks
+from app.services import assessments, usage, webhooks
 from app.services.orchestration import processor
 
 log = logging.getLogger("codeverity.worker")
 
 IDLE_POLL_SECONDS = 1.0
+PRUNE_INTERVAL_SECONDS = 3600
 
 
 async def process_next(db: AsyncSession) -> bool:
@@ -61,6 +63,22 @@ async def _loop(name: str, step: Callable[[AsyncSession], Awaitable[bool]], stop
                 pass
 
 
+async def _prune_logs(stop: asyncio.Event) -> None:
+    """Delete request logs past the retention period, once an hour."""
+    while not stop.is_set():
+        try:
+            async with SessionLocal() as db:
+                deleted = await usage.prune_logs(db, get_settings().log_retention_days)
+            if deleted:
+                log.info("pruned %d request logs", deleted)
+        except Exception:
+            log.exception("log pruning error")
+        try:
+            await asyncio.wait_for(stop.wait(), timeout=PRUNE_INTERVAL_SECONDS)
+        except TimeoutError:
+            pass
+
+
 async def run(stop: asyncio.Event) -> None:
     log.info("worker started")
     async with httpx.AsyncClient(
@@ -69,6 +87,7 @@ async def run(stop: asyncio.Event) -> None:
         await asyncio.gather(
             _loop("assessments", process_next, stop),
             _loop("webhooks", lambda db: webhooks.deliver_next(db, client), stop),
+            _prune_logs(stop),
         )
     await engine.dispose()
     log.info("worker stopped")

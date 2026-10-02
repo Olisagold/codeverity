@@ -82,7 +82,9 @@ async def list_logs(
 
 
 async def get_log(db: AsyncSession, organization_id: uuid.UUID, public_id: str) -> LogOut:
-    row = (await db.execute(_logs_query(organization_id).where(RequestLog.public_id == public_id))).first()
+    row = (
+        await db.execute(_logs_query(organization_id).where(RequestLog.public_id == public_id))
+    ).first()
     if row is None:
         raise LogNotFound
     return _log_out(*row)
@@ -119,8 +121,9 @@ async def usage(
     keys = await db.execute(
         _scoped(
             RequestLog,
-            select(RequestLog.api_key_id, ApiKey.name, func.count())
-            .outerjoin(ApiKey, ApiKey.id == RequestLog.api_key_id),
+            select(RequestLog.api_key_id, ApiKey.name, func.count()).outerjoin(
+                ApiKey, ApiKey.id == RequestLog.api_key_id
+            ),
         )
         .group_by(RequestLog.api_key_id, ApiKey.name)
         .order_by(func.count().desc())

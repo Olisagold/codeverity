@@ -7,7 +7,13 @@ from fastapi.testclient import TestClient
 
 from app.models.api_key import ApiKeyEnvironment
 from app.models.assessment import Assessment, AssessmentStatus
-from tests.test_usage import PAYLOAD, Org, _key, _run_db, client, org, other_org  # noqa: F401
+from tests import test_usage as shared
+from tests.test_usage import Org, _key, _run_db
+
+# Same fixtures as the usage tests: an organization with a user and two keys.
+client = shared.client
+org = shared.org
+other_org = shared.other_org
 
 
 def test_session_returns_user_and_organization(client: TestClient, org: Org) -> None:

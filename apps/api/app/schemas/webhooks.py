@@ -33,6 +33,7 @@ class WebhookOut(BaseModel):
     events: list[str]
     active: bool
     created_at: datetime
+    last_delivery_at: datetime | None = None
 
 
 class WebhookWithSecret(WebhookOut):
@@ -45,6 +46,7 @@ class DeliveryOut(BaseModel):
     id: uuid.UUID
     event_id: str
     event_type: str
+    payload: dict
     status: DeliveryStatus
     attempts: int
     last_status_code: int | None

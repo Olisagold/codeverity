@@ -103,6 +103,19 @@ async def list_endpoints(db: AsyncSession, organization_id: uuid.UUID) -> list[W
     return list(result)
 
 
+async def last_delivery_times(
+    db: AsyncSession, endpoint_ids: list[uuid.UUID]
+) -> dict[uuid.UUID, datetime]:
+    if not endpoint_ids:
+        return {}
+    rows = await db.execute(
+        select(WebhookDelivery.endpoint_id, func.max(WebhookDelivery.created_at))
+        .where(WebhookDelivery.endpoint_id.in_(endpoint_ids))
+        .group_by(WebhookDelivery.endpoint_id)
+    )
+    return dict(rows.all())
+
+
 async def create_endpoint(
     db: AsyncSession,
     *,

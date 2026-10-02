@@ -24,8 +24,9 @@ from app.services import webhooks
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 
 
-def _to_out(endpoint: WebhookEndpoint) -> WebhookOut:
+def _to_out(endpoint: WebhookEndpoint, last_delivery_at=None) -> WebhookOut:
     return WebhookOut(
+        last_delivery_at=last_delivery_at,
         id=endpoint.id,
         url=endpoint.url,
         environment=endpoint.environment,
@@ -59,7 +60,9 @@ async def _owned_or_404(db: AsyncSession, endpoint_id: uuid.UUID, user: User) ->
 async def list_webhooks(
     user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ) -> list[WebhookOut]:
-    return [_to_out(e) for e in await webhooks.list_endpoints(db, user.organization_id)]
+    endpoints = await webhooks.list_endpoints(db, user.organization_id)
+    last = await webhooks.last_delivery_times(db, [e.id for e in endpoints])
+    return [_to_out(e, last.get(e.id)) for e in endpoints]
 
 
 @router.post("", response_model=WebhookWithSecret, status_code=status.HTTP_201_CREATED)
@@ -93,7 +96,9 @@ async def get_webhook(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> WebhookOut:
-    return _to_out(await _owned_or_404(db, endpoint_id, user))
+    endpoint = await _owned_or_404(db, endpoint_id, user)
+    last = await webhooks.last_delivery_times(db, [endpoint.id])
+    return _to_out(endpoint, last.get(endpoint.id))
 
 
 @router.patch("/{endpoint_id}", response_model=WebhookOut)

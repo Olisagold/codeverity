@@ -21,6 +21,7 @@ async def list_logs(
     status_filter: LogStatus | None = Query(None, alias="status"),
     environment: ApiKeyEnvironment | None = None,
     api_key_id: uuid.UUID | None = None,
+    method: str | None = Query(None, max_length=10),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> LogPage:
@@ -33,6 +34,7 @@ async def list_logs(
         status=status_filter,
         environment=environment,
         api_key_id=api_key_id,
+        method=method,
     )
 
 

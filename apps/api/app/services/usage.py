@@ -62,6 +62,7 @@ async def list_logs(
     status: LogStatus | None = None,
     environment: ApiKeyEnvironment | None = None,
     api_key_id: uuid.UUID | None = None,
+    method: str | None = None,
 ) -> LogPage:
     query = _logs_query(organization_id)
     # Public IDs are ULIDs, so they sort by creation time.
@@ -75,6 +76,8 @@ async def list_logs(
         query = query.where(RequestLog.environment == environment)
     if api_key_id:
         query = query.where(RequestLog.api_key_id == api_key_id)
+    if method:
+        query = query.where(RequestLog.method == method.upper())
 
     rows = (await db.execute(query.order_by(RequestLog.public_id.desc()).limit(limit + 1))).all()
     page = [_log_out(entry, name) for entry, name in rows[:limit]]
@@ -127,7 +130,20 @@ async def usage(
         .order_by(func.count().desc())
     )
 
+    key_assessments = await db.execute(
+        _scoped(Assessment, select(Assessment.api_key_id, func.count())).group_by(
+            Assessment.api_key_id
+        )
+    )
+    avg_seconds = await db.scalar(
+        _scoped(
+            Assessment,
+            select(func.avg(func.extract("epoch", Assessment.completed_at - Assessment.started_at))),
+        ).where(Assessment.status == AssessmentStatus.completed)
+    )
+
     by_status: dict[AssessmentStatus, int] = dict(statuses.all())
+    assessments_by_key: dict[uuid.UUID | None, int] = dict(key_assessments.all())
     series = [
         UsagePoint(
             date=day,
@@ -144,10 +160,15 @@ async def usage(
             assessments=sum(by_status.values()),
             completed=by_status.get(AssessmentStatus.completed, 0),
             failed=by_status.get(AssessmentStatus.failed, 0),
+            avg_processing_seconds=round(float(avg_seconds), 1) if avg_seconds else None,
         ),
         series=series,
         by_key=[
-            KeyUsage(api_key=_key_ref(key_id, name), requests=count)
+            KeyUsage(
+                api_key=_key_ref(key_id, name),
+                requests=count,
+                assessments=assessments_by_key.get(key_id, 0),
+            )
             for key_id, name, count in keys.all()
         ],
     )

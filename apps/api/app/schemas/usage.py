@@ -37,6 +37,7 @@ class UsageTotals(BaseModel):
     assessments: int
     completed: int
     failed: int
+    avg_processing_seconds: float | None
 
 
 class UsagePoint(BaseModel):
@@ -48,6 +49,7 @@ class UsagePoint(BaseModel):
 class KeyUsage(BaseModel):
     api_key: KeyRef | None
     requests: int
+    assessments: int
 
 
 class UsageOut(BaseModel):

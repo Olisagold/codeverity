@@ -9,6 +9,7 @@ from app.core.security import hash_password
 from app.models.api_key import ApiKeyEnvironment
 from app.models.assessment import Assessment, AssessmentStatus
 from app.models.user import User
+from app.models.webhook import WebhookEndpoint
 from tests import test_usage as shared
 from tests.test_usage import Org, _key, _run_db
 
@@ -136,7 +137,74 @@ def test_assessments_are_scoped_to_organization(
     assert listed["data"] == []
 
 
-@pytest.mark.parametrize("path", ["/v1/dashboard/session", "/v1/dashboard/assessments"])
+def _add_webhook(org: Org) -> None:
+    async def _do(db) -> None:
+        db.add(
+            WebhookEndpoint(
+                organization_id=org.user.organization_id,
+                environment=ApiKeyEnvironment.test,
+                url="https://example.com/hook",
+                events=["assessment.completed"],
+                secret="whsec_test",
+            )
+        )
+        await db.commit()
+
+    _run_db(_do)
+
+
+def test_quickstart_tracks_each_step(client: TestClient, org: Org, other_org: Org) -> None:
+    def progress() -> dict:
+        return client.get("/v1/dashboard/quickstart", headers=org.session).json()
+
+    # The fixture organization already has keys and nothing else.
+    assert progress() == {
+        "api_key": True,
+        "assessment": False,
+        "webhook": False,
+        "result_viewed": False,
+        "first_completed_assessment_id": None,
+        "dismissed": False,
+    }
+
+    queued = _add(org)
+    _add_webhook(org)
+    assert (progress()["assessment"], progress()["webhook"]) == (True, True)
+
+    # Opening an unfinished assessment is not seeing a result.
+    client.get(f"/v1/dashboard/assessments/{queued}", headers=org.session)
+    assert progress()["result_viewed"] is False
+
+    done = _add(org, status=AssessmentStatus.completed, score=8.0)
+    assert progress()["first_completed_assessment_id"] == done
+    client.get(f"/v1/dashboard/assessments/{done}", headers=org.session)
+    assert progress()["result_viewed"] is True
+    assert client.get("/v1/dashboard/quickstart", headers=other_org.session).json()[
+        "result_viewed"
+    ] is False
+
+
+def test_quickstart_counts_result_fetched_with_api(client: TestClient, org: Org) -> None:
+    done = _add(org, status=AssessmentStatus.completed, score=8.0)
+    response = client.get(f"/v1/assessments/{done}/result", headers=_key(org.test))
+    assert response.status_code == 200
+    body = client.get("/v1/dashboard/quickstart", headers=org.session).json()
+    assert body["result_viewed"] is True
+
+
+def test_quickstart_dismiss_is_per_organization(
+    client: TestClient, org: Org, other_org: Org
+) -> None:
+    response = client.post("/v1/dashboard/quickstart/dismiss", headers=org.session)
+    assert response.status_code == 204
+    assert client.get("/v1/dashboard/quickstart", headers=org.session).json()["dismissed"] is True
+    other = client.get("/v1/dashboard/quickstart", headers=other_org.session).json()
+    assert other["dismissed"] is False
+
+
+@pytest.mark.parametrize(
+    "path", ["/v1/dashboard/session", "/v1/dashboard/assessments", "/v1/dashboard/quickstart"]
+)
 def test_dashboard_requires_session(client: TestClient, org: Org, path: str) -> None:
     assert client.get(path).status_code == 401
     assert client.get(path, headers=_key(org.test)).status_code == 401

@@ -8,12 +8,17 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api import rate_limit
 from app.api.deps import ApiCaller, get_api_caller, get_db
 from app.models.assessment import Assessment, AssessmentStatus
 from app.schemas.assessments import AssessmentCreate, AssessmentOut, AssessmentResult
 from app.services import assessments
 
-router = APIRouter(prefix="/assessments", tags=["assessments"])
+router = APIRouter(
+    prefix="/assessments",
+    tags=["assessments"],
+    dependencies=[Depends(rate_limit.limit_requests)],
+)
 
 
 def _to_out(assessment: Assessment) -> AssessmentOut:
@@ -45,6 +50,7 @@ async def create_assessment(
     db: AsyncSession = Depends(get_db),
 ) -> AssessmentOut:
     """Accept a submission and queue it. Poll the assessment or use webhooks for the result."""
+    await rate_limit.check_assessment_quota(caller)
     assessment = await assessments.create(
         db,
         organization_id=caller.organization_id,

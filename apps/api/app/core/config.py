@@ -58,6 +58,12 @@ class Settings(BaseSettings):
     # Fewest successful model assessments needed before the review runs.
     min_model_results: int = 2
 
+    # Public API limits. 0 turns a limit off.
+    rate_limit_requests_per_minute: int = 120
+    rate_limit_assessments_per_minute: int = 10
+    # Caps model spend: live assessments per organization per UTC day.
+    live_assessments_per_day: int = 200
+
     @property
     def cors_origins(self) -> list[str]:
         return [origin.strip() for origin in self.api_cors_origins.split(",") if origin.strip()]

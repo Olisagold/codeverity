@@ -11,12 +11,15 @@ import { ErrorState } from '@/components/dashboard/ErrorState';
 import { Skeleton } from '@/components/dashboard/Skeleton';
 import { DataTable, type Column } from '@/components/dashboard/DataTable';
 import { SecretModal } from '@/components/dashboard/SecretModal';
+import { Modal } from '@/components/dashboard/Modal';
 import { CodePre } from '@/components/ui/CodePre';
 import { useApi } from '@/hooks/useApi';
 import { errorMessage } from '@/lib/api/client';
 import { getWebhook, listDeliveries, rotateWebhookSecret, sendTestEvent, updateWebhook } from '@/lib/api/dashboard';
 import { formatDateTime, formatRelative } from '@/lib/format';
-import type { Delivery } from '@/types/api';
+import type { Delivery, WebhookEvent } from '@/types/api';
+
+const allEvents: WebhookEvent[] = ['assessment.completed', 'assessment.failed'];
 
 const deliveryTone: Record<Delivery['status'], 'success' | 'error' | 'neutral'> = {
   succeeded: 'success',
@@ -56,6 +59,10 @@ export default function WebhookDetailsPage() {
   const [secret, setSecret] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [editUrl, setEditUrl] = useState('');
+  const [editEvents, setEditEvents] = useState<WebhookEvent[]>([]);
+  const [editError, setEditError] = useState('');
 
   async function run(action: () => Promise<void>, failure: string) {
     setBusy(true);
@@ -106,6 +113,32 @@ export default function WebhookDetailsPage() {
     );
   }
 
+  function openEdit() {
+    if (!webhook) return;
+    setEditUrl(webhook.url);
+    setEditEvents(webhook.events);
+    setEditError('');
+    setEditing(true);
+  }
+
+  async function saveEdit() {
+    if (!webhook) return;
+    if (editEvents.length === 0) {
+      setEditError('Choose at least one event.');
+      return;
+    }
+    setBusy(true);
+    setEditError('');
+    try {
+      endpoint.setData(await updateWebhook(webhook.id, { url: editUrl.trim(), events: editEvents }));
+      setEditing(false);
+    } catch (error) {
+      setEditError(errorMessage(error, 'Could not save the endpoint.'));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   const columns: Column<Delivery>[] = [
     {
       key: 'event',
@@ -139,6 +172,9 @@ export default function WebhookDetailsPage() {
         description={webhook.url}
         actions={
           <div className="flex flex-wrap gap-2">
+            <button type="button" disabled={busy} className={buttonClasses} onClick={openEdit}>
+              Edit
+            </button>
             <button
               type="button"
               disabled={busy}
@@ -279,6 +315,62 @@ export default function WebhookDetailsPage() {
           />
         </section>
       ) : null}
+
+      <Modal
+        open={editing}
+        title="Edit webhook endpoint"
+        onClose={() => setEditing(false)}
+        footer={
+          <>
+            <button type="button" onClick={() => setEditing(false)} className={buttonClasses}>
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={saveEdit}
+              disabled={busy}
+              className="rounded-lg bg-white px-3 py-1.5 text-[13px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50"
+            >
+              Save
+            </button>
+          </>
+        }
+      >
+        <div className="space-y-5">
+          <div>
+            <label htmlFor="edit-url" className="text-[13px] font-medium text-white">
+              Endpoint URL
+            </label>
+            <input
+              id="edit-url"
+              value={editUrl}
+              onChange={(event) => setEditUrl(event.target.value)}
+              className="mt-2 h-11 w-full rounded-lg border border-line bg-base px-3 font-mono text-[12.5px] text-white transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+            />
+          </div>
+          <fieldset>
+            <legend className="text-[13px] font-medium text-white">Events</legend>
+            <div className="mt-2 space-y-2">
+              {allEvents.map((event) => (
+                <label key={event} className="flex items-center gap-2.5 font-mono text-[12.5px] text-muted">
+                  <input
+                    type="checkbox"
+                    checked={editEvents.includes(event)}
+                    onChange={() =>
+                      setEditEvents((current) =>
+                        current.includes(event) ? current.filter((item) => item !== event) : [...current, event]
+                      )
+                    }
+                    className="h-3.5 w-3.5 rounded border-line-strong bg-base text-accent focus:ring-2 focus:ring-accent"
+                  />
+                  {event}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          {editError ? <p className="text-[12.5px] text-amber">{editError}</p> : null}
+        </div>
+      </Modal>
 
       <SecretModal
         secret={secret}

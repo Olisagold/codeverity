@@ -8,8 +8,8 @@
 |---|---|---|
 | 0 | Scaffold, Docker, health checks | Done |
 | 1 | Auth, organizations, API keys | Done |
-| 2 | Assessment CRUD, job queue | Done (simulated results until Phase 3) |
-| 3 | Multi model orchestration | Not started |
+| 2 | Assessment CRUD, job queue | Done |
+| 3 | Multi model orchestration | Done |
 | 4 | Webhooks | Not started |
 | 5 | Usage, logs, rate limiting | Not started |
 | 6 | Migrations, deploy, hardening | Not started |
@@ -56,20 +56,20 @@ apps/api/
 │   ├── services/
 │   │   ├── auth/           OAuth, OTP codes, user resolution, state and exchange codes
 │   │   ├── email/          Sendlib client for the signup OTP email
-│   │   └── orchestration/  Model dispatch and reassessment (Phase 3, empty)
+│   │   └── orchestration/  Model adapters, parallel assessment, Claude review
 │   ├── api/
 │   │   ├── health.py      Unversioned health checks
 │   │   └── v1/
 │   │       ├── router.py   Versioned API routes
 │   │       └── auth.py     Google, GitHub, and email/password sign in endpoints
-│   └── worker/             Background job worker (Phase 2, empty)
+│   └── worker/             Background job worker
 ├── alembic/                Migrations
 ├── tests/
 ├── docs/diagrams/          Architecture diagrams
 └── Dockerfile
 ```
 
-`services/orchestration` and `worker` are still empty placeholders for later phases. Everything else above is real, working code.
+Everything above is real, working code.
 
 <br/>
 
@@ -204,9 +204,8 @@ Matches the shapes in the docs (`/docs/api/assessments`).
   from Postgres with `FOR UPDATE SKIP LOCKED`, so a saved assessment can't be
   lost and any number of workers can run. Jobs stuck in `processing` for 10
   minutes are retried, up to 3 attempts, then marked failed.
-- `app/services/orchestration/processor.py` is where Phase 3 plugs in. Until
-  then, test keys get a result marked `simulated: true` and live keys fail with
-  `ORCHESTRATION_UNAVAILABLE`, so no production caller gets a made-up grade.
+- Test keys get a result marked `simulated: true` and never call the models,
+  so integrations can be built without spending credit.
 
 <br/>
 
@@ -214,10 +213,11 @@ Matches the shapes in the docs (`/docs/api/assessments`).
 
 The core of the product. See [assessment-lifecycle.png](docs/diagrams/assessment-lifecycle.png).
 
-- One interface, one adapter per model provider
-- Fan out to N models in parallel
-- An independent judge pass that resolves disagreement into one result
-- Timeout and retry handling, so one bad model does not fail the whole run
+- GPT-6 Luna, Gemini Flash and DeepSeek V4.1 Flash write feedback in parallel
+- Claude Sonnet 5.5 scores each one, then writes the final feedback and scores it
+- Gemini works through a list of models, falling back to a cheaper one when rate limited or busy
+- A run needs `MIN_MODEL_RESULTS` (default 2) assessments, so one failed model does not fail it
+- Tuned for cost: low assessor effort, capped output tokens, medium reviewer effort
 
 <br/>
 

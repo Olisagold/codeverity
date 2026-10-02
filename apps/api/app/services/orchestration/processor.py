@@ -5,6 +5,7 @@ Gemini, DeepSeek) write feedback in parallel, then Claude reviews it and
 produces the final result. Test keys get a clearly labelled simulated result,
 so integrations can be built end to end without spending model credits.
 """
+
 import asyncio
 import logging
 import time
@@ -66,7 +67,10 @@ async def process(assessment: Assessment) -> Outcome:
         confidence=round(0.5 * verdict.agreement + 0.05 * score, 2),
         criteria=verdict.criteria,
         feedback=verdict.feedback,
-        model_results=[*results, {"provider": "anthropic", "model": verdict.model, "role": "review"}],
+        model_results=[
+            *results,
+            {"provider": "anthropic", "model": verdict.model, "role": "review"},
+        ],
     )
 
 

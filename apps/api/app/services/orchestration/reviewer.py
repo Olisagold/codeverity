@@ -1,4 +1,5 @@
 """Claude's review pass: scores each model's feedback and writes the final result."""
+
 import json
 from dataclasses import dataclass
 
@@ -38,9 +39,7 @@ async def review(assessment: Assessment, candidates: list[dict]) -> Review:
                 "format": {"type": "json_schema", "schema": prompts.REVIEW_SCHEMA},
             },
             system=prompts.REVIEWER_SYSTEM,
-            messages=[
-                {"role": "user", "content": prompts.reviewer_prompt(assessment, candidates)}
-            ],
+            messages=[{"role": "user", "content": prompts.reviewer_prompt(assessment, candidates)}],
         )
     except anthropic.APIError as exc:
         raise ReviewError(f"Claude request failed: {type(exc).__name__}") from exc

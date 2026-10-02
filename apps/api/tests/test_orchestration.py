@@ -84,7 +84,9 @@ def test_pipeline_combines_models_and_review(configured, fake_review) -> None:
 
 
 def test_pipeline_tolerates_one_failed_model(configured, fake_review) -> None:
-    configured([FakeProvider("openai"), FakeProvider("gemini", fail=True), FakeProvider("deepseek")])
+    configured(
+        [FakeProvider("openai"), FakeProvider("gemini", fail=True), FakeProvider("deepseek")]
+    )
     outcome = asyncio.run(processor.process(_assessment()))
 
     assert len(fake_review[0]) == 2

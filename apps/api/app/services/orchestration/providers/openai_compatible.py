@@ -1,4 +1,5 @@
 """OpenAI and DeepSeek, which share the chat completions API."""
+
 import httpx
 
 from app.services.orchestration.providers.base import Completion, ProviderError, post_json

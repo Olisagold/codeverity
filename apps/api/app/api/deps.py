@@ -22,6 +22,7 @@ from app.db.session import get_db
 from app.models.api_key import ApiKey, ApiKeyEnvironment
 from app.models.user import User
 from app.services import api_keys as key_service
+from app.services.auth import revocation
 
 _bearer = HTTPBearer(auto_error=False)
 
@@ -42,7 +43,7 @@ async def get_current_user(
         payload = decode_token(credentials.credentials)
     except jwt.PyJWTError as exc:
         raise _UNAUTHORIZED from exc
-    if payload.get("type") != "access":
+    if payload.get("type") != "access" or await revocation.is_revoked(payload):
         raise _UNAUTHORIZED
 
     try:

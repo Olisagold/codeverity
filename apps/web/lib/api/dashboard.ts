@@ -27,8 +27,12 @@ export const changePassword = (input: { current_password?: string; new_password:
   request<void>('/api/v1/dashboard/password', { method: 'POST', body: JSON.stringify(input) });
 
 export async function signOut() {
-  await fetch('/api/auth/logout', { method: 'POST' });
-  window.location.href = '/login';
+  try {
+    await fetch('/api/auth/logout', { method: 'POST' });
+  } finally {
+    // A full page load also drops the cached session in memory.
+    window.location.replace('/login');
+  }
 }
 
 // ── Assessments ───────────────────────────────────────────

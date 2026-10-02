@@ -1,5 +1,7 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
+import jwt
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response, status
 from fastapi.responses import RedirectResponse
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,6 +10,7 @@ from app.core.config import get_settings
 from app.core.security import (
     create_access_token,
     create_refresh_token,
+    decode_token,
     hash_password,
     verify_password,
 )
@@ -18,6 +21,7 @@ from app.schemas.auth import (
     ForgotPasswordRequest,
     ForgotPasswordResponse,
     LoginRequest,
+    LogoutRequest,
     ResetPasswordRequest,
     ResetPasswordResponse,
     SignupRequest,
@@ -25,7 +29,7 @@ from app.schemas.auth import (
     TokenPair,
     VerifyOtpRequest,
 )
-from app.services.auth import oauth_state, otp, password_reset
+from app.services.auth import oauth_state, otp, password_reset, revocation
 from app.services.auth.github import NoVerifiedEmailError
 from app.services.auth.github import build_authorize_url as build_github_authorize_url
 from app.services.auth.github import fetch_profile as fetch_github_profile
@@ -43,6 +47,7 @@ from app.services.email.sendlib import (
 )
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+_bearer = HTTPBearer(auto_error=False)
 
 
 def _issue_tokens(user: User) -> TokenPair:
@@ -272,3 +277,22 @@ async def exchange(payload: ExchangeRequest) -> TokenPair:
     if stored is None:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid or expired code.")
     return TokenPair.model_validate_json(stored)
+
+
+@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+async def logout(
+    payload: LogoutRequest | None = None,
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
+) -> Response:
+    """Revoke the access token (bearer header) and refresh token (body).
+
+    Always 204: tokens that are missing, invalid, or expired need no revoking.
+    """
+    tokens = [credentials.credentials if credentials else None]
+    tokens.append(payload.refresh_token if payload else None)
+    for token in filter(None, tokens):
+        try:
+            await revocation.revoke(decode_token(token))
+        except jwt.PyJWTError:
+            continue
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

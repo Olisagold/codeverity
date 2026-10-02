@@ -47,3 +47,7 @@ class ResetPasswordRequest(BaseModel):
 
 class ResetPasswordResponse(BaseModel):
     message: str
+
+
+class LogoutRequest(BaseModel):
+    refresh_token: str | None = None

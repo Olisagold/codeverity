@@ -7,6 +7,7 @@ requests) and a longer-lived refresh token (`JWT_EXPIRES_IN` in `.env`, e.g.
 
 import re
 import time
+import uuid
 from datetime import timedelta
 
 import bcrypt
@@ -37,6 +38,8 @@ def _encode(subject: str, token_type: str, ttl: timedelta, extra_claims: dict | 
         "type": token_type,
         "iat": now,
         "exp": now + int(ttl.total_seconds()),
+        # Unique per token so a single token can be revoked on sign-out.
+        "jti": uuid.uuid4().hex,
     }
     if extra_claims:
         payload.update(extra_claims)

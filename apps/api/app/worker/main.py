@@ -43,20 +43,30 @@ async def process_next(db: AsyncSession) -> bool:
     return True
 
 
-async def run(stop: asyncio.Event) -> None:
-    log.info("worker started")
+async def _loop(name: str, step: Callable[[AsyncSession], Awaitable[bool]], stop) -> None:
     while not stop.is_set():
         try:
             async with SessionLocal() as db:
-                worked = await process_next(db)
+                worked = await step(db)
         except Exception:
-            log.exception("worker loop error")
+            log.exception("%s loop error", name)
             worked = False
         if not worked:
             try:
                 await asyncio.wait_for(stop.wait(), timeout=IDLE_POLL_SECONDS)
             except TimeoutError:
                 pass
+
+
+async def run(stop: asyncio.Event) -> None:
+    log.info("worker started")
+    async with httpx.AsyncClient(
+        timeout=webhooks.DELIVERY_TIMEOUT_SECONDS, follow_redirects=False
+    ) as client:
+        await asyncio.gather(
+            _loop("assessments", process_next, stop),
+            _loop("webhooks", lambda db: webhooks.deliver_next(db, client), stop),
+        )
     await engine.dispose()
     log.info("worker stopped")
 

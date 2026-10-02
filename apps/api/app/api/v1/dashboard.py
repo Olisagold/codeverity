@@ -26,10 +26,12 @@ from app.schemas.dashboard import (
     ModelResult,
     OrganizationUpdate,
     PasswordChange,
+    QuickstartOut,
     SessionOrganization,
     SessionOut,
     SessionUser,
 )
+from app.services import quickstart
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
@@ -98,6 +100,24 @@ async def change_password(
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Your current password is incorrect.")
     user.password_hash = hash_password(body.new_password)
     await db.commit()
+
+
+@router.get("/quickstart", response_model=QuickstartOut)
+async def get_quickstart(
+    user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
+) -> QuickstartOut:
+    """Progress through the getting started checklist on the overview page."""
+    organization = await db.get(Organization, user.organization_id)
+    return await quickstart.progress(db, organization)
+
+
+@router.post("/quickstart/dismiss", status_code=status.HTTP_204_NO_CONTENT)
+async def dismiss_quickstart(
+    user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
+) -> None:
+    """Hide the checklist for everyone in the organization."""
+    organization = await db.get(Organization, user.organization_id)
+    await quickstart.dismiss(db, organization)
 
 
 def _summary(a: Assessment) -> dict:
@@ -195,6 +215,8 @@ async def get_assessment(
     )
     if a is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Assessment not found.")
+    if a.status == AssessmentStatus.completed:
+        await quickstart.mark_result_viewed(db, user.organization_id)
     models, reviewer = _models(a.model_results)
     processing = (
         (a.completed_at - a.started_at).total_seconds() if a.completed_at and a.started_at else None

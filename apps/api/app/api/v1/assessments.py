@@ -12,7 +12,7 @@ from app.api import rate_limit
 from app.api.deps import ApiCaller, get_api_caller, get_db
 from app.models.assessment import Assessment, AssessmentStatus
 from app.schemas.assessments import AssessmentCreate, AssessmentOut, AssessmentResult
-from app.services import assessments
+from app.services import assessments, quickstart
 
 router = APIRouter(
     prefix="/assessments",
@@ -100,4 +100,5 @@ async def get_assessment_result(
             },
         )
 
+    await quickstart.mark_result_viewed(db, caller.organization_id)
     return AssessmentResult.from_assessment(assessment)

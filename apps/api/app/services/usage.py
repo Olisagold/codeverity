@@ -110,10 +110,10 @@ async def usage(
         return cast(func.timezone("UTC", model.created_at), Date)
 
     request_days = await db.execute(
-        _scoped(RequestLog, select(_day(RequestLog), func.count())).group_by(1)
+        _scoped(RequestLog, select(_day(RequestLog), func.count())).group_by(_day(RequestLog))
     )
     assessment_days = await db.execute(
-        _scoped(Assessment, select(_day(Assessment), func.count())).group_by(1)
+        _scoped(Assessment, select(_day(Assessment), func.count())).group_by(_day(Assessment))
     )
     statuses = await db.execute(
         _scoped(Assessment, select(Assessment.status, func.count())).group_by(Assessment.status)

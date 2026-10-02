@@ -6,8 +6,6 @@ export interface ApiKey {
   description: string;
   lastUsed: string;
   created: string;
-  requests: number;
-  assessments: number;
   active: boolean;
 }
 

@@ -29,9 +29,6 @@ function toApiKey(data: ApiKeyResponse): ApiKey {
     description: data.description ?? '',
     lastUsed: formatRelative(data.last_used_at),
     created: formatDate(data.created_at),
-    // Per-key usage isn't tracked yet.
-    requests: 0,
-    assessments: 0,
     active: data.active,
   };
 }

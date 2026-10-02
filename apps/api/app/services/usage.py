@@ -106,15 +106,13 @@ async def usage(
         query = query.where(model.organization_id == organization_id, model.created_at >= since)
         return query.where(model.environment == environment) if environment else query
 
-    def _day(model):
-        return cast(func.timezone("UTC", model.created_at), Date)
+    async def _per_day(model) -> dict[date, int]:
+        day = cast(func.timezone("UTC", model.created_at), Date).label("day")
+        rows = await db.execute(_scoped(model, select(day, func.count())).group_by(day))
+        return dict(rows.all())
 
-    request_days = await db.execute(
-        _scoped(RequestLog, select(_day(RequestLog), func.count())).group_by(_day(RequestLog))
-    )
-    assessment_days = await db.execute(
-        _scoped(Assessment, select(_day(Assessment), func.count())).group_by(_day(Assessment))
-    )
+    requests_by_day = await _per_day(RequestLog)
+    assessments_by_day = await _per_day(Assessment)
     statuses = await db.execute(
         _scoped(Assessment, select(Assessment.status, func.count())).group_by(Assessment.status)
     )
@@ -129,8 +127,6 @@ async def usage(
         .order_by(func.count().desc())
     )
 
-    requests_by_day: dict[date, int] = dict(request_days.all())
-    assessments_by_day: dict[date, int] = dict(assessment_days.all())
     by_status: dict[AssessmentStatus, int] = dict(statuses.all())
     series = [
         UsagePoint(

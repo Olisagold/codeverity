@@ -11,7 +11,7 @@
 | 2 | Assessment CRUD, job queue | Done |
 | 3 | Multi model orchestration | Done |
 | 4 | Webhooks | Done |
-| 5 | Usage, logs, rate limiting | Rate limiting done |
+| 5 | Usage, logs, rate limiting | Done |
 | 6 | Migrations, deploy, hardening | Not started |
 
 <br/>
@@ -237,8 +237,13 @@ The core of the product. See [assessment-lifecycle.png](docs/diagrams/assessment
 
 ## Phase 5: Usage, Logs, Rate Limiting
 
-- Request logging middleware
-- `GET /v1/usage` and `GET /v1/logs`
+- Request logging middleware. Done: every public API call made with a recognized key is logged
+  (method, path, status, duration, key, environment). Each /v1 response carries `X-Request-Id`,
+  which matches the log ID. The worker deletes logs older than `LOG_RETENTION_DAYS` (30) hourly
+- `GET /v1/logs` and `GET /v1/logs/{id}`. Done: newest first, filter by `status`
+  (success or error), `environment`, and `api_key_id`, paginated with `before=<next_cursor>`
+- `GET /v1/usage?range=7d|30d|90d&environment=`. Done: totals (requests, assessments,
+  completed, failed), one point per UTC day, and requests per key
 - Per key rate limiting backed by Redis. Done: 120 requests and 10 new assessments per key per
   minute, plus a daily cap of 200 live assessments per organization to protect model credit.
   All configurable, 0 turns a limit off, and requests pass through if Redis is down

@@ -218,6 +218,9 @@ The core of the product. See [assessment-lifecycle.png](docs/diagrams/assessment
 - Gemini works through a list of models, falling back to a cheaper one when rate limited or busy
 - A run needs `MIN_MODEL_RESULTS` (default 2) assessments, so one failed model does not fail it
 - Tuned for cost: low assessor effort, capped output tokens, medium reviewer effort
+- Optional instructor `rubric` (weighted criteria, learner level, short notes). It reaches the
+  models as tagged data only, so it can shape the assessment but not the role or output format.
+  The result then includes `rubric_scores` per criterion and a weighted `rubric_score` for the code
 
 <br/>
 

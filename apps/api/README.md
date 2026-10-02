@@ -10,8 +10,8 @@
 | 1 | Auth, organizations, API keys | Done |
 | 2 | Assessment CRUD, job queue | Done |
 | 3 | Multi model orchestration | Done |
-| 4 | Webhooks | Not started |
-| 5 | Usage, logs, rate limiting | Not started |
+| 4 | Webhooks | Done |
+| 5 | Usage, logs, rate limiting | Rate limiting done |
 | 6 | Migrations, deploy, hardening | Not started |
 
 <br/>
@@ -226,10 +226,12 @@ The core of the product. See [assessment-lifecycle.png](docs/diagrams/assessment
 
 ## Phase 4: Webhooks
 
-- `webhook_endpoints` and `webhook_deliveries` tables
-- Fire `assessment.completed` and `assessment.failed`
-- Retry deliveries with backoff
-- Sign payloads with HMAC
+- Dashboard routes under `/v1/webhooks`: create, list, update, delete, rotate secret, send a test event, list deliveries
+- Up to 10 endpoints per organization, each tied to live or test
+- `assessment.completed` and `assessment.failed` are queued in the same transaction that finishes the assessment
+- Signed with `Codeverity-Signature: t=<unix time>,v1=<hex>`, the HMAC-SHA256 of `"<t>.<raw body>"`
+- 6 attempts over about 9 hours (1m, 5m, 30m, 2h, 6h between tries); redirects are not followed
+- Outside development, URLs must be https and resolve to public addresses (checked again at send time)
 
 <br/>
 
@@ -237,7 +239,9 @@ The core of the product. See [assessment-lifecycle.png](docs/diagrams/assessment
 
 - Request logging middleware
 - `GET /v1/usage` and `GET /v1/logs`
-- Per key rate limiting backed by Redis
+- Per key rate limiting backed by Redis. Done: 120 requests and 10 new assessments per key per
+  minute, plus a daily cap of 200 live assessments per organization to protect model credit.
+  All configurable, 0 turns a limit off, and requests pass through if Redis is down
 
 <br/>
 

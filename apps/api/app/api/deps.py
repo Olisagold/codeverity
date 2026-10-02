@@ -13,7 +13,7 @@ import uuid
 from dataclasses import dataclass
 
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -82,6 +82,7 @@ def _api_key_error(detail: str) -> HTTPException:
 
 
 async def get_api_caller(
+    request: Request,
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
     db: AsyncSession = Depends(get_db),
 ) -> ApiCaller:
@@ -90,6 +91,8 @@ async def get_api_caller(
     api_key = await key_service.authenticate(db, credentials.credentials)
     if api_key is None:
         raise _api_key_error("Invalid API key.")
+    # Read by RequestLogMiddleware to attribute the request.
+    request.state.api_key = api_key
     return ApiCaller(api_key=api_key)
 
 

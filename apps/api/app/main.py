@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.health import router as health_router
 from app.api.v1.router import api_router
 from app.core.config import get_settings
+from app.core.request_log import RequestLogMiddleware
 from app.db.redis import get_redis
 from app.db.session import engine
 
@@ -34,12 +35,14 @@ def create_app() -> FastAPI:
         redoc_url=None,
     )
 
+    app.add_middleware(RequestLogMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        expose_headers=["X-Request-Id", "X-RateLimit-Limit", "X-RateLimit-Remaining"],
     )
 
     app.include_router(health_router)

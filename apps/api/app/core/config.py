@@ -64,6 +64,9 @@ class Settings(BaseSettings):
     # Caps model spend: live assessments per organization per UTC day.
     live_assessments_per_day: int = 200
 
+    # Request logs older than this are deleted by the worker.
+    log_retention_days: int = 30
+
     @property
     def cors_origins(self) -> list[str]:
         return [origin.strip() for origin in self.api_cors_origins.split(",") if origin.strip()]

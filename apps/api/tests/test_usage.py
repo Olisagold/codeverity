@@ -172,6 +172,7 @@ def test_log_filters_and_pagination(client: TestClient, org: Org) -> None:
     assert ids(status="success") == [202]
     assert ids(environment="live") == [404]
     assert ids(api_key_id=str(org.test_key_id)) == [404, 202]
+    assert ids(method="post") == [202]
 
     first = client.get("/v1/logs", headers=org.session, params={"limit": 2}).json()
     assert len(first["data"]) == 2
@@ -203,14 +204,20 @@ def test_usage_counts_requests_and_assessments(client: TestClient, org: Org) -> 
 
     body = client.get("/v1/usage", headers=org.session).json()
     assert body["range"] == "7d"
-    assert body["totals"] == {"requests": 3, "assessments": 2, "completed": 0, "failed": 0}
+    assert body["totals"] == {
+        "requests": 3,
+        "assessments": 2,
+        "completed": 0,
+        "failed": 0,
+        "avg_processing_seconds": None,
+    }
     assert len(body["series"]) == 7
     today = body["series"][-1]
     assert today["date"] == datetime.now(UTC).date().isoformat()
     assert (today["requests"], today["assessments"]) == (3, 2)
-    assert {(k["api_key"]["name"], k["requests"]) for k in body["by_key"]} == {
-        ("Dev", 2),
-        ("Prod", 1),
+    assert {(k["api_key"]["name"], k["requests"], k["assessments"]) for k in body["by_key"]} == {
+        ("Dev", 2, 2),
+        ("Prod", 1, 0),
     }
 
     live = client.get("/v1/usage", headers=org.session, params={"environment": "live"}).json()

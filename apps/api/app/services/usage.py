@@ -138,7 +138,9 @@ async def usage(
     avg_seconds = await db.scalar(
         _scoped(
             Assessment,
-            select(func.avg(func.extract("epoch", Assessment.completed_at - Assessment.started_at))),
+            select(
+                func.avg(func.extract("epoch", Assessment.completed_at - Assessment.started_at))
+            ),
         ).where(Assessment.status == AssessmentStatus.completed)
     )
 

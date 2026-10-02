@@ -258,7 +258,7 @@ assessment = requests.post(
       { type: 'heading', id: 'events', text: 'Events' },
       {
         type: 'table',
-        columns: ['Event', 'Sent when', '`data` contains'],
+        columns: ['Event', 'Sent when', 'Data contains'],
         rows: [
           ['assessment.completed', 'The review finished and a result is available', 'The full result, as returned by `/result`'],
           ['assessment.failed', 'The assessment could not be completed', '`assessment_id`, `status`, and `error` with `code` and `message`'],

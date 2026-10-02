@@ -27,7 +27,7 @@ export const conceptPages: DocPage[] = [
         type: 'cards',
         cards: [
           { title: 'Multi-model assessment', text: 'How models are selected and normalized.', to: '/docs/concepts/multi-model' },
-          { title: 'Reassessment', text: 'How the final prescription is chosen.', to: '/docs/concepts/reassessment' },
+          { title: 'Reassessment', text: 'How the final feedback is chosen.', to: '/docs/concepts/reassessment' },
         ],
       },
     ],
@@ -41,33 +41,27 @@ export const conceptPages: DocPage[] = [
       { type: 'heading', id: 'independent', text: 'Independent assessments' },
       {
         type: 'paragraph',
-        text: 'Every assessment is dispatched to multiple models in parallel. Each returns an assessment of the submission and a prescription: the concrete change the student should make.',
+        text: 'Every live assessment is sent to three models in parallel: GPT-6 Luna, Gemini Flash, and DeepSeek V4.1 Flash. Each writes feedback for the student on its own. If Gemini is busy or rate limited, a cheaper Gemini model is tried. At least two models must succeed for the assessment to continue.',
       },
       { type: 'heading', id: 'normalization', text: 'Normalization' },
       {
         type: 'paragraph',
-        text: 'Model outputs are normalized into a common structure before reassessment, so prescriptions can be compared rather than concatenated.',
+        text: 'Every model must return the same JSON structure, so their feedback can be compared side by side rather than concatenated. Output that doesn’t match is discarded.',
       },
       {
         type: 'code',
         language: 'json',
         label: 'Normalized assessment',
         code: `{
-  "model": "model_a",
-  "assessment": {
-    "summary": "Fails for lists of only negative numbers.",
-    "issues": ["max_num initialized to 0"]
-  },
-  "prescription": {
-    "action": "Initialize max_num with the first element",
-    "code": "max_num = numbers[0]"
-  }
+  "summary": "The loop works, but starting at 0 fails for lists of only negative numbers.",
+  "issues": ["max_num is initialized to 0, so find_max([-5, -2]) returns 0."],
+  "suggestions": ["Initialize max_num with the first element: max_num = numbers[0]."]
 }`,
       },
       { type: 'heading', id: 'disagreement', text: 'Disagreement' },
       {
         type: 'paragraph',
-        text: 'When prescriptions conflict, the disagreement is preserved and passed into reassessment instead of being silently resolved by picking the first response.',
+        text: 'When the models disagree, all of their feedback goes to the review step instead of one being picked at random. Claude Sonnet 5.5 scores each one, writes the final feedback, and rates how closely they agreed. That agreement feeds into `confidence`.',
       },
     ],
   },
@@ -96,7 +90,7 @@ export const conceptPages: DocPage[] = [
       { type: 'heading', id: 'confidence', text: 'Confidence' },
       {
         type: 'paragraph',
-        text: 'The result includes a `confidence` value derived from how strongly the independent assessments agreed and how well the selected prescription scored against the evaluation criteria.',
+        text: 'The result includes a `confidence` value derived from how strongly the independent assessments agreed and how well the final feedback scored against the evaluation criteria.',
       },
       {
         type: 'code',

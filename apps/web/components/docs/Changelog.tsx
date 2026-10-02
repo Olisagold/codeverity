@@ -39,6 +39,70 @@ function DocLink({ href, children }: { href: string; children: React.ReactNode }
 /** Newest first. Add each new release at the top. */
 const RELEASES: Release[] = [
   {
+    version: '0.10.0',
+    date: 'Oct 2, 2026',
+    title: 'Live dashboard, usage and logs',
+    body: (
+      <>
+        The dashboard now shows your real data: assessments with each model&apos;s output, usage per key, request logs,
+        and webhook deliveries. Every API response carries an <Code>X-Request-Id</Code> header that matches its log entry.
+      </>
+    ),
+    link: { label: 'Usage and logs', href: '/docs/usage' },
+    fixes: [
+      { lead: 'Logs', text: 'Requests made with your keys are logged for 30 days.' },
+      { lead: 'Password', text: 'Change your password, or set one on a Google or GitHub account, under Settings.' },
+      { lead: 'Search', text: 'Press ⌘K in the dashboard to jump to a page or open an asm_ or req_ ID.' },
+    ],
+  },
+  {
+    version: '0.9.0',
+    date: 'Oct 2, 2026',
+    title: 'Webhooks and rate limits',
+    body: (
+      <>
+        Receive <Code>assessment.completed</Code> and <Code>assessment.failed</Code> events at your own endpoint, signed
+        with HMAC so you can verify they came from Codeverity. Failed deliveries are retried for about 9 hours.
+      </>
+    ),
+    link: { label: 'Webhooks', href: '/docs/webhooks' },
+    fixes: [
+      {
+        lead: 'Rate limits',
+        text: (
+          <>
+            120 requests and 10 new assessments per key per minute, plus 200 live assessments per organization per day.
+            Over the limit returns <Code>429</Code> with <Code>Retry-After</Code>.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    version: '0.8.0',
+    date: 'Oct 2, 2026',
+    title: 'Multi-model assessment and rubrics',
+    body: (
+      <>
+        Live keys now run the real pipeline: GPT-6 Luna, Gemini Flash and DeepSeek V4.1 Flash assess the submission in
+        parallel, then Claude Sonnet 5.5 reviews their feedback and writes the final result. Add an optional{' '}
+        <Code>rubric</Code> to get a weighted grade for the code itself.
+      </>
+    ),
+    link: { label: 'Assessments', href: '/docs/api/assessments' },
+    fixes: [
+      { lead: 'Resilience', text: 'One model failing no longer fails the assessment; two of three is enough.' },
+      {
+        lead: 'Failure codes',
+        text: (
+          <>
+            Failed assessments report <Code>MODELS_UNAVAILABLE</Code> or <Code>REVIEW_FAILED</Code>.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     version: '0.7.0',
     date: 'Sep 30, 2026',
     title: 'Assessments API',

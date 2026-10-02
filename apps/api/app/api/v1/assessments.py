@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import ApiCaller, get_api_caller, get_db
 from app.models.assessment import Assessment, AssessmentStatus
-from app.schemas.assessments import AssessmentCreate, AssessmentOut, AssessmentResult, Feedback
+from app.schemas.assessments import AssessmentCreate, AssessmentOut, AssessmentResult
 from app.services import assessments
 
 router = APIRouter(prefix="/assessments", tags=["assessments"])
@@ -94,16 +94,4 @@ async def get_assessment_result(
             },
         )
 
-    feedback = dict(assessment.feedback or {})
-    simulated = bool(feedback.pop("simulated", False))
-    return AssessmentResult(
-        assessment_id=assessment.public_id,
-        status=assessment.status,
-        score=assessment.score or 0.0,
-        confidence=assessment.confidence or 0.0,
-        criteria=assessment.criteria or {},
-        feedback=Feedback(**feedback),
-        rubric_score=assessment.rubric_score,
-        rubric_scores=assessment.rubric_scores,
-        simulated=simulated,
-    )
+    return AssessmentResult.from_assessment(assessment)

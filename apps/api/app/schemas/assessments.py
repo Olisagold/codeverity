@@ -3,7 +3,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, model_validator
 
-from app.models.assessment import AssessmentStatus
+from app.models.assessment import Assessment, AssessmentStatus
 
 MAX_CODE_CHARS = 100_000
 MAX_REQUIREMENTS_CHARS = 10_000
@@ -87,3 +87,19 @@ class AssessmentResult(BaseModel):
     rubric_score: float | None = None
     rubric_scores: list[RubricScore] | None = None
     simulated: bool = False
+
+    @classmethod
+    def from_assessment(cls, assessment: Assessment) -> "AssessmentResult":
+        feedback = dict(assessment.feedback or {})
+        simulated = bool(feedback.pop("simulated", False))
+        return cls(
+            assessment_id=assessment.public_id,
+            status=assessment.status,
+            score=assessment.score or 0.0,
+            confidence=assessment.confidence or 0.0,
+            criteria=assessment.criteria or {},
+            feedback=Feedback(**feedback),
+            rubric_score=assessment.rubric_score,
+            rubric_scores=assessment.rubric_scores,
+            simulated=simulated,
+        )

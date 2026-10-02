@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.api_key import ApiKeyEnvironment
 from app.models.assessment import Assessment, AssessmentStatus
 from app.schemas.assessments import AssessmentCreate
+from app.services import webhooks
 
 # A job still `processing` after this long is assumed to belong to a worker
 # that died, and is picked up again.
@@ -133,6 +134,7 @@ async def claim_next(db: AsyncSession) -> Assessment | None:
                 "The assessment did not finish after several attempts.",
                 now,
             )
+            await webhooks.enqueue(db, assessment, "assessment.failed")
             await db.commit()
             continue
 
@@ -155,11 +157,13 @@ async def complete(db: AsyncSession, assessment: Assessment, outcome: Outcome) -
     assessment.error_code = None
     assessment.error_message = None
     assessment.completed_at = datetime.now(UTC)
+    await webhooks.enqueue(db, assessment, "assessment.completed")
     await db.commit()
 
 
 async def fail(db: AsyncSession, assessment: Assessment, code: str, message: str) -> None:
     _mark_failed(assessment, code, message, datetime.now(UTC))
+    await webhooks.enqueue(db, assessment, "assessment.failed")
     await db.commit()
 
 

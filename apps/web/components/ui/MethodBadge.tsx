@@ -4,6 +4,7 @@ import type { HttpMethod } from '@/types/docs';
 const tones: Record<HttpMethod, string> = {
   GET: 'border-accent/40 text-accent',
   POST: 'border-ok/40 text-ok',
+  PATCH: 'border-line-strong text-muted',
   DELETE: 'border-amber/40 text-amber',
 };
 

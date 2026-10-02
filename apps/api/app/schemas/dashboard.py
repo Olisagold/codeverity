@@ -13,6 +13,13 @@ class SessionUser(BaseModel):
     id: uuid.UUID
     name: str
     email: str
+    # False for accounts created with Google or GitHub that never set one.
+    has_password: bool
+
+
+class PasswordChange(BaseModel):
+    current_password: str | None = None
+    new_password: str = Field(min_length=8, max_length=128)
 
 
 class Member(BaseModel):

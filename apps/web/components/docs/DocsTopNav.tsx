@@ -63,7 +63,9 @@ export function DocsTopNav() {
             <DocsSearch />
           </div>
           <a
-            href="#"
+            href="https://github.com/Olisagold/codeverity"
+            target="_blank"
+            rel="noreferrer"
             aria-label="GitHub"
             className="hidden rounded-md p-1.5 text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:block"
           >

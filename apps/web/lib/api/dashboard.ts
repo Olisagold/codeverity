@@ -23,6 +23,14 @@ export const getSession = () => request<Session>('/api/v1/dashboard/session');
 export const updateOrganization = (input: { name?: string; slug?: string }) =>
   request<Session>('/api/v1/dashboard/organization', { method: 'PATCH', body: JSON.stringify(input) });
 
+export const changePassword = (input: { current_password?: string; new_password: string }) =>
+  request<void>('/api/v1/dashboard/password', { method: 'POST', body: JSON.stringify(input) });
+
+export async function signOut() {
+  await fetch('/api/auth/logout', { method: 'POST' });
+  window.location.href = '/login';
+}
+
 // ── Assessments ───────────────────────────────────────────
 
 export const listAssessments = (params: {

@@ -12,6 +12,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, get_db
+from app.core.security import hash_password, verify_password
 from app.models.api_key import ApiKeyEnvironment
 from app.models.assessment import Assessment, AssessmentStatus
 from app.models.organization import Organization
@@ -24,6 +25,7 @@ from app.schemas.dashboard import (
     Member,
     ModelResult,
     OrganizationUpdate,
+    PasswordChange,
     SessionOrganization,
     SessionOut,
     SessionUser,
@@ -40,7 +42,12 @@ async def _session(db: AsyncSession, user: User) -> SessionOut:
         select(User).where(User.organization_id == organization.id).order_by(User.created_at)
     )
     return SessionOut(
-        user=SessionUser(id=user.id, name=user.name, email=user.email),
+        user=SessionUser(
+            id=user.id,
+            name=user.name,
+            email=user.email,
+            has_password=user.password_hash is not None,
+        ),
         organization=SessionOrganization(
             id=organization.id,
             name=organization.name,
@@ -76,6 +83,21 @@ async def update_organization(
         await db.rollback()
         raise HTTPException(status.HTTP_409_CONFLICT, "That slug is already taken.") from exc
     return await _session(db, user)
+
+
+@router.post("/password", status_code=status.HTTP_204_NO_CONTENT)
+async def change_password(
+    body: PasswordChange,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> None:
+    """Change the password, or set one on an account created with Google or GitHub."""
+    if user.password_hash is not None and not (
+        body.current_password and verify_password(body.current_password, user.password_hash)
+    ):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Your current password is incorrect.")
+    user.password_hash = hash_password(body.new_password)
+    await db.commit()
 
 
 def _summary(a: Assessment) -> dict:

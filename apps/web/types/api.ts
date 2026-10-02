@@ -5,7 +5,7 @@ export type AssessmentStatus = 'queued' | 'processing' | 'completed' | 'failed';
 export type Range = '7d' | '30d' | '90d';
 
 export interface Session {
-  user: { id: string; name: string; email: string };
+  user: { id: string; name: string; email: string; has_password: boolean };
   organization: {
     id: string;
     name: string;

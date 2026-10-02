@@ -5,8 +5,10 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from fastapi.testclient import TestClient
 
+from app.core.security import hash_password
 from app.models.api_key import ApiKeyEnvironment
 from app.models.assessment import Assessment, AssessmentStatus
+from app.models.user import User
 from tests import test_usage as shared
 from tests.test_usage import Org, _key, _run_db
 
@@ -138,3 +140,55 @@ def test_assessments_are_scoped_to_organization(
 def test_dashboard_requires_session(client: TestClient, org: Org, path: str) -> None:
     assert client.get(path).status_code == 401
     assert client.get(path, headers=_key(org.test)).status_code == 401
+
+
+def _set_password(org: Org, password: str | None) -> None:
+    async def _do(db) -> None:
+        user = await db.get(User, org.user.id)
+        user.password_hash = hash_password(password) if password else None
+        await db.commit()
+
+    _run_db(_do)
+
+
+def test_change_password_requires_current(client: TestClient, org: Org) -> None:
+    _set_password(org, "old-password-1")
+    path = "/v1/dashboard/password"
+    wrong = client.post(
+        path,
+        headers=org.session,
+        json={"current_password": "nope", "new_password": "new-password-1"},
+    )
+    assert wrong.status_code == 400
+    missing = client.post(path, headers=org.session, json={"new_password": "new-password-1"})
+    assert missing.status_code == 400
+    short = client.post(
+        path,
+        headers=org.session,
+        json={"current_password": "old-password-1", "new_password": "short"},
+    )
+    assert short.status_code == 422
+
+    ok = client.post(
+        path,
+        headers=org.session,
+        json={"current_password": "old-password-1", "new_password": "new-password-1"},
+    )
+    assert ok.status_code == 204
+    login = client.post(
+        "/v1/auth/login", json={"email": org.user.email, "password": "new-password-1"}
+    )
+    assert login.status_code == 200
+
+
+def test_oauth_account_can_set_password(client: TestClient, org: Org) -> None:
+    _set_password(org, None)
+    session = client.get("/v1/dashboard/session", headers=org.session).json()
+    assert session["user"]["has_password"] is False
+
+    response = client.post(
+        "/v1/dashboard/password", headers=org.session, json={"new_password": "first-password-1"}
+    )
+    assert response.status_code == 204
+    session = client.get("/v1/dashboard/session", headers=org.session).json()
+    assert session["user"]["has_password"] is True

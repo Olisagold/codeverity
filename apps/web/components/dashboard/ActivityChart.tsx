@@ -10,7 +10,8 @@ interface ActivityChartProps {
 export function ActivityChart({ points, metric = 'assessments', height = 180 }: ActivityChartProps) {
   const width = 960;
   const values = points.map((point) => point[metric]);
-  const max = Math.max(...values) * 1.15;
+  // Floor of 1 keeps an all-zero series on the baseline instead of dividing by zero.
+  const max = Math.max(1, ...values) * 1.15;
   const step = points.length > 1 ? width / (points.length - 1) : width;
 
   const coords = values.map((value, index) => ({

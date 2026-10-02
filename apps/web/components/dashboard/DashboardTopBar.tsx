@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { MenuIcon, SearchIcon, XIcon } from 'lucide-react';
-import { currentUser } from '@/lib/dashboard';
+import { useSession } from '@/hooks/useSession';
 
 interface DashboardTopBarProps {
   mobileOpen: boolean;
@@ -13,6 +13,13 @@ interface DashboardTopBarProps {
 export function DashboardTopBar({ mobileOpen, onToggleMobile }: DashboardTopBarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const session = useSession();
+  const initials = (session?.user.name ?? '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join('');
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -79,14 +86,14 @@ export function DashboardTopBar({ mobileOpen, onToggleMobile }: DashboardTopBarP
               onClick={() => setMenuOpen((value) => !value)}
               className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-surface font-mono text-[11px] text-white transition-colors duration-150 ease-out hover:border-line-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
-              {currentUser.initials}
+              {initials}
             </button>
 
             {menuOpen ? (
               <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-lg border border-line bg-surface">
                 <div className="border-b border-line px-3 py-2.5">
-                  <p className="text-[13px] text-white">{currentUser.name}</p>
-                  <p className="font-mono text-[11px] text-faint">{currentUser.email}</p>
+                  <p className="text-[13px] text-white">{session?.user.name ?? ''}</p>
+                  <p className="font-mono text-[11px] text-faint">{session?.user.email ?? ''}</p>
                 </div>
                 <ul className="py-1">
                   <li>

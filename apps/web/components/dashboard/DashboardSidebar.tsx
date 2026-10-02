@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronsUpDownIcon, ExternalLinkIcon } from 'lucide-react';
-import { organization } from '@/lib/dashboard';
+import { useSession } from '@/hooks/useSession';
 
 interface NavItem {
   label: string;
@@ -61,6 +61,7 @@ interface DashboardSidebarProps {
 
 export function DashboardSidebar({ onNavigate }: DashboardSidebarProps) {
   const pathname = usePathname();
+  const session = useSession();
 
   return (
     <div className="flex h-full flex-col">
@@ -114,8 +115,8 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps) {
           className="flex w-full items-center justify-between rounded-md px-2.5 py-2 text-left transition-colors duration-150 ease-out hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           <span className="min-w-0">
-            <span className="block truncate text-[13px] text-white">{organization.name}</span>
-            <span className="block truncate font-mono text-[11px] text-faint">{organization.slug}</span>
+            <span className="block truncate text-[13px] text-white">{session?.organization.name ?? '…'}</span>
+            <span className="block truncate font-mono text-[11px] text-faint">{session?.organization.slug ?? ''}</span>
           </span>
           <ChevronsUpDownIcon aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-faint" />
         </button>

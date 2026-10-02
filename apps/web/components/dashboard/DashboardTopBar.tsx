@@ -3,7 +3,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { MenuIcon, SearchIcon, XIcon } from 'lucide-react';
+import { CommandMenu } from '@/components/dashboard/CommandMenu';
 import { useSession } from '@/hooks/useSession';
+import { signOut } from '@/lib/api/dashboard';
 
 interface DashboardTopBarProps {
   mobileOpen: boolean;
@@ -12,6 +14,7 @@ interface DashboardTopBarProps {
 
 export function DashboardTopBar({ mobileOpen, onToggleMobile }: DashboardTopBarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const session = useSession();
   const initials = (session?.user.name ?? '')
@@ -20,6 +23,17 @@ export function DashboardTopBar({ mobileOpen, onToggleMobile }: DashboardTopBarP
     .slice(0, 2)
     .map((part) => part[0].toUpperCase())
     .join('');
+
+  useEffect(() => {
+    function handleShortcut(event: KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setSearchOpen((value) => !value);
+      }
+    }
+    document.addEventListener('keydown', handleShortcut);
+    return () => document.removeEventListener('keydown', handleShortcut);
+  }, []);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -64,6 +78,7 @@ export function DashboardTopBar({ mobileOpen, onToggleMobile }: DashboardTopBarP
         <div className="ml-auto flex items-center gap-3">
           <button
             type="button"
+            onClick={() => setSearchOpen(true)}
             className="hidden h-8 items-center gap-2 rounded-lg border border-line bg-surface px-3 text-[12.5px] text-faint transition-colors duration-150 ease-out hover:border-line-strong hover:text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:flex"
           >
             <SearchIcon aria-hidden="true" className="h-3.5 w-3.5" />
@@ -116,19 +131,23 @@ export function DashboardTopBar({ mobileOpen, onToggleMobile }: DashboardTopBarP
                   </li>
                 </ul>
                 <div className="border-t border-line py-1">
-                  <Link
-                    href="/login"
-                    onClick={() => setMenuOpen(false)}
-                    className="block px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:bg-surface-2 hover:text-white"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      void signOut();
+                    }}
+                    className="block w-full px-3 py-1.5 text-left text-[13px] text-muted transition-colors duration-150 ease-out hover:bg-surface-2 hover:text-white"
                   >
                     Sign out
-                  </Link>
+                  </button>
                 </div>
               </div>
             ) : null}
           </div>
         </div>
       </div>
+      <CommandMenu open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 }

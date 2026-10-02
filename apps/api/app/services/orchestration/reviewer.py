@@ -30,11 +30,11 @@ async def review(assessment: Assessment, candidates: list[dict]) -> Review:
     try:
         response = await client.beta.messages.create(
             model=settings.anthropic_model,
-            max_tokens=16000,
+            max_tokens=8000,
             betas=["server-side-fallback-2026-07-01"],
             fallbacks="default",
             output_config={
-                "effort": "high",
+                "effort": settings.reviewer_effort,
                 "format": {"type": "json_schema", "schema": prompts.REVIEW_SCHEMA},
             },
             system=prompts.REVIEWER_SYSTEM,

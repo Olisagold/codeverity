@@ -6,9 +6,9 @@ from app.services.orchestration.providers.base import Completion, ProviderError,
 
 BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 
-# 429: rate limited (common on the free tier). 404: model retired or not
-# available to this key. Either way the next model in the list may work.
-FALL_THROUGH_STATUSES = {404, 429}
+# 429 is rate limiting, 503 is "high demand", and the API also returns
+# intermittent empty 404s. In each case the next model in the list may work.
+FALL_THROUGH_STATUSES = {404, 429, 500, 502, 503, 504}
 
 log = logging.getLogger("codeverity.orchestration")
 
@@ -16,10 +16,20 @@ log = logging.getLogger("codeverity.orchestration")
 class GeminiProvider:
     name = "gemini"
 
-    def __init__(self, *, api_key: str, models: list[str], client: httpx.AsyncClient):
+    def __init__(
+        self,
+        *,
+        api_key: str,
+        models: list[str],
+        client: httpx.AsyncClient,
+        effort: str,
+        max_tokens: int,
+    ):
         self.api_key = api_key
         self.models = models
         self.client = client
+        self.effort = effort
+        self.max_tokens = max_tokens
 
     async def complete(self, system: str, user: str) -> Completion:
         last_error = ProviderError("no Gemini models configured")
@@ -41,7 +51,11 @@ class GeminiProvider:
             body={
                 "systemInstruction": {"parts": [{"text": system}]},
                 "contents": [{"role": "user", "parts": [{"text": user}]}],
-                "generationConfig": {"responseMimeType": "application/json"},
+                "generationConfig": {
+                    "responseMimeType": "application/json",
+                    "maxOutputTokens": self.max_tokens,
+                    "thinkingConfig": {"thinkingLevel": self.effort},
+                },
             },
         )
         try:

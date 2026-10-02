@@ -9,13 +9,22 @@ DEEPSEEK_BASE_URL = "https://api.deepseek.com"
 
 class OpenAICompatibleProvider:
     def __init__(
-        self, *, name: str, base_url: str, api_key: str, model: str, client: httpx.AsyncClient
+        self,
+        *,
+        name: str,
+        base_url: str,
+        api_key: str,
+        model: str,
+        client: httpx.AsyncClient,
+        options: dict,
     ):
         self.name = name
         self.base_url = base_url
         self.api_key = api_key
         self.model = model
         self.client = client
+        # Provider specific request fields, such as effort and output limits.
+        self.options = options
 
     async def complete(self, system: str, user: str) -> Completion:
         data = await post_json(
@@ -29,6 +38,7 @@ class OpenAICompatibleProvider:
                     {"role": "user", "content": user},
                 ],
                 "response_format": {"type": "json_object"},
+                **self.options,
             },
         )
         try:

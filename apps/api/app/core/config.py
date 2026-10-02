@@ -39,17 +39,21 @@ class Settings(BaseSettings):
 
     # Model providers. A provider with no key is skipped.
     openai_api_key: str = ""
-    openai_model: str = "gpt-5"
+    openai_model: str = "gpt-6-luna"
     # Tried in order; a model that is rate limited or unavailable falls through
-    # to the next, so the free tier keeps working on the cheaper models.
+    # to the next, cheaper one.
     gemini_api_key: str = ""
-    gemini_models: str = "gemini-2.5-pro,gemini-2.5-flash,gemini-2.5-flash-lite"
+    gemini_models: str = "gemini-3.8-flash,gemini-3.5-flash-lite,gemini-3.1-flash-lite"
     deepseek_api_key: str = ""
-    deepseek_model: str = "deepseek-chat"
+    deepseek_model: str = "deepseek-flash"
     # Reviews the other models' output and produces the final result.
     anthropic_api_key: str = ""
-    anthropic_model: str = "claude-opus-5-5"
+    anthropic_model: str = "claude-sonnet-5-5"
+    reviewer_effort: str = "medium"
 
+    # Kept low to control cost: assessors think briefly and write short feedback.
+    assessor_effort: str = "low"
+    assessor_max_tokens: int = 4000
     model_timeout_seconds: float = 90
     # Fewest successful model assessments needed before the review runs.
     min_model_results: int = 2

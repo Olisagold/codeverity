@@ -3,26 +3,97 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { ChevronLeftIcon } from 'lucide-react';
+import { ChevronLeftIcon, RefreshCwIcon } from 'lucide-react';
 import { PageHeader } from '@/components/dashboard/PageHeader';
 import { StatusBadge } from '@/components/dashboard/StatusBadge';
 import { EmptyState } from '@/components/dashboard/EmptyState';
+import { ErrorState } from '@/components/dashboard/ErrorState';
+import { Skeleton } from '@/components/dashboard/Skeleton';
 import { DataTable, type Column } from '@/components/dashboard/DataTable';
+import { SecretModal } from '@/components/dashboard/SecretModal';
 import { CodePre } from '@/components/ui/CodePre';
-import { webhooks } from '@/lib/dashboard';
-import type { WebhookDelivery } from '@/types/dashboard';
+import { useApi } from '@/hooks/useApi';
+import { errorMessage } from '@/lib/api/client';
+import { getWebhook, listDeliveries, rotateWebhookSecret, sendTestEvent, updateWebhook } from '@/lib/api/dashboard';
+import { formatDateTime, formatRelative } from '@/lib/format';
+import type { Delivery } from '@/types/api';
+
+const deliveryTone: Record<Delivery['status'], 'success' | 'error' | 'neutral'> = {
+  succeeded: 'success',
+  failed: 'error',
+  pending: 'neutral',
+};
+
+const buttonClasses =
+  'rounded-lg border border-line px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:border-line-strong hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50';
+
+function headersFor(delivery: Delivery) {
+  return `Content-Type: application/json
+User-Agent: Codeverity-Webhooks/1.0
+Codeverity-Event: ${delivery.event_type}
+Codeverity-Delivery: ${delivery.id}
+Codeverity-Signature: t=<unix time>,v1=<HMAC-SHA256 of "<t>.<body>">`;
+}
+
+function responseFor(delivery: Delivery) {
+  const lines = [
+    `Status: ${delivery.status}`,
+    `Attempts: ${delivery.attempts}`,
+    `Last HTTP status: ${delivery.last_status_code ?? 'none'}`,
+  ];
+  if (delivery.last_error) lines.push(`Last error: ${delivery.last_error}`);
+  if (delivery.delivered_at) lines.push(`Delivered: ${formatDateTime(delivery.delivered_at)}`);
+  if (delivery.status === 'pending' && delivery.attempts > 0) lines.push('A retry is scheduled.');
+  return lines.join('\n');
+}
 
 export default function WebhookDetailsPage() {
   const params = useParams<{ id: string }>();
-  const endpoint = webhooks.find((item) => item.id === params.id);
-  const [selected, setSelected] = useState<WebhookDelivery | null>(null);
+  const endpoint = useApi(() => getWebhook(params.id), [params.id], 'Could not load this endpoint.');
+  const deliveries = useApi(() => listDeliveries(params.id), [params.id], 'Could not load deliveries.');
+  const [selected, setSelected] = useState<Delivery | null>(null);
   const [tab, setTab] = useState<'request' | 'response' | 'headers'>('request');
+  const [secret, setSecret] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
 
-  if (!endpoint) {
+  async function run(action: () => Promise<void>, failure: string) {
+    setBusy(true);
+    setNotice(null);
+    try {
+      await action();
+    } catch (error) {
+      setNotice(errorMessage(error, failure));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const back = (
+    <Link
+      href="/dashboard/webhooks"
+      className="inline-flex items-center gap-1.5 font-mono text-[11.5px] uppercase tracking-[0.14em] text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+    >
+      <ChevronLeftIcon aria-hidden="true" className="h-3.5 w-3.5" />
+      Webhooks
+    </Link>
+  );
+
+  if (endpoint.loading && !endpoint.data) {
+    return (
+      <>
+        <PageHeader breadcrumb={back} title="Webhook endpoint" />
+        <Skeleton rows={5} />
+      </>
+    );
+  }
+
+  const webhook = endpoint.data;
+  if (!webhook) {
     return (
       <EmptyState
         title="Webhook endpoint not found."
-        description="This endpoint may have been deleted."
+        description={endpoint.error === 'Webhook not found.' ? 'This endpoint may have been deleted.' : endpoint.error ?? ''}
         action={
           <Link
             href="/dashboard/webhooks"
@@ -35,52 +106,90 @@ export default function WebhookDetailsPage() {
     );
   }
 
-  const columns: Column<WebhookDelivery>[] = [
+  const columns: Column<Delivery>[] = [
     {
       key: 'event',
       header: 'Event',
-      render: (row) => <span className="font-mono text-[12.5px] text-white">{row.event}</span>,
+      render: (row) => <span className="font-mono text-[12.5px] text-white">{row.event_type}</span>,
     },
+    { key: 'status', header: 'Status', render: (row) => <StatusBadge status={row.status} tone={deliveryTone[row.status]} /> },
     {
-      key: 'status',
-      header: 'Status',
+      key: 'code',
+      header: 'HTTP',
       render: (row) => (
-        <span className={`font-mono text-[12.5px] ${row.status < 400 ? 'text-ok' : 'text-[#EF4444]'}`}>{row.status}</span>
+        <span className={`font-mono text-[12.5px] ${row.last_status_code && row.last_status_code < 400 ? 'text-ok' : 'text-faint'}`}>
+          {row.last_status_code ?? '—'}
+        </span>
       ),
     },
+    { key: 'attempts', header: 'Attempts', render: (row) => <span className="font-mono text-[12.5px]">{row.attempts}</span> },
     {
       key: 'time',
-      header: 'Time',
+      header: 'Created',
       className: 'text-right',
-      render: (row) => <span className="font-mono text-[12px] text-faint">{row.time}</span>,
+      render: (row) => <span className="font-mono text-[12px] text-faint">{formatDateTime(row.created_at)}</span>,
     },
   ];
-
-  const headers = `Content-Type: application/json
-Codeverity-Signature: t=1758196800,v1=8f2c...
-User-Agent: Codeverity/1.0`;
 
   return (
     <>
       <PageHeader
-        breadcrumb={
-          <Link
-            href="/dashboard/webhooks"
-            className="inline-flex items-center gap-1.5 font-mono text-[11.5px] uppercase tracking-[0.14em] text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          >
-            <ChevronLeftIcon aria-hidden="true" className="h-3.5 w-3.5" />
-            Webhooks
-          </Link>
-        }
+        breadcrumb={back}
         title="Webhook endpoint"
-        description={endpoint.url}
+        description={webhook.url}
+        actions={
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={busy}
+              className={buttonClasses}
+              onClick={() =>
+                run(async () => {
+                  await sendTestEvent(webhook.id);
+                  deliveries.reload();
+                }, 'Could not send a test event.')
+              }
+            >
+              Send test event
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              className={buttonClasses}
+              onClick={() =>
+                run(async () => {
+                  setSecret((await rotateWebhookSecret(webhook.id)).secret);
+                }, 'Could not rotate the secret.')
+              }
+            >
+              Rotate secret
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              className={buttonClasses}
+              onClick={() =>
+                run(async () => {
+                  endpoint.setData(await updateWebhook(webhook.id, { active: !webhook.active }));
+                }, 'Could not update the endpoint.')
+              }
+            >
+              {webhook.active ? 'Disable' : 'Enable'}
+            </button>
+          </div>
+        }
       />
 
+      {notice ? <p className="mb-4 text-[13px] text-amber">{notice}</p> : null}
+
       <div className="mb-8 flex flex-wrap items-center gap-x-6 gap-y-2 rounded-xl border border-line bg-surface px-5 py-3.5">
-        <StatusBadge status={endpoint.active ? 'active' : 'disabled'} />
-        <span className="font-mono text-[11.5px] text-faint">Last delivery {endpoint.lastDelivery}</span>
+        <StatusBadge status={webhook.active ? 'active' : 'disabled'} />
+        <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-faint">{webhook.environment}</span>
+        <span className="font-mono text-[11.5px] text-faint">
+          Last delivery {webhook.last_delivery_at ? formatRelative(webhook.last_delivery_at) : 'never'}
+        </span>
         <div className="flex flex-wrap gap-2">
-          {endpoint.events.map((event) => (
+          {webhook.events.map((event) => (
             <span key={event} className="rounded border border-line px-2 py-0.5 font-mono text-[11.5px] text-muted">
               {event}
             </span>
@@ -89,29 +198,47 @@ User-Agent: Codeverity/1.0`;
       </div>
 
       <section>
-        <h2 className="mb-3 text-[14.5px] font-medium text-white">Recent deliveries</h2>
-        <DataTable
-          columns={columns}
-          rows={endpoint.deliveries}
-          rowKey={(row) => row.id}
-          onRowClick={(row) => {
-            setSelected(row);
-            setTab('request');
-          }}
-          caption="Recent deliveries"
-          empty={<EmptyState title="No deliveries yet." description="Deliveries appear here once an assessment event is sent to this endpoint." />}
-        />
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-[14.5px] font-medium text-white">Recent deliveries</h2>
+          <button
+            type="button"
+            onClick={deliveries.reload}
+            className="inline-flex items-center gap-1.5 text-[12.5px] text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            <RefreshCwIcon aria-hidden="true" className="h-3.5 w-3.5" />
+            Refresh
+          </button>
+        </div>
+        {deliveries.error ? (
+          <ErrorState title="Could not load deliveries." description={deliveries.error} />
+        ) : (
+          <DataTable
+            columns={columns}
+            rows={deliveries.data ?? []}
+            rowKey={(row) => row.id}
+            loading={deliveries.loading && !deliveries.data}
+            onRowClick={(row) => {
+              setSelected(row);
+              setTab('request');
+            }}
+            caption="Recent deliveries"
+            empty={
+              <EmptyState
+                title="No deliveries yet."
+                description="Deliveries appear here once an assessment event is sent to this endpoint. Send a test event to try it."
+              />
+            }
+          />
+        )}
       </section>
 
       {selected ? (
         <section className="mt-6 overflow-hidden rounded-xl border border-line bg-surface">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3">
             <div className="flex items-center gap-3">
-              <code className="font-mono text-[12.5px] text-white">{selected.id}</code>
-              <span className={`font-mono text-[12px] ${selected.status < 400 ? 'text-ok' : 'text-[#EF4444]'}`}>
-                {selected.status}
-              </span>
-              <span className="font-mono text-[11.5px] text-faint">{selected.time}</span>
+              <code className="font-mono text-[12.5px] text-white">{selected.event_id}</code>
+              <StatusBadge status={selected.status} tone={deliveryTone[selected.status]} />
+              <span className="font-mono text-[11.5px] text-faint">{formatDateTime(selected.created_at)}</span>
             </div>
             <button
               type="button"
@@ -140,9 +267,25 @@ User-Agent: Codeverity/1.0`;
             ))}
           </div>
 
-          <CodePre code={tab === 'request' ? selected.request : tab === 'response' ? selected.response : headers} className="!px-5 !py-4 !text-[12.5px] !leading-[1.75]" />
+          <CodePre
+            code={
+              tab === 'request'
+                ? JSON.stringify(selected.payload, null, 2)
+                : tab === 'response'
+                  ? responseFor(selected)
+                  : headersFor(selected)
+            }
+            className="!px-5 !py-4 !text-[12.5px] !leading-[1.75]"
+          />
         </section>
       ) : null}
+
+      <SecretModal
+        secret={secret}
+        title="Signing secret rotated"
+        description="The old secret stopped working immediately. Update your endpoint to verify signatures with this one."
+        onClose={() => setSecret(null)}
+      />
     </>
   );
 }

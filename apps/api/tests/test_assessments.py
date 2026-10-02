@@ -415,10 +415,11 @@ def test_request_limit_per_key(
     client: TestClient, org: Org, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     path = f"/v1/assessments/{_create(client, org.test)['id']}"
-    _limits(monkeypatch, rate_limit_requests_per_minute=2)
+    # Creating the assessment already used one request this minute.
+    _limits(monkeypatch, rate_limit_requests_per_minute=3)
 
     first = client.get(path, headers=_bearer(org.test))
-    assert first.headers["X-RateLimit-Limit"] == "2"
+    assert first.headers["X-RateLimit-Limit"] == "3"
     assert first.headers["X-RateLimit-Remaining"] == "1"
     client.get(path, headers=_bearer(org.test))
     blocked = client.get(path, headers=_bearer(org.test))

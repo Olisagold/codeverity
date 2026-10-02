@@ -13,13 +13,17 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
 import pytest
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from app.api import rate_limit
+from app.api.deps import ApiCaller
 from app.core.config import get_settings
 from app.core.ids import new_id, ulid
 from app.core.security import create_access_token
+from app.db.redis import get_redis
 from app.main import app
 from app.models.api_key import ApiKey, ApiKeyEnvironment
 from app.models.assessment import Assessment, AssessmentStatus
@@ -397,3 +401,90 @@ def test_ids_are_unique_and_time_sortable() -> None:
     assert len(first) == len(second) == 26
     assert first < second
     assert len({new_id("asm") for _ in range(1000)}) == 1000
+
+
+# ── Rate limits ──────────────────────────────────────────
+
+
+def _limits(monkeypatch: pytest.MonkeyPatch, **values: int) -> None:
+    settings = get_settings().model_copy(update=values)
+    monkeypatch.setattr(rate_limit, "get_settings", lambda: settings)
+
+
+def test_request_limit_per_key(
+    client: TestClient, org: Org, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _limits(monkeypatch, rate_limit_requests_per_minute=2)
+    path = "/v1/assessments/asm_missing"
+
+    first = client.get(path, headers=_bearer(org.test))
+    assert first.headers["X-RateLimit-Limit"] == "2"
+    assert first.headers["X-RateLimit-Remaining"] == "1"
+    client.get(path, headers=_bearer(org.test))
+    blocked = client.get(path, headers=_bearer(org.test))
+    assert blocked.status_code == 429
+    assert 0 < int(blocked.headers["Retry-After"]) <= 60
+
+    # Counted per key: the org's other key is unaffected.
+    assert client.get(path, headers=_bearer(org.live)).status_code == 404
+
+
+def test_assessment_creation_limit_per_key(
+    client: TestClient, org: Org, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _limits(monkeypatch, rate_limit_assessments_per_minute=1)
+    _create(client, org.test)
+    response = client.post("/v1/assessments", headers=_bearer(org.test), json=PAYLOAD)
+    assert response.status_code == 429
+
+
+def test_invalid_body_does_not_use_assessment_quota(
+    client: TestClient, org: Org, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _limits(monkeypatch, rate_limit_assessments_per_minute=1)
+    bad = client.post("/v1/assessments", headers=_bearer(org.test), json={"language": "python"})
+    assert bad.status_code == 422
+    _create(client, org.test)
+
+
+def _caller(org: Org, environment: ApiKeyEnvironment) -> ApiCaller:
+    key = ApiKey(id=uuid.uuid4(), organization_id=org.org.id, environment=environment)
+    return ApiCaller(api_key=key)
+
+
+def test_daily_live_cap_per_organization(org: Org, monkeypatch: pytest.MonkeyPatch) -> None:
+    # Called directly so no live assessment is created (a worker could spend credit on it).
+    _limits(monkeypatch, live_assessments_per_day=2, rate_limit_assessments_per_minute=0)
+
+    async def _do() -> None:
+        live = _caller(org, ApiKeyEnvironment.live)
+        await rate_limit.check_assessment_quota(live)
+        # A second live key in the same org shares the daily cap.
+        await rate_limit.check_assessment_quota(_caller(org, ApiKeyEnvironment.live))
+        with pytest.raises(HTTPException) as exc:
+            await rate_limit.check_assessment_quota(live)
+        assert exc.value.status_code == 429
+        assert "00:00 UTC" in exc.value.detail
+        # Test keys never call the models, so the cap doesn't apply.
+        await rate_limit.check_assessment_quota(_caller(org, ApiKeyEnvironment.test))
+        await get_redis().aclose()
+        get_redis.cache_clear()
+
+    asyncio.run(_do())
+
+
+def test_rate_limits_fail_open_when_redis_is_down(
+    org: Org, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _limits(monkeypatch, live_assessments_per_day=1, rate_limit_assessments_per_minute=1)
+
+    async def _down(key: str, ttl: int) -> None:
+        return None
+
+    monkeypatch.setattr(rate_limit, "_count", _down)
+
+    async def _do() -> None:
+        for _ in range(3):
+            await rate_limit.check_assessment_quota(_caller(org, ApiKeyEnvironment.live))
+
+    asyncio.run(_do())

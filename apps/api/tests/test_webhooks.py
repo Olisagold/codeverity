@@ -74,7 +74,9 @@ def _make_user() -> User:
 
 def _remove(user: User) -> None:
     async def _do(db: AsyncSession) -> None:
-        await db.execute(delete(Assessment).where(Assessment.organization_id == user.organization_id))
+        await db.execute(
+            delete(Assessment).where(Assessment.organization_id == user.organization_id)
+        )
         await db.execute(
             delete(WebhookEndpoint).where(WebhookEndpoint.organization_id == user.organization_id)
         )
@@ -258,9 +260,7 @@ def test_failed_assessment_queues_event(client: TestClient, user: User) -> None:
     assert delivery.payload["data"]["error"]["code"] == "MODELS_UNAVAILABLE"
 
 
-def test_events_respect_environment_subscription_and_status(
-    client: TestClient, user: User
-) -> None:
+def test_events_respect_environment_subscription_and_status(client: TestClient, user: User) -> None:
     live = _create(client, user, environment="live")
     failed_only = _create(client, user, events=["assessment.failed"])
     disabled = _create(client, user)

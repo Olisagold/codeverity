@@ -105,7 +105,9 @@ async def update_webhook(
 ) -> WebhookOut:
     endpoint = await _owned_or_404(db, endpoint_id, user)
     try:
-        endpoint = await webhooks.update_endpoint(db, endpoint, **body.model_dump(exclude_unset=True))
+        endpoint = await webhooks.update_endpoint(
+            db, endpoint, **body.model_dump(exclude_unset=True)
+        )
     except webhooks.InvalidWebhookUrl as exc:
         raise _bad_url(exc) from exc
     return _to_out(endpoint)

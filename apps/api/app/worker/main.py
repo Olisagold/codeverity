@@ -1,17 +1,20 @@
-"""The assessment worker: claims queued assessments and processes them.
+"""The worker: processes queued assessments and sends webhook deliveries.
 
-Run with ``python -m app.worker``. Any number of workers can run at once;
-`claim_next` uses row locks, so each assessment is processed by one worker.
+Run with ``python -m app.worker``. Any number of workers can run at once; both
+queues are claimed with row locks, so each job is handled by one worker. The
+two queues run as separate loops so slow model calls never delay webhooks.
 """
 
 import asyncio
 import logging
 import signal
+from collections.abc import Awaitable, Callable
 
+import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import SessionLocal, engine
-from app.services import assessments
+from app.services import assessments, webhooks
 from app.services.orchestration import processor
 
 log = logging.getLogger("codeverity.worker")

@@ -51,7 +51,7 @@ export default function SettingsGeneralPage() {
       <SettingsCard title="General">
         <div className="space-y-5">
           <div>
-            <label htmlFor="org-name" className="text-[13px] font-medium text-white">
+            <label htmlFor="org-name" className="block text-[13px] font-medium text-white">
               Organization name
             </label>
             <input
@@ -65,7 +65,7 @@ export default function SettingsGeneralPage() {
             />
           </div>
           <div>
-            <label htmlFor="org-slug" className="text-[13px] font-medium text-white">
+            <label htmlFor="org-slug" className="block text-[13px] font-medium text-white">
               Organization slug
             </label>
             <input

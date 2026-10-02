@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { SettingsIcon, ExternalLinkIcon } from 'lucide-react';
+import { BuildingIcon, ChevronsUpDownIcon, ExternalLinkIcon, LogOutIcon, SettingsIcon } from 'lucide-react';
 import { useSession } from '@/hooks/useSession';
+import { signOut } from '@/lib/api/dashboard';
 
 interface NavItem {
   label: string;
@@ -61,7 +62,6 @@ interface DashboardSidebarProps {
 
 export function DashboardSidebar({ onNavigate }: DashboardSidebarProps) {
   const pathname = usePathname();
-  const session = useSession();
 
   return (
     <div className="flex h-full flex-col">
@@ -109,19 +109,96 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps) {
         ))}
       </nav>
 
-      <div className="border-t border-line-soft py-3 pr-3">
-        <Link
-          href="/dashboard/settings/organization"
-          onClick={onNavigate}
-          className="flex w-full items-center justify-between rounded-md px-2.5 py-2 text-left transition-colors duration-150 ease-out hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      <AccountMenu onNavigate={onNavigate} />
+    </div>
+  );
+}
+
+const menuItem =
+  'flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px] text-muted transition-colors duration-150 ease-out hover:bg-surface-2 hover:text-white focus-visible:bg-surface-2 focus-visible:text-white focus-visible:outline-none';
+
+/** Organization row at the foot of the sidebar. Opens upward with account actions. */
+function AccountMenu({ onNavigate }: { onNavigate?: () => void }) {
+  const session = useSession();
+  const [open, setOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handlePointerDown(event: MouseEvent) {
+      if (!ref.current?.contains(event.target as Node)) setOpen(false);
+    }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setOpen(false);
+    }
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open]);
+
+  function close() {
+    setOpen(false);
+    onNavigate?.();
+  }
+
+  return (
+    <div ref={ref} className="relative border-t border-line-soft py-3 pr-3">
+      {open ? (
+        <div
+          role="menu"
+          className="absolute bottom-full left-0 right-3 mb-1 overflow-hidden rounded-lg border border-line bg-surface shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
         >
-          <span className="min-w-0">
-            <span className="block truncate text-[13px] text-white">{session?.organization.name ?? '…'}</span>
-            <span className="block truncate font-mono text-[11px] text-faint">{session?.organization.slug ?? ''}</span>
-          </span>
-          <SettingsIcon aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-faint" />
-        </Link>
-      </div>
+          <div className="border-b border-line px-3 py-2.5">
+            <p className="truncate text-[13px] text-white">{session?.user.name ?? ''}</p>
+            <p className="truncate font-mono text-[11px] text-faint">{session?.user.email ?? ''}</p>
+          </div>
+          <div className="py-1">
+            <Link role="menuitem" href="/dashboard/settings/organization" onClick={close} className={menuItem}>
+              <BuildingIcon aria-hidden="true" className="h-3.5 w-3.5" />
+              Organization
+            </Link>
+            <Link role="menuitem" href="/dashboard/settings" onClick={close} className={menuItem}>
+              <SettingsIcon aria-hidden="true" className="h-3.5 w-3.5" />
+              Settings
+            </Link>
+          </div>
+          <div className="border-t border-line py-1">
+            <button
+              type="button"
+              role="menuitem"
+              disabled={signingOut}
+              onClick={() => {
+                setSigningOut(true);
+                void signOut();
+              }}
+              className={`${menuItem} disabled:opacity-60`}
+            >
+              <LogOutIcon aria-hidden="true" className="h-3.5 w-3.5" />
+              {signingOut ? 'Signing out…' : 'Sign out'}
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      <button
+        type="button"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+        className={`flex w-full items-center justify-between gap-2 rounded-md px-2.5 py-2 text-left transition-colors duration-150 ease-out hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+          open ? 'bg-surface' : ''
+        }`}
+      >
+        <span className="min-w-0">
+          <span className="block truncate text-[13px] text-white">{session?.organization.name ?? '…'}</span>
+          <span className="block truncate font-mono text-[11px] text-faint">{session?.organization.slug ?? ''}</span>
+        </span>
+        <ChevronsUpDownIcon aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-faint" />
+      </button>
     </div>
   );
 }

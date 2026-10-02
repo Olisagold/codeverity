@@ -65,7 +65,7 @@ export default function SettingsSecurityPage() {
             </p>
             {hasPassword ? (
               <div>
-                <label htmlFor="current-password" className="text-[13px] font-medium text-white">
+                <label htmlFor="current-password" className="block text-[13px] font-medium text-white">
                   Current password
                 </label>
                 <input
@@ -79,7 +79,7 @@ export default function SettingsSecurityPage() {
               </div>
             ) : null}
             <div>
-              <label htmlFor="new-password" className="text-[13px] font-medium text-white">
+              <label htmlFor="new-password" className="block text-[13px] font-medium text-white">
                 New password
               </label>
               <input
@@ -92,7 +92,7 @@ export default function SettingsSecurityPage() {
               />
             </div>
             <div>
-              <label htmlFor="confirm-password" className="text-[13px] font-medium text-white">
+              <label htmlFor="confirm-password" className="block text-[13px] font-medium text-white">
                 Confirm new password
               </label>
               <input

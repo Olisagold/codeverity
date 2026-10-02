@@ -309,13 +309,18 @@ async def deliver_next(db: AsyncSession, client: httpx.AsyncClient) -> bool:
     if delivery is None:
         await db.rollback()
         return False
+    await attempt(db, client, delivery)
+    return True
 
+
+async def attempt(db: AsyncSession, client: httpx.AsyncClient, delivery: WebhookDelivery) -> None:
+    """Make one delivery attempt and schedule a retry if it fails."""
     endpoint = await db.get(WebhookEndpoint, delivery.endpoint_id)
     if endpoint is None or not endpoint.active:
         delivery.status = DeliveryStatus.failed
         delivery.last_error = "endpoint disabled"
         await db.commit()
-        return True
+        return
 
     delivery.attempts += 1
     status_code, error = await _send(client, endpoint, delivery)
@@ -329,4 +334,3 @@ async def deliver_next(db: AsyncSession, client: httpx.AsyncClient) -> bool:
     else:
         delivery.next_attempt_at = datetime.now(UTC) + RETRY_DELAYS[delivery.attempts - 1]
     await db.commit()
-    return True

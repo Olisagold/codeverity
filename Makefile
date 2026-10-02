@@ -36,8 +36,11 @@ api-logs:
 api-shell:
 	docker compose exec api bash
 
+# The worker is paused so it can't pick up live assessments the tests create
+# and spend model credit on them.
 api-test:
-	docker compose exec api pytest
+	docker compose stop worker
+	docker compose exec api pytest; status=$$?; docker compose start worker; exit $$status
 
 api-lint:
 	docker compose exec api ruff check .

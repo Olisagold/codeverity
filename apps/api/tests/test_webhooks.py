@@ -102,7 +102,7 @@ def other_user() -> Iterator[User]:
 
 
 def _auth(user: User) -> dict[str, str]:
-    return {"Authorization": f"Bearer {create_access_token(user.id)}"}
+    return {"Authorization": f"Bearer {create_access_token(user.id, user.organization_id)}"}
 
 
 def _create(client: TestClient, user: User, **body) -> dict:

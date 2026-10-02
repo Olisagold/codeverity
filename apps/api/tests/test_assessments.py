@@ -15,6 +15,7 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
+from redis.asyncio import Redis
 from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
@@ -23,7 +24,6 @@ from app.api.deps import ApiCaller
 from app.core.config import get_settings
 from app.core.ids import new_id, ulid
 from app.core.security import create_access_token
-from app.db.redis import get_redis
 from app.main import app
 from app.models.api_key import ApiKey, ApiKeyEnvironment
 from app.models.assessment import Assessment, AssessmentStatus
@@ -414,8 +414,8 @@ def _limits(monkeypatch: pytest.MonkeyPatch, **values: int) -> None:
 def test_request_limit_per_key(
     client: TestClient, org: Org, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    path = f"/v1/assessments/{_create(client, org.test)['id']}"
     _limits(monkeypatch, rate_limit_requests_per_minute=2)
-    path = "/v1/assessments/asm_missing"
 
     first = client.get(path, headers=_bearer(org.test))
     assert first.headers["X-RateLimit-Limit"] == "2"
@@ -427,6 +427,13 @@ def test_request_limit_per_key(
 
     # Counted per key: the org's other key is unaffected.
     assert client.get(path, headers=_bearer(org.live)).status_code == 404
+
+
+def _own_redis(monkeypatch: pytest.MonkeyPatch) -> Redis:
+    """A client bound to the test's own event loop, not the TestClient's."""
+    redis = Redis.from_url(get_settings().redis_url)
+    monkeypatch.setattr(rate_limit, "get_redis", lambda: redis)
+    return redis
 
 
 def test_assessment_creation_limit_per_key(
@@ -455,6 +462,7 @@ def _caller(org: Org, environment: ApiKeyEnvironment) -> ApiCaller:
 def test_daily_live_cap_per_organization(org: Org, monkeypatch: pytest.MonkeyPatch) -> None:
     # Called directly so no live assessment is created (a worker could spend credit on it).
     _limits(monkeypatch, live_assessments_per_day=2, rate_limit_assessments_per_minute=0)
+    redis = _own_redis(monkeypatch)
 
     async def _do() -> None:
         live = _caller(org, ApiKeyEnvironment.live)
@@ -467,8 +475,7 @@ def test_daily_live_cap_per_organization(org: Org, monkeypatch: pytest.MonkeyPat
         assert "00:00 UTC" in exc.value.detail
         # Test keys never call the models, so the cap doesn't apply.
         await rate_limit.check_assessment_quota(_caller(org, ApiKeyEnvironment.test))
-        await get_redis().aclose()
-        get_redis.cache_clear()
+        await redis.aclose()
 
     asyncio.run(_do())
 

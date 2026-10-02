@@ -6,6 +6,7 @@ from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.core.ids import new_id
 from app.db.base import Base
 from app.models.enums import ApiKeyEnvironment
 
@@ -21,6 +22,9 @@ class WebhookEndpoint(Base):
     __tablename__ = "webhook_endpoints"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    public_id: Mapped[str] = mapped_column(
+        String(40), unique=True, index=True, default=lambda: new_id("whk")
+    )
     organization_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("organizations.id", ondelete="CASCADE"), index=True
     )
@@ -52,6 +56,9 @@ class WebhookDelivery(Base):
     __tablename__ = "webhook_deliveries"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    public_id: Mapped[str] = mapped_column(
+        String(40), unique=True, index=True, default=lambda: new_id("dlv")
+    )
     endpoint_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("webhook_endpoints.id", ondelete="CASCADE"), index=True
     )

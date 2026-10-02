@@ -92,3 +92,15 @@ class AssessmentDetail(AssessmentSummary):
     processing_seconds: float | None
     error_code: str | None
     error_message: str | None
+
+
+class QuickstartOut(BaseModel):
+    """Which quickstart steps the organization has done. Creating it is always done."""
+
+    api_key: bool
+    assessment: bool
+    webhook: bool
+    result_viewed: bool
+    # Where "View your first result" sends the user, once there is one.
+    first_completed_assessment_id: str | None
+    dismissed: bool

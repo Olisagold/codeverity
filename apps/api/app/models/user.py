@@ -5,6 +5,7 @@ from datetime import datetime
 from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.core.ids import new_id
 from app.db.base import Base
 
 
@@ -23,6 +24,10 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    # Shown in the API and dashboard instead of the internal UUID.
+    public_id: Mapped[str] = mapped_column(
+        String(40), unique=True, index=True, default=lambda: new_id("usr")
+    )
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     name: Mapped[str | None] = mapped_column(String(255))
 

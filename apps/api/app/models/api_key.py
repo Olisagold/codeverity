@@ -4,6 +4,7 @@ from datetime import datetime
 from sqlalchemy import DateTime, Enum, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.core.ids import new_id
 from app.db.base import Base
 from app.models.enums import ApiKeyEnvironment
 
@@ -21,6 +22,10 @@ class ApiKey(Base):
     __tablename__ = "api_keys"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    # Shown in the API and dashboard instead of the internal UUID.
+    public_id: Mapped[str] = mapped_column(
+        String(40), unique=True, index=True, default=lambda: new_id("key")
+    )
     organization_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("organizations.id", ondelete="CASCADE"), index=True
     )

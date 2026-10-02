@@ -259,7 +259,13 @@ def test_worker_completes_test_assessment(client: TestClient, org: Org) -> None:
     assert _load(created["id"]).attempts == 1
 
 
-def test_worker_fails_live_assessment_until_orchestration(client: TestClient, org: Org) -> None:
+def test_worker_fails_live_assessment_without_provider_keys(
+    client: TestClient, org: Org, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    no_keys = get_settings().model_copy(
+        update={"openai_api_key": "", "gemini_api_key": "", "deepseek_api_key": ""}
+    )
+    monkeypatch.setattr(processor, "get_settings", lambda: no_keys)
     created = _create(client, org.live)
     _drain()
 

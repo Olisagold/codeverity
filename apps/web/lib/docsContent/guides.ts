@@ -160,6 +160,146 @@ submission.save()`,
     ],
   },
   {
+    slug: 'guides/rubrics',
+    section: 'Guides',
+    title: 'Grade with instructor rubrics',
+    description: 'Let teachers write their own rubric for an assignment and get a weighted grade for the student’s code.',
+    blocks: [
+      {
+        type: 'paragraph',
+        text: 'Without a rubric, Codeverity returns feedback for the student. With one, the instructor decides what matters for the assignment: the models focus on those criteria, and the result adds a grade for the code against each one.',
+      },
+      { type: 'heading', id: 'write', text: '1. Let teachers write the rubric' },
+      {
+        type: 'paragraph',
+        text: 'Give instructors a form on each assignment in your platform and store the rubric with the assignment. Check the rules below in the form, so teachers see mistakes before a student submits.',
+      },
+      {
+        type: 'table',
+        columns: ['Field', 'Rule'],
+        rows: [
+          ['criteria', '1 to 10 criteria. Names must be unique, ignoring case'],
+          ['criteria[].name', 'Up to 100 characters, for example `Edge cases`'],
+          ['criteria[].description', 'What to look for, up to 500 characters'],
+          ['criteria[].weight', 'Whole number from 1 to 100. All weights must add up to 100'],
+          ['learner_level', 'Optional: `beginner`, `intermediate`, or `advanced`. Sets the tone of the feedback'],
+          ['notes', 'Optional extra context for the assessment, up to 1,000 characters'],
+        ],
+      },
+      { type: 'heading', id: 'send', text: '2. Send it with each submission' },
+      {
+        type: 'paragraph',
+        text: 'Pass the assignment’s rubric as `rubric` on every `POST /v1/assessments` for that assignment. Each request is independent, so Codeverity does not remember a rubric between submissions.',
+      },
+      {
+        type: 'tabs',
+        tabs: [
+          {
+            label: 'JavaScript',
+            language: 'javascript',
+            code: `const assessment = await fetch("https://api.codeverity.com/v1/assessments", {
+  method: "POST",
+  headers: {
+    Authorization: \`Bearer \${process.env.CODEVERITY_API_KEY}\`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    language: submission.language,
+    assignment: {
+      title: assignment.title,
+      requirements: assignment.requirements,
+    },
+    submission: { code: submission.code },
+    rubric: {
+      criteria: assignment.rubric.criteria, // [{ name, description, weight }]
+      learner_level: assignment.rubric.learnerLevel,
+      notes: assignment.rubric.notes,
+    },
+  }),
+}).then((res) => res.json());`,
+          },
+          {
+            label: 'Python',
+            language: 'python',
+            code: `assessment = requests.post(
+    "https://api.codeverity.com/v1/assessments",
+    headers={"Authorization": f"Bearer {CODEVERITY_API_KEY}"},
+    json={
+        "language": submission.language,
+        "assignment": {
+            "title": assignment.title,
+            "requirements": assignment.requirements,
+        },
+        "submission": {"code": submission.code},
+        "rubric": {
+            "criteria": assignment.rubric["criteria"],  # [{name, description, weight}]
+            "learner_level": assignment.rubric.get("learner_level"),
+            "notes": assignment.rubric.get("notes"),
+        },
+    },
+).json()`,
+          },
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: 'A rubric that breaks a rule is rejected with a 422 that names the problem, and no assessment is created.',
+      },
+      {
+        type: 'code',
+        language: 'json',
+        label: '422 · invalid rubric',
+        code: `{
+  "detail": [
+    { "loc": ["body", "rubric"], "msg": "Value error, criteria weights must add up to 100", "type": "value_error" }
+  ]
+}`,
+      },
+      { type: 'heading', id: 'grade', text: '3. Read the grade' },
+      {
+        type: 'paragraph',
+        text: 'When the assessment completes, the result includes `rubric_scores`, one entry per criterion in the order you sent them, each scored 0 to 10 with a one sentence comment. `rubric_score` is their weighted average, also 0 to 10.',
+      },
+      {
+        type: 'code',
+        language: 'json',
+        label: 'GET /v1/assessments/{id}/result',
+        code: `{
+  "score": 9.1,
+  "confidence": 0.86,
+  "rubric_score": 4.1,
+  "rubric_scores": [
+    { "name": "Edge cases", "weight": 70, "score": 2.0, "comment": "Empty and all-negative lists are wrong." },
+    { "name": "Readability", "weight": 30, "score": 9.0, "comment": "Clear names and simple structure." }
+  ]
+}`,
+      },
+      {
+        type: 'callout',
+        tone: 'warning',
+        title: 'Use rubric_score as the grade, not score',
+        text: '`score` rates the quality of the feedback Codeverity wrote, not the student’s code. The grade for the code is `rubric_score`, and it is only present when the request included a rubric.',
+      },
+      {
+        type: 'paragraph',
+        text: 'Show the student their grade and the comment for each criterion next to the feedback. To display it out of 100, multiply `rubric_score` by 10.',
+      },
+      {
+        type: 'callout',
+        tone: 'info',
+        title: 'Rubrics are guidance, not instructions',
+        text: 'The rubric is passed to the models as data. It shapes what they focus on, but text in it cannot change their role or the output format.',
+      },
+      {
+        type: 'cards',
+        cards: [
+          { title: 'Rubric fields', text: 'Every rubric parameter and limit.', to: '/docs/api/assessments#rubric' },
+          { title: 'Response objects', text: 'The full result shape.', to: '/docs/reference/responses' },
+        ],
+      },
+    ],
+  },
+  {
     slug: 'guides/errors',
     section: 'Guides',
     title: 'Handle errors',

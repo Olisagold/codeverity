@@ -148,6 +148,10 @@ assessment = requests.post(
           ['rubric.notes', 'string', 'No', 'Extra context for the assessment, up to 1,000 characters'],
         ],
       },
+      {
+        type: 'paragraph',
+        text: 'See [Grade with instructor rubrics](/docs/guides/rubrics) for letting teachers write their own rubric and reading the grade.',
+      },
       { type: 'heading', id: 'retrieve', text: 'Retrieve an assessment' },
       {
         type: 'endpoint',

@@ -50,6 +50,7 @@ export const docsNav: DocsNavGroup[] = [
       { title: 'Submit your first assessment', slug: 'guides/first-assessment' },
       { title: 'Handle asynchronous results', slug: 'guides/async-assessments' },
       { title: 'Configure webhooks', slug: 'guides/webhooks' },
+      { title: 'Grade with instructor rubrics', slug: 'guides/rubrics' },
       { title: 'Handle errors', slug: 'guides/errors' },
     ],
   },

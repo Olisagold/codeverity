@@ -44,7 +44,7 @@ export function Features() {
                   } ${index >= features.length - 2 ? 'sm:border-b-0' : ''}`}
                 >
                   <Icon aria-hidden="true" className="h-4 w-4 text-faint" />
-                  <h3 className="mt-4 text-[15px] font-medium text-white">{feature.title}</h3>
+                  <h3 className="mt-4 text-[15px] font-medium text-fg">{feature.title}</h3>
                   <p className="mt-2 text-[13px] leading-relaxed text-faint">{feature.body}</p>
                 </article>
               );

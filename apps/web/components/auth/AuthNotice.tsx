@@ -20,7 +20,7 @@ export function AuthNotice({ tone, title, children, action }: AuthNoticeProps) {
       <div className={`flex h-[110px] w-[110px] items-center justify-center rounded-full ${ringColor}`}>
         <Icon aria-hidden="true" className={`h-10 w-10 ${iconColor}`} strokeWidth={1.75} />
       </div>
-      <h2 className="mt-8 text-[22px] font-medium tracking-[-0.01em] text-white">{title}</h2>
+      <h2 className="mt-8 text-[22px] font-medium tracking-[-0.01em] text-fg">{title}</h2>
       <div className="mt-4 max-w-[400px] text-[15px] leading-[1.7] text-muted">{children}</div>
       {action ? <div className="mt-8 w-full">{action}</div> : null}
     </div>

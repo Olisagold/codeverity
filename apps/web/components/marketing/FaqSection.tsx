@@ -135,7 +135,7 @@ export function FaqSection() {
             FAQ
           </span>
           <div className="mt-8 grid gap-6 lg:grid-cols-12 lg:items-end">
-            <h2 className="text-4xl font-medium leading-[1.12] tracking-[-0.03em] text-white sm:text-5xl lg:col-span-7">
+            <h2 className="text-4xl font-medium leading-[1.12] tracking-[-0.03em] text-fg sm:text-5xl lg:col-span-7">
               Answers to the questions
               <br />
               that come up most.
@@ -163,7 +163,7 @@ export function FaqSection() {
                       aria-selected={isActive}
                       onClick={() => selectCategory(c.id)}
                       className={`relative rounded-xl px-5 py-3.5 text-center text-[15px] transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                        isActive ? 'text-white' : 'text-faint hover:text-muted'
+                        isActive ? 'text-fg' : 'text-faint hover:text-muted'
                       }`}
                     >
                       {isActive ? (
@@ -217,7 +217,7 @@ export function FaqSection() {
                           onClick={() => setOpen(isOpen ? null : id)}
                           className="flex w-full items-center justify-between gap-6 px-6 py-7 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
                         >
-                          <span className="text-[16px] text-white">{item.q}</span>
+                          <span className="text-[16px] text-fg">{item.q}</span>
                           <motion.span
                             aria-hidden="true"
                             animate={{ rotate: isOpen ? 180 : 0 }}
@@ -262,13 +262,13 @@ export function FaqSection() {
 function ContactCard() {
   return (
     <div className="rounded-2xl border border-line-soft bg-surface p-8">
-      <p className="text-[22px] font-medium tracking-[-0.02em] text-white">Got questions?</p>
+      <p className="text-[22px] font-medium tracking-[-0.02em] text-fg">Got questions?</p>
       <p className="mt-3 max-w-xs text-[15px] leading-relaxed text-muted">
         Can&apos;t find what you&apos;re looking for? Reach out and we&apos;ll get back to you fast.
       </p>
       <Link
         href="mailto:dev@codeverity.dev?subject=Codeverity%20question"
-        className="mt-7 inline-flex items-center gap-2 text-[15px] text-muted transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="mt-7 inline-flex items-center gap-2 text-[15px] text-muted transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         Contact us
         <ArrowRightIcon aria-hidden="true" className="h-4 w-4" />

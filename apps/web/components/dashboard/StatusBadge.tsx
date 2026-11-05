@@ -6,7 +6,7 @@ const tones: Record<Tone, { dot: string; text: string }> = {
   success: { dot: 'bg-ok', text: 'text-ok' },
   progress: { dot: 'bg-accent', text: 'text-accent' },
   neutral: { dot: 'bg-line-strong', text: 'text-faint' },
-  error: { dot: 'bg-[#EF4444]', text: 'text-[#EF4444]' },
+  error: { dot: 'bg-danger', text: 'text-danger' },
   warning: { dot: 'bg-amber', text: 'text-amber' },
 };
 

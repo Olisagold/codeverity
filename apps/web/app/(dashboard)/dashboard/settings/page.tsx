@@ -40,7 +40,7 @@ export default function SettingsGeneralPage() {
   }
 
   const inputClasses =
-    'mt-2 h-11 w-full max-w-md rounded-lg border border-line bg-base px-3 text-[13.5px] text-white transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent';
+    'mt-2 h-11 w-full max-w-md rounded-lg border border-line bg-base px-3 text-[13.5px] text-fg transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent';
 
   return (
     <>
@@ -51,7 +51,7 @@ export default function SettingsGeneralPage() {
       <SettingsCard title="General">
         <div className="space-y-5">
           <div>
-            <label htmlFor="org-name" className="block text-[13px] font-medium text-white">
+            <label htmlFor="org-name" className="block text-[13px] font-medium text-fg">
               Organization name
             </label>
             <input
@@ -65,7 +65,7 @@ export default function SettingsGeneralPage() {
             />
           </div>
           <div>
-            <label htmlFor="org-slug" className="block text-[13px] font-medium text-white">
+            <label htmlFor="org-slug" className="block text-[13px] font-medium text-fg">
               Organization slug
             </label>
             <input
@@ -83,7 +83,7 @@ export default function SettingsGeneralPage() {
               type="button"
               onClick={save}
               disabled={!session || saving}
-              className="rounded-lg bg-white px-3 py-1.5 text-[13px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:opacity-50"
+              className="rounded-lg bg-fg px-3 py-1.5 text-[13px] font-medium text-on-fg transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base disabled:opacity-50"
             >
               {saving ? 'Saving…' : 'Save changes'}
             </button>

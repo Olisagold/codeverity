@@ -10,13 +10,13 @@ export function ApiKeysMock() {
     <div className="overflow-hidden rounded-xl border border-line bg-surface">
       <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
         <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-faint">API keys</span>
-        <span className="rounded-md border border-line-strong px-2 py-1 text-[12px] text-white">Create API key</span>
+        <span className="rounded-md border border-line-strong px-2 py-1 text-[12px] text-fg">Create API key</span>
       </div>
       <ul className="divide-y divide-line">
         {keys.map((key) => (
           <li key={key.name} className="flex flex-wrap items-center justify-between gap-3 px-4 py-4">
             <div className="min-w-0">
-              <p className="flex items-center gap-2 text-[13.5px] text-white">
+              <p className="flex items-center gap-2 text-[13.5px] text-fg">
                 {key.name}
                 <span
                   className={`rounded border px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.1em] ${

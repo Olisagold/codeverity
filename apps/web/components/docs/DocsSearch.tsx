@@ -54,7 +54,7 @@ export function DocsSearch() {
       </button>
 
       {open ? (
-        <div className="fixed inset-0 z-[60] flex items-start justify-center bg-black/80 px-4 pt-[12vh]">
+        <div className="fixed inset-0 z-[60] flex items-start justify-center bg-scrim/80 px-4 pt-[12vh]">
           <div role="dialog" aria-modal="true" aria-label="Search documentation" className="w-full max-w-xl overflow-hidden rounded-xl border border-line bg-surface">
             <div className="flex items-center gap-3 border-b border-line px-4">
               <SearchIcon aria-hidden="true" className="h-4 w-4 text-faint" />
@@ -63,13 +63,13 @@ export function DocsSearch() {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search documentation…"
-                className="h-12 flex-1 bg-transparent text-[14px] text-white placeholder:text-faint focus:outline-none"
+                className="h-12 flex-1 bg-transparent text-[14px] text-fg placeholder:text-faint focus:outline-none"
               />
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Close search"
-                className="rounded-md p-1.5 text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded-md p-1.5 text-faint transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 <XIcon aria-hidden="true" className="h-4 w-4" />
               </button>
@@ -85,7 +85,7 @@ export function DocsSearch() {
                       className="flex w-full flex-col items-start gap-0.5 px-4 py-2.5 text-left transition-colors duration-150 ease-out hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
                     >
                       <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-faint">{page.section}</span>
-                      <span className="text-[14px] text-white">{page.title}</span>
+                      <span className="text-[14px] text-fg">{page.title}</span>
                       <span className="line-clamp-1 text-[12.5px] text-faint">{page.description}</span>
                     </button>
                   </li>

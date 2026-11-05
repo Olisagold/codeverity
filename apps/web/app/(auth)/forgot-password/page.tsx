@@ -10,7 +10,7 @@ import { TextField } from '@/components/ui/TextField';
 type Status = 'idle' | 'loading' | 'success';
 
 const LINK_CLASS =
-  'text-white underline-offset-4 transition-colors duration-150 ease-out hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black';
+  'text-fg underline-offset-4 transition-colors duration-150 ease-out hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -74,7 +74,7 @@ export default function ForgotPasswordPage() {
             <button
               type="button"
               onClick={() => setStatus('idle')}
-              className="text-muted underline-offset-4 transition-colors duration-150 ease-out hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              className="text-muted underline-offset-4 transition-colors duration-150 ease-out hover:text-fg hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
             >
               try another email
             </button>
@@ -104,7 +104,7 @@ export default function ForgotPasswordPage() {
         />
 
         {formError ? (
-          <p className="text-center text-[13px] text-[#EF4444]" role="alert">
+          <p className="text-center text-[13px] text-danger" role="alert">
             {formError}
           </p>
         ) : null}
@@ -112,7 +112,7 @@ export default function ForgotPasswordPage() {
         <button
           type="submit"
           disabled={status !== 'idle'}
-          className="flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-white text-[15px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted disabled:cursor-not-allowed disabled:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+          className="flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-fg text-[15px] font-medium text-on-fg transition-colors duration-150 ease-out hover:bg-muted disabled:cursor-not-allowed disabled:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
         >
           {status === 'loading' ? (
             <>

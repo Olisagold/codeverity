@@ -23,7 +23,7 @@ export function RangeToggle({ value, onChange }: RangeToggleProps) {
           aria-pressed={value === option.value}
           onClick={() => onChange(option.value)}
           className={`rounded-md px-2.5 py-1 text-[12.5px] transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-            value === option.value ? 'bg-surface-2 text-white' : 'text-faint hover:text-muted'
+            value === option.value ? 'bg-surface-2 text-fg' : 'text-faint hover:text-muted'
           }`}
         >
           {option.label}

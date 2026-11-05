@@ -9,7 +9,7 @@ function Rich({ text }: { text: string }) {
       {text.split(RICH).map((part, index) => {
         if (part.startsWith('**') && part.endsWith('**')) {
           return (
-            <strong key={index} className="font-medium text-white">
+            <strong key={index} className="font-medium text-fg">
               {part.slice(2, -2)}
             </strong>
           );
@@ -20,7 +20,7 @@ function Rich({ text }: { text: string }) {
             <Link
               key={index}
               href={link[2]}
-              className="text-white underline decoration-accent underline-offset-4 transition-colors duration-150 hover:text-accent"
+              className="text-fg underline decoration-accent underline-offset-4 transition-colors duration-150 hover:text-accent"
             >
               {link[1]}
             </Link>
@@ -40,7 +40,7 @@ export function InlineText({ text }: { text: string }) {
     <>
       {parts.map((part, index) =>
         index % 2 === 1 ? (
-          <code key={index} className="rounded border border-line bg-surface px-1.5 py-0.5 font-mono text-[12.5px] text-white">
+          <code key={index} className="rounded border border-line bg-surface px-1.5 py-0.5 font-mono text-[12.5px] text-fg">
             {part}
           </code>
         ) : (

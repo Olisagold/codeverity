@@ -30,7 +30,7 @@ export default function SettingsOrganizationPage() {
               ].map((item) => (
                 <div key={item.label}>
                   <dt className="text-[12.5px] text-faint">{item.label}</dt>
-                  <dd className="mt-1.5 break-all font-mono text-[12.5px] text-white">{item.value}</dd>
+                  <dd className="mt-1.5 break-all font-mono text-[12.5px] text-fg">{item.value}</dd>
                 </div>
               ))}
             </dl>
@@ -40,7 +40,7 @@ export default function SettingsOrganizationPage() {
             <ul className="divide-y divide-line-soft">
               {organization.members.map((member) => (
                 <li key={member.email} className="py-3 first:pt-0 last:pb-0">
-                  <p className="text-[13.5px] text-white">{member.name}</p>
+                  <p className="text-[13.5px] text-fg">{member.name}</p>
                   <p className="font-mono text-[11.5px] text-faint">{member.email}</p>
                 </li>
               ))}

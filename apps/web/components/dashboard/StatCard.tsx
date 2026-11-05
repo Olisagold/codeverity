@@ -14,7 +14,7 @@ export function StatCard({ label, value, detail, trend }: StatCardProps) {
   return (
     <div className="rounded-xl border border-line bg-surface p-4">
       <p className="text-[12.5px] text-faint">{label}</p>
-      <p className="mt-3 text-[26px] font-medium leading-none tracking-[-0.02em] text-white">{value}</p>
+      <p className="mt-3 text-[26px] font-medium leading-none tracking-[-0.02em] text-fg">{value}</p>
       <div className="mt-2 flex items-center gap-2">
         {trend ? (
           <span

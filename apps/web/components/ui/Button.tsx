@@ -13,12 +13,12 @@ interface ButtonProps {
 }
 
 const base =
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black';
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base';
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-white text-black hover:bg-muted',
-  secondary: 'border border-line-strong bg-transparent text-white hover:border-white/60',
-  quiet: 'text-muted hover:text-white',
+  primary: 'bg-fg text-on-fg hover:bg-muted',
+  secondary: 'border border-line-strong bg-transparent text-fg hover:border-fg/60',
+  quiet: 'text-muted hover:text-fg',
 };
 
 export function Button({ children, href, to, variant = 'primary', className = '', onClick }: ButtonProps) {

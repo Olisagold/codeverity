@@ -8,7 +8,7 @@ import { Reveal } from '@/components/ui/Reveal';
 import { CopyButton } from '@/components/ui/CopyButton';
 
 
-type Tone = 'muted' | 'white' | 'ok' | 'accent' | 'violet' | 'faint';
+type Tone = 'muted' | 'fg' | 'ok' | 'accent' | 'violet' | 'faint';
 
 interface TerminalLine {
   text: string;
@@ -39,7 +39,7 @@ const STEPS: Step[] = [
     windowTitle: 'Dashboard · API keys',
     terminalTitle: 'terminal',
     lines: [
-      { text: 'curl -X POST api.codeverity.com/v1/assessments \\', prompt: true, tone: 'white' },
+      { text: 'curl -X POST api.codeverity.com/v1/assessments \\', prompt: true, tone: 'fg' },
       { text: '  -H "Authorization: Bearer sk_live_••••••91K2" \\', tone: 'muted' },
       { text: '  -d @submission.json', tone: 'muted' },
       { text: '{ "id": "asm_01JABC123", "status": "processing" }', tone: 'ok' },
@@ -88,7 +88,7 @@ const STEPS: Step[] = [
     windowTitle: 'Dashboard · Webhooks',
     terminalTitle: 'webhook · assessment.completed',
     lines: [
-      { text: 'POST your-platform.com/webhooks/codeverity', tone: 'white' },
+      { text: 'POST your-platform.com/webhooks/codeverity', tone: 'fg' },
       { text: '{', tone: 'muted' },
       { text: '  "event": "assessment.completed",', tone: 'muted' },
       { text: '  "score": 9.2, "confidence": 0.92', tone: 'muted' },
@@ -103,7 +103,7 @@ const STEP_DURATION = 6500;
 
 const TONE_CLASS: Record<Tone, string> = {
   muted: 'text-muted',
-  white: 'text-white',
+  fg: 'text-fg',
   ok: 'text-ok',
   accent: 'text-accent',
   violet: 'text-violet',
@@ -168,7 +168,7 @@ export function HowItWorks() {
                     >
                       <span
                         className={`mt-0.5 font-mono text-[12px] transition-colors duration-150 ${
-                          isActive ? 'text-white' : 'text-faint'
+                          isActive ? 'text-fg' : 'text-faint'
                         }`}
                       >
                         {item.index}
@@ -176,7 +176,7 @@ export function HowItWorks() {
                       <span className="min-w-0 flex-1">
                         <span
                           className={`block text-[15px] font-medium tracking-[-0.01em] transition-colors duration-150 ${
-                            isActive ? 'text-white' : 'text-muted group-hover:text-white'
+                            isActive ? 'text-fg' : 'text-muted group-hover:text-fg'
                           }`}
                         >
                           {item.title}
@@ -193,11 +193,11 @@ export function HowItWorks() {
                     </button>
                     {/* Progress rail */}
                     <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-px bg-line-soft">
-                      {isActive && (paused || reduceMotion) ? <span className="block h-full w-full bg-white" /> : null}
+                      {isActive && (paused || reduceMotion) ? <span className="block h-full w-full bg-fg" /> : null}
                       {isActive && !paused && !reduceMotion ? (
                         <motion.span
                           key={`${item.id}-${active}`}
-                          className="block h-full bg-white"
+                          className="block h-full bg-fg"
                           initial={{ width: 0 }}
                           animate={{ width: '100%' }}
                           transition={{ duration: STEP_DURATION / 1000, ease: 'linear' }}
@@ -230,7 +230,7 @@ export function HowItWorks() {
                 {/* Back window: dashboard screenshot */}
                 <motion.div
                   key={`${step.id}-window`}
-                  className="absolute left-[5%] top-[7%] w-[78%] overflow-hidden rounded-xl border border-line-strong bg-base shadow-[0_30px_80px_-30px_rgba(0,0,0,0.9)]"
+                  className="absolute left-[5%] top-[7%] w-[78%] overflow-hidden rounded-xl border border-line-strong bg-base shadow-window"
                   initial={reduceMotion ? false : { opacity: 0, y: 24, scale: 0.98 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -16, scale: 0.98 }}
@@ -251,7 +251,7 @@ export function HowItWorks() {
                 {/* Front window: terminal */}
                 <motion.div
                   key={`${step.id}-terminal`}
-                  className="absolute bottom-[7%] right-[4%] w-[68%] overflow-hidden rounded-xl border border-line-strong bg-[#0a0a0b] shadow-[0_30px_80px_-30px_rgba(0,0,0,0.95)] sm:w-[58%]"
+                  className="absolute bottom-[7%] right-[4%] w-[68%] overflow-hidden rounded-xl border border-line-strong bg-surface-2 shadow-window-strong sm:w-[58%]"
                   initial={reduceMotion ? false : { opacity: 0, y: 32, scale: 0.97 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.98 }}
@@ -275,11 +275,11 @@ export function HowItWorks() {
 
 function WindowChrome({ title, mono = false }: { title: string; mono?: boolean }) {
   return (
-    <div className="relative flex h-8 items-center border-b border-line-soft bg-[#0e0e10] px-3">
+    <div className="relative flex h-8 items-center border-b border-line-soft bg-chrome px-3">
       <span aria-hidden="true" className="flex items-center gap-1.5">
-        <span className="h-2.5 w-2.5 rounded-full bg-[#3f3f46]" />
-        <span className="h-2.5 w-2.5 rounded-full bg-[#3f3f46]" />
-        <span className="h-2.5 w-2.5 rounded-full bg-[#3f3f46]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-chrome-dot" />
+        <span className="h-2.5 w-2.5 rounded-full bg-chrome-dot" />
+        <span className="h-2.5 w-2.5 rounded-full bg-chrome-dot" />
       </span>
       <span
         className={`pointer-events-none absolute inset-x-0 truncate px-16 text-center text-[11px] text-faint ${

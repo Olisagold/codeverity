@@ -106,7 +106,7 @@ export default function SignUpPage() {
             <button
               type="button"
               onClick={() => setStep('form')}
-              className="text-white underline-offset-4 transition-colors duration-150 ease-out hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              className="text-fg underline-offset-4 transition-colors duration-150 ease-out hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
             >
               Use a different email
             </button>
@@ -127,7 +127,7 @@ export default function SignUpPage() {
           <button
             type="submit"
             disabled={status !== 'idle'}
-            className="flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-white text-[15px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted disabled:cursor-not-allowed disabled:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            className="flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-fg text-[15px] font-medium text-on-fg transition-colors duration-150 ease-out hover:bg-muted disabled:cursor-not-allowed disabled:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
           >
             {status === 'loading' ? (
               <>
@@ -157,7 +157,7 @@ export default function SignUpPage() {
           Already have an account?{' '}
           <Link
             href="/login"
-            className="text-white underline-offset-4 transition-colors duration-150 ease-out hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            className="text-fg underline-offset-4 transition-colors duration-150 ease-out hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
           >
             Sign in
           </Link>
@@ -222,11 +222,11 @@ export default function SignUpPage() {
               checked={accepted}
               onChange={(event) => setAccepted(event.target.checked)}
               aria-describedby={errors.terms ? 'terms-error' : undefined}
-              className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-line-strong bg-surface text-accent focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-black"
+              className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-line-strong bg-surface text-accent focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-base"
             />
             <span>
-              I agree to the <span className="text-white">Terms of Service</span> and{' '}
-              <span className="text-white">Privacy Policy</span>.
+              I agree to the <span className="text-fg">Terms of Service</span> and{' '}
+              <span className="text-fg">Privacy Policy</span>.
             </span>
           </label>
           {errors.terms ? (
@@ -239,7 +239,7 @@ export default function SignUpPage() {
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-white text-[15px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted disabled:cursor-not-allowed disabled:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+          className="flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-fg text-[15px] font-medium text-on-fg transition-colors duration-150 ease-out hover:bg-muted disabled:cursor-not-allowed disabled:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
         >
           {status === 'loading' ? (
             <>

@@ -62,17 +62,17 @@ export function ResultSection() {
                     style={{ top: c.top }}
                   >
                     <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-faint">{c.label}</p>
-                    <p className="mt-1 text-[15px] font-medium tracking-[-0.01em] text-white">{c.value}</p>
+                    <p className="mt-1 text-[15px] font-medium tracking-[-0.01em] text-fg">{c.value}</p>
                   </motion.div>
                 ))}
 
                 {/* Window */}
                 <div className="overflow-hidden rounded-t-xl border border-b-0 border-line-strong bg-base">
-                  <div className="relative flex h-9 items-center border-b border-line-soft bg-[#0e0e10] px-3">
+                  <div className="relative flex h-9 items-center border-b border-line-soft bg-chrome px-3">
                     <span aria-hidden="true" className="flex items-center gap-1.5">
-                      <span className="h-2.5 w-2.5 rounded-full bg-[#3f3f46]" />
-                      <span className="h-2.5 w-2.5 rounded-full bg-[#3f3f46]" />
-                      <span className="h-2.5 w-2.5 rounded-full bg-[#3f3f46]" />
+                      <span className="h-2.5 w-2.5 rounded-full bg-chrome-dot" />
+                      <span className="h-2.5 w-2.5 rounded-full bg-chrome-dot" />
+                      <span className="h-2.5 w-2.5 rounded-full bg-chrome-dot" />
                     </span>
                     <span className="pointer-events-none absolute inset-x-0 truncate px-16 text-center font-mono text-[11px] text-faint">
                       app.codeverity.com/dashboard/assessments/asm_01JABC123
@@ -98,13 +98,13 @@ export function ResultSection() {
         <Reveal delay={0.1}>
           <ul className="mx-auto mt-10 grid max-w-3xl gap-x-8 gap-y-4 text-sm leading-relaxed text-muted sm:grid-cols-3">
             <li>
-              <span className="text-white">Score and confidence</span> you can show students directly or gate on.
+              <span className="text-fg">Score and confidence</span> you can show students directly or gate on.
             </li>
             <li>
-              <span className="text-white">Per-model reasoning</span> so you can see where the models agreed and where they did not.
+              <span className="text-fg">Per-model reasoning</span> so you can see where the models agreed and where they did not.
             </li>
             <li>
-              <span className="text-white">One reconciled prescription</span> chosen against your evaluation criteria.
+              <span className="text-fg">One reconciled prescription</span> chosen against your evaluation criteria.
             </li>
           </ul>
         </Reveal>

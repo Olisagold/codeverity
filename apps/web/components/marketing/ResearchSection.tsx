@@ -32,7 +32,7 @@ export function ResearchSection() {
                     }`}
                   >
                     <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-faint">{config.label}</p>
-                    <p className="mt-2 text-[15px] font-medium text-white">{config.title}</p>
+                    <p className="mt-2 text-[15px] font-medium text-fg">{config.title}</p>
                     <p className="mt-2 text-[13px] leading-relaxed text-faint">{config.detail}</p>
                   </div>
                 </React.Fragment>

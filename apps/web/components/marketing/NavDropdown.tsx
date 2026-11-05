@@ -43,7 +43,7 @@ export function NavDropdown({ group }: NavDropdownProps) {
         aria-expanded={open}
         aria-haspopup="true"
         onClick={() => setOpen((value) => !value)}
-        className="flex items-center gap-1 rounded-md px-2 py-1.5 text-sm text-muted transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+        className="flex items-center gap-1 rounded-md px-2 py-1.5 text-sm text-muted transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
       >
         {group.label}
         <ChevronDownIcon
@@ -57,7 +57,7 @@ export function NavDropdown({ group }: NavDropdownProps) {
           <ul className="rounded-lg border border-line bg-surface py-1.5">
             {group.items.map((item) => {
               const classes =
-                'block px-3 py-1.5 text-sm text-muted transition-colors duration-150 ease-out hover:bg-surface-2 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent';
+                'block px-3 py-1.5 text-sm text-muted transition-colors duration-150 ease-out hover:bg-surface-2 hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent';
               return (
                 <li key={item.label}>
                   {item.href.startsWith('/') ? (

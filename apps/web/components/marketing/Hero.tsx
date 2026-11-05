@@ -8,9 +8,9 @@ export function Hero() {
       <div className="mx-auto max-w-shell px-6 pb-28 pt-24 sm:pb-36 sm:pt-32">
         <Reveal className="mx-auto max-w-3xl text-center">
           <p className="text-sm text-faint">
-            AI code assessment <span className="text-white">API</span>
+            AI code assessment <span className="text-fg">API</span>
           </p>
-          <h1 className="mt-6 text-5xl font-semibold leading-[1.02] tracking-[-0.035em] text-white sm:text-6xl lg:text-7xl">
+          <h1 className="mt-6 text-5xl font-semibold leading-[1.02] tracking-[-0.035em] text-fg sm:text-6xl lg:text-7xl">
             One API.
             <br />
             Reliable code grading.

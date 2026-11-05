@@ -24,7 +24,7 @@ export function EndpointCard({ method, path, description, request, response, sta
       <div>
         <div className="flex min-w-0 flex-wrap items-center gap-2.5">
           <MethodBadge method={method} />
-          <code className="truncate font-mono text-[14px] text-white">{path}</code>
+          <code className="truncate font-mono text-[14px] text-fg">{path}</code>
         </div>
         {description ? <p className="mt-3 text-[14.5px] leading-relaxed text-muted">{description}</p> : null}
       </div>

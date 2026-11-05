@@ -10,7 +10,7 @@ interface DocsLayoutProps {
 
 export function DocsLayout({ children, toc }: DocsLayoutProps) {
   return (
-    <div className="min-h-screen w-full bg-base font-sans text-white">
+    <div className="min-h-screen w-full bg-base font-sans text-fg">
       <DocsTopNav />
 
       <div className="mx-auto flex max-w-[1440px] px-4 sm:px-6">

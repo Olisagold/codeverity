@@ -103,7 +103,7 @@ export default function ApiKeysPage() {
       header: 'Name',
       render: (row) => (
         <div>
-          <p className="text-[13px] text-white">{row.name}</p>
+          <p className="text-[13px] text-fg">{row.name}</p>
           {row.description ? <p className="mt-0.5 text-[12px] text-faint">{row.description}</p> : null}
         </div>
       ),
@@ -157,7 +157,7 @@ export default function ApiKeysPage() {
           <button
             type="button"
             onClick={openCreate}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-[13px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-fg px-3 py-1.5 text-[13px] font-medium text-on-fg transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
           >
             <PlusIcon aria-hidden="true" className="h-3.5 w-3.5" />
             Create API key
@@ -166,7 +166,7 @@ export default function ApiKeysPage() {
       />
 
       {loadError ? (
-        <p role="alert" className="mb-4 rounded-lg border border-[#EF4444]/40 px-4 py-3 text-[13px] text-[#EF4444]">
+        <p role="alert" className="mb-4 rounded-lg border border-danger/40 px-4 py-3 text-[13px] text-danger">
           {loadError}
         </p>
       ) : null}
@@ -191,7 +191,7 @@ export default function ApiKeysPage() {
               <button
                 type="button"
                 onClick={openCreate}
-                className="rounded-lg bg-white px-3.5 py-2 text-[13px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+                className="rounded-lg bg-fg px-3.5 py-2 text-[13px] font-medium text-on-fg transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
               >
                 Create API key
               </button>
@@ -210,7 +210,7 @@ export default function ApiKeysPage() {
             <button
               type="button"
               onClick={() => setCreateOpen(false)}
-              className="rounded-lg border border-line px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:border-line-strong hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded-lg border border-line px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:border-line-strong hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               Cancel
             </button>
@@ -218,7 +218,7 @@ export default function ApiKeysPage() {
               type="button"
               onClick={handleCreate}
               disabled={creating}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-[13px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted disabled:cursor-not-allowed disabled:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-fg px-3 py-1.5 text-[13px] font-medium text-on-fg transition-colors duration-150 ease-out hover:bg-muted disabled:cursor-not-allowed disabled:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
             >
               {creating ? <Loader2Icon aria-hidden="true" className="h-3.5 w-3.5 animate-spin" /> : null}
               {creating ? 'Creating' : 'Create key'}
@@ -228,7 +228,7 @@ export default function ApiKeysPage() {
       >
         <div className="space-y-5">
           <div>
-            <label htmlFor="key-name" className="text-[13px] font-medium text-white">
+            <label htmlFor="key-name" className="text-[13px] font-medium text-fg">
               Name
             </label>
             <input
@@ -236,12 +236,12 @@ export default function ApiKeysPage() {
               value={name}
               onChange={(event) => setName(event.target.value)}
               maxLength={100}
-              className="mt-2 h-11 w-full rounded-lg border border-line bg-base px-3 text-[13.5px] text-white placeholder:text-faint transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              className="mt-2 h-11 w-full rounded-lg border border-line bg-base px-3 text-[13.5px] text-fg placeholder:text-faint transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
 
           <fieldset>
-            <legend className="text-[13px] font-medium text-white">Environment</legend>
+            <legend className="text-[13px] font-medium text-fg">Environment</legend>
             <div className="mt-2 space-y-2">
               {(['test', 'live'] as const).map((value) => (
                 <label key={value} className="flex items-center gap-2.5 text-[13.5px] text-muted">
@@ -251,7 +251,7 @@ export default function ApiKeysPage() {
                     value={value}
                     checked={environment === value}
                     onChange={() => setEnvironment(value)}
-                    className="h-3.5 w-3.5 border-line-strong bg-base text-accent focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-black"
+                    className="h-3.5 w-3.5 border-line-strong bg-base text-accent focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-base"
                   />
                   {value === 'test' ? 'Test' : 'Production'}
                 </label>
@@ -260,7 +260,7 @@ export default function ApiKeysPage() {
           </fieldset>
 
           <div>
-            <label htmlFor="key-description" className="text-[13px] font-medium text-white">
+            <label htmlFor="key-description" className="text-[13px] font-medium text-fg">
               Description <span className="text-faint">(optional)</span>
             </label>
             <input
@@ -269,12 +269,12 @@ export default function ApiKeysPage() {
               onChange={(event) => setDescription(event.target.value)}
               placeholder="Main production integration"
               maxLength={255}
-              className="mt-2 h-11 w-full rounded-lg border border-line bg-base px-3 text-[13.5px] text-white placeholder:text-faint transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              className="mt-2 h-11 w-full rounded-lg border border-line bg-base px-3 text-[13.5px] text-fg placeholder:text-faint transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
 
           {createError ? (
-            <p role="alert" className="text-[13px] text-[#EF4444]">
+            <p role="alert" className="text-[13px] text-danger">
               {createError}
             </p>
           ) : null}
@@ -291,7 +291,7 @@ export default function ApiKeysPage() {
               type="button"
               onClick={() => setRevokeTarget(null)}
               disabled={revoking}
-              className="rounded-lg border border-line px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:border-line-strong hover:text-white disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded-lg border border-line px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:border-line-strong hover:text-fg disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               Cancel
             </button>
@@ -299,7 +299,7 @@ export default function ApiKeysPage() {
               type="button"
               onClick={confirmRevoke}
               disabled={revoking}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-[#EF4444] px-3 py-1.5 text-[13px] font-medium text-white transition-colors duration-150 ease-out hover:bg-[#DC2626] disabled:cursor-not-allowed disabled:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-danger px-3 py-1.5 text-[13px] font-medium text-white transition-colors duration-150 ease-out hover:bg-danger-strong disabled:cursor-not-allowed disabled:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
             >
               {revoking ? <Loader2Icon aria-hidden="true" className="h-3.5 w-3.5 animate-spin" /> : null}
               {revoking ? 'Revoking' : 'Revoke key'}
@@ -308,11 +308,11 @@ export default function ApiKeysPage() {
         }
       >
         <p className="text-[13.5px] leading-relaxed text-muted">
-          Requests using <span className="font-mono text-[12.5px] text-white">{revokeTarget?.masked}</span> will stop
+          Requests using <span className="font-mono text-[12.5px] text-fg">{revokeTarget?.masked}</span> will stop
           working immediately. This can&apos;t be undone.
         </p>
         {revokeError ? (
-          <p role="alert" className="mt-3 text-[13px] text-[#EF4444]">
+          <p role="alert" className="mt-3 text-[13px] text-danger">
             {revokeError}
           </p>
         ) : null}
@@ -326,7 +326,7 @@ export default function ApiKeysPage() {
           <button
             type="button"
             onClick={() => setCreatedKey(null)}
-            className="rounded-lg bg-white px-3 py-1.5 text-[13px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            className="rounded-lg bg-fg px-3 py-1.5 text-[13px] font-medium text-on-fg transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
           >
             Done
           </button>
@@ -337,7 +337,7 @@ export default function ApiKeysPage() {
         </p>
 
         <div className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-line bg-base px-3 py-2.5">
-          <code className="truncate font-mono text-[12.5px] text-white">{createdKey}</code>
+          <code className="truncate font-mono text-[12.5px] text-fg">{createdKey}</code>
           <CopyButton value={createdKey ?? ''} />
         </div>
 

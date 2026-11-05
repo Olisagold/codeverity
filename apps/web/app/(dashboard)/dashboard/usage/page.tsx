@@ -62,7 +62,7 @@ export default function UsagePage() {
 
           <section className="mt-6 rounded-xl border border-line bg-surface">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3.5">
-              <h2 className="text-[14.5px] font-medium text-white">Requests</h2>
+              <h2 className="text-[14.5px] font-medium text-fg">Requests</h2>
               <RangeToggle value={range} onChange={setRange} />
             </div>
             <div className="px-5 py-5">
@@ -72,7 +72,7 @@ export default function UsagePage() {
 
           <section className="mt-6 overflow-hidden rounded-xl border border-line bg-surface">
             <div className="border-b border-line px-5 py-3.5">
-              <h2 className="text-[14.5px] font-medium text-white">Usage by API key</h2>
+              <h2 className="text-[14.5px] font-medium text-fg">Usage by API key</h2>
             </div>
             {loading && !usage ? (
               <div className="p-3">
@@ -84,14 +84,14 @@ export default function UsagePage() {
               <ul className="divide-y divide-line-soft">
                 {(usage?.by_key ?? []).map((row) => (
                   <li key={row.api_key?.id ?? 'deleted'} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
-                    <p className="text-[13.5px] text-white">{row.api_key?.name ?? 'Deleted keys'}</p>
+                    <p className="text-[13.5px] text-fg">{row.api_key?.name ?? 'Deleted keys'}</p>
                     <div className="flex items-center gap-8">
                       <div className="text-right">
-                        <p className="font-mono text-[13px] text-white">{formatNumber(row.requests)}</p>
+                        <p className="font-mono text-[13px] text-fg">{formatNumber(row.requests)}</p>
                         <p className="font-mono text-[11px] text-faint">requests</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-mono text-[13px] text-white">{formatNumber(row.assessments)}</p>
+                        <p className="font-mono text-[13px] text-fg">{formatNumber(row.assessments)}</p>
                         <p className="font-mono text-[11px] text-faint">assessments</p>
                       </div>
                     </div>

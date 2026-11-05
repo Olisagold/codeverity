@@ -23,7 +23,7 @@ const columns: Column<AssessmentSummary>[] = [
   {
     key: 'id',
     header: 'ID',
-    render: (row) => <span className="font-mono text-[12.5px] text-white">{row.id}</span>,
+    render: (row) => <span className="font-mono text-[12.5px] text-fg">{row.id}</span>,
   },
   { key: 'status', header: 'Status', render: (row) => <StatusBadge status={row.status} /> },
   { key: 'language', header: 'Language', render: (row) => <span className="capitalize">{row.language}</span> },
@@ -31,7 +31,7 @@ const columns: Column<AssessmentSummary>[] = [
     key: 'score',
     header: 'Score',
     render: (row) => (
-      <span className="font-mono text-[12.5px] text-white">{row.score === null ? '—' : row.score.toFixed(1)}</span>
+      <span className="font-mono text-[12.5px] text-fg">{row.score === null ? '—' : row.score.toFixed(1)}</span>
     ),
   },
   {
@@ -96,7 +96,7 @@ export default function DashboardOverviewPage() {
 
           <section className="mt-6 rounded-xl border border-line bg-surface">
             <div className="border-b border-line px-5 py-3.5">
-              <h2 className="text-[14.5px] font-medium text-white">Assessment activity</h2>
+              <h2 className="text-[14.5px] font-medium text-fg">Assessment activity</h2>
             </div>
             <div className="px-5 py-5">
               {usage.data ? <ActivityChart points={toSeries(usage.data)} metric="assessments" /> : <Skeleton rows={4} />}
@@ -107,7 +107,7 @@ export default function DashboardOverviewPage() {
 
       <section className="mt-6">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-[14.5px] font-medium text-white">Recent assessments</h2>
+          <h2 className="text-[14.5px] font-medium text-fg">Recent assessments</h2>
           <Link
             href="/dashboard/assessments"
             className="text-[13px] text-accent underline-offset-4 transition-colors duration-150 ease-out hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"

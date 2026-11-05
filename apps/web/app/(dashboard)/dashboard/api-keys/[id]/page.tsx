@@ -67,7 +67,7 @@ export default function ApiKeyDetailsPage() {
         action={
           <Link
             href="/dashboard/api-keys"
-            className="rounded-lg border border-line-strong px-3.5 py-2 text-[13px] text-white transition-colors duration-150 ease-out hover:border-white/60"
+            className="rounded-lg border border-line-strong px-3.5 py-2 text-[13px] text-fg transition-colors duration-150 ease-out hover:border-fg/60"
           >
             Back to API keys
           </Link>
@@ -82,7 +82,7 @@ export default function ApiKeyDetailsPage() {
       value: apiKey.active ? <StatusBadge status="active" /> : <span className="text-faint">Revoked</span>,
     },
     { label: 'Environment', value: apiKey.environment === 'live' ? 'Production' : 'Test' },
-    { label: 'Key', value: <span className="font-mono text-[12.5px] text-white">{apiKey.masked}</span> },
+    { label: 'Key', value: <span className="font-mono text-[12.5px] text-fg">{apiKey.masked}</span> },
     { label: 'Created', value: apiKey.created },
     { label: 'Last used', value: apiKey.lastUsed },
   ];
@@ -93,7 +93,7 @@ export default function ApiKeyDetailsPage() {
         breadcrumb={
           <Link
             href="/dashboard/api-keys"
-            className="inline-flex items-center gap-1.5 font-mono text-[11.5px] uppercase tracking-[0.14em] text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex items-center gap-1.5 font-mono text-[11.5px] uppercase tracking-[0.14em] text-faint transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             <ChevronLeftIcon aria-hidden="true" className="h-3.5 w-3.5" />
             API keys
@@ -107,22 +107,22 @@ export default function ApiKeyDetailsPage() {
         {facts.map((fact) => (
           <div key={fact.label} className="rounded-xl border border-line bg-surface p-4">
             <dt className="text-[12.5px] text-faint">{fact.label}</dt>
-            <dd className="mt-2 text-[13.5px] text-white">{fact.value}</dd>
+            <dd className="mt-2 text-[13.5px] text-fg">{fact.value}</dd>
           </div>
         ))}
       </dl>
 
       <section className="mt-8">
-        <h2 className="mb-3 text-[14.5px] font-medium text-white">Usage</h2>
+        <h2 className="mb-3 text-[14.5px] font-medium text-fg">Usage</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           <StatCard label="Requests" value="—" detail="not tracked yet" />
           <StatCard label="Assessments" value="—" detail="not tracked yet" />
         </div>
       </section>
 
-      <section className="mt-8 rounded-xl border border-[#EF4444]/30 bg-surface">
+      <section className="mt-8 rounded-xl border border-danger/30 bg-surface">
         <div className="border-b border-line px-5 py-3.5">
-          <h2 className="text-[14.5px] font-medium text-white">Danger zone</h2>
+          <h2 className="text-[14.5px] font-medium text-fg">Danger zone</h2>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-4 px-5 py-4">
           <p className="max-w-xl text-[13px] leading-relaxed text-muted">
@@ -132,14 +132,14 @@ export default function ApiKeyDetailsPage() {
             type="button"
             onClick={handleRevoke}
             disabled={revoking || !apiKey.active}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-[#EF4444]/50 px-3 py-1.5 text-[13px] text-[#EF4444] transition-colors duration-150 ease-out hover:border-[#EF4444] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-danger/50 px-3 py-1.5 text-[13px] text-danger transition-colors duration-150 ease-out hover:border-danger disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {revoking ? <Loader2Icon aria-hidden="true" className="h-3.5 w-3.5 animate-spin" /> : null}
             {apiKey.active ? (revoking ? 'Revoking' : 'Revoke API key') : 'Revoked'}
           </button>
         </div>
         {revokeError ? (
-          <p role="alert" className="px-5 pb-4 text-[13px] text-[#EF4444]">
+          <p role="alert" className="px-5 pb-4 text-[13px] text-danger">
             {revokeError}
           </p>
         ) : null}

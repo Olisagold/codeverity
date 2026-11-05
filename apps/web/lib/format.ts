@@ -39,7 +39,7 @@ export function titleCase(value: string) {
 
 /** Text color for an HTTP status code. */
 export function statusColor(status: number) {
-  if (status >= 500) return 'text-[#EF4444]';
+  if (status >= 500) return 'text-danger';
   if (status >= 400) return 'text-amber';
   return 'text-ok';
 }

@@ -45,7 +45,7 @@ export function TableOfContents({ items }: TableOfContentsProps) {
               href={`#${item.id}`}
               aria-current={activeId === item.id ? 'true' : undefined}
               className={`-ml-px block border-l py-1 pl-3 text-[13px] transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                activeId === item.id ? 'border-accent text-white' : 'border-transparent text-faint hover:text-muted'
+                activeId === item.id ? 'border-accent text-fg' : 'border-transparent text-faint hover:text-muted'
               }`}
             >
               {item.text}

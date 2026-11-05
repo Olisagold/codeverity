@@ -24,7 +24,7 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-black/80 px-4 py-[10vh]">
+    <div className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-scrim/80 px-4 py-[10vh]">
       <div
         role="dialog"
         aria-modal="true"
@@ -32,12 +32,12 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
         className="w-full max-w-lg overflow-hidden rounded-xl border border-line bg-surface"
       >
         <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
-          <h2 className="text-[15px] font-medium text-white">{title}</h2>
+          <h2 className="text-[15px] font-medium text-fg">{title}</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="rounded-md p-1.5 text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-md p-1.5 text-faint transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             <XIcon aria-hidden="true" className="h-4 w-4" />
           </button>

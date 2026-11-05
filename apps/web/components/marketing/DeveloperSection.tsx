@@ -263,7 +263,7 @@ export function DeveloperSection() {
     <section id="developers" className="border-b border-line-soft">
       <div className="mx-auto max-w-shell px-6 py-24">
         <Reveal className="mx-auto max-w-2xl text-center">
-          <h2 className="text-4xl font-medium leading-[1.05] tracking-[-0.03em] text-white sm:text-5xl">
+          <h2 className="text-4xl font-medium leading-[1.05] tracking-[-0.03em] text-fg sm:text-5xl">
             Integrate <span className="text-accent">this afternoon</span>.
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-[15px] leading-relaxed text-muted sm:text-[16px]">
@@ -292,7 +292,7 @@ export function DeveloperSection() {
                   <span
                     className={`flex h-14 w-14 items-center justify-center rounded-xl border transition-colors duration-150 ease-out group-focus-visible:ring-2 group-focus-visible:ring-accent ${
                       isActive
-                        ? 'border-line-strong bg-surface-2 text-white'
+                        ? 'border-line-strong bg-surface-2 text-fg'
                         : 'border-line bg-surface text-faint group-hover:border-line-strong group-hover:text-muted'
                     }`}
                   >
@@ -300,7 +300,7 @@ export function DeveloperSection() {
                   </span>
                   <span
                     className={`text-[12.5px] transition-colors duration-150 ${
-                      isActive ? 'text-white' : 'text-faint group-hover:text-muted'
+                      isActive ? 'text-fg' : 'text-faint group-hover:text-muted'
                     }`}
                   >
                     {item.label}
@@ -326,7 +326,7 @@ export function DeveloperSection() {
                       aria-selected={isActive}
                       onClick={() => setView(item)}
                       className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-[12.5px] transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                        isActive ? 'bg-surface-2 text-white ring-1 ring-inset ring-line-strong' : 'text-faint hover:text-muted'
+                        isActive ? 'bg-surface-2 text-fg ring-1 ring-inset ring-line-strong' : 'text-faint hover:text-muted'
                       }`}
                     >
                       {item === 'request' ? <LangMark id={lang.id} className="h-3.5 w-3.5" /> : <span className="font-mono text-[11px]">{'{ }'}</span>}
@@ -360,14 +360,14 @@ export function DeveloperSection() {
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-line px-5 py-3">
               <Link
                 href="/docs/quickstart"
-                className="flex items-center gap-1.5 text-[12.5px] text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="flex items-center gap-1.5 text-[12.5px] text-faint transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 <BookOpenIcon aria-hidden="true" className="h-3.5 w-3.5" />
                 Quickstart
               </Link>
               <Link
                 href="/docs/reference/endpoints"
-                className="flex items-center gap-1.5 text-[12.5px] text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="flex items-center gap-1.5 text-[12.5px] text-faint transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 <ArrowUpRightIcon aria-hidden="true" className="h-3.5 w-3.5" />
                 API reference

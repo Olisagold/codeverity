@@ -6,7 +6,7 @@ import { footerColumns } from '@/lib/content';
 import { SocialMark } from '@/components/ui/SocialMarks';
 
 const linkClasses =
-  'group inline-flex items-center gap-2 text-[15px] text-muted transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black';
+  'group inline-flex items-center gap-2 text-[15px] text-muted transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base';
 
 export function Footer() {
   return (
@@ -15,14 +15,15 @@ export function Footer() {
         <div className="grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <Link href="/" aria-label="Codeverity home" className="inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
-              <Image src="/icons/logo.png" alt="Codeverity" width={52} height={30} className="h-7 w-auto" />
+              <Image src="/icons/logo.png" alt="Codeverity" width={52} height={30} className="theme-dark-only h-7 w-auto" />
+              <Image src="/icons/logo-dark.png" alt="Codeverity" width={52} height={30} className="theme-light-only h-7 w-auto" />
             </Link>
           </div>
 
           <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4 lg:col-span-8">
             {footerColumns.map((column) => (
               <nav key={column.title} aria-label={column.title}>
-                <p className="text-[15px] font-medium text-white">{column.title}</p>
+                <p className="text-[15px] font-medium text-fg">{column.title}</p>
                 <ul className="mt-5 space-y-3.5">
                   {column.items.map((item) => {
                     const content = (
@@ -30,7 +31,7 @@ export function Footer() {
                         {item.icon ? <SocialMark id={item.icon} className="h-4 w-4" /> : null}
                         {item.label}
                         {item.external && !item.icon ? (
-                          <ArrowUpRightIcon aria-hidden="true" className="h-3.5 w-3.5 text-faint transition-colors group-hover:text-white" />
+                          <ArrowUpRightIcon aria-hidden="true" className="h-3.5 w-3.5 text-faint transition-colors group-hover:text-fg" />
                         ) : null}
                       </>
                     );

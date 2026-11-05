@@ -19,7 +19,12 @@ const MODELS = [
 ];
 
 function CvLogo({ className = 'h-3.5 w-auto' }: { className?: string }) {
-  return <Image src="/icons/logo.png" alt="" width={24} height={14} className={className} />;
+  return (
+    <>
+      <Image src="/icons/logo.png" alt="" width={24} height={14} className={`theme-dark-only ${className}`} />
+      <Image src="/icons/logo-dark.png" alt="" width={24} height={14} className={`theme-light-only ${className}`} />
+    </>
+  );
 }
 
 function ClaudeIcon() {
@@ -55,10 +60,10 @@ function Node({ icon, title, sub, trailing, tone = 'default' }: NodeProps) {
     <div className={`flex min-h-[42px] w-full items-center gap-2.5 rounded-lg border px-2.5 py-2 ${tones[tone]}`}>
       {icon ? <span className="flex min-w-4 shrink-0 items-center justify-center">{icon}</span> : null}
       <span className="min-w-0 flex-1">
-        <span className={`block text-[12.5px] leading-tight ${tone === 'muted' ? 'text-muted' : 'text-white'}`}>{title}</span>
+        <span className={`block text-[12.5px] leading-tight ${tone === 'muted' ? 'text-muted' : 'text-fg'}`}>{title}</span>
         {sub ? <span className="mt-0.5 block text-[11.5px] leading-tight text-faint">{sub}</span> : null}
       </span>
-      {trailing ? <span className="shrink-0 font-mono text-[12px] text-white">{trailing}</span> : null}
+      {trailing ? <span className="shrink-0 font-mono text-[12px] text-fg">{trailing}</span> : null}
     </div>
   );
 }
@@ -258,7 +263,7 @@ export function ExperimentConfigs() {
       {configs.map((config, index) => (
         <div key={config.key} className={`flex flex-col ${index > 0 ? 'border-line md:border-l md:pl-6' : ''} ${index < 2 ? 'md:pr-6' : ''}`}>
           <StepLabel accent={config.accent}>Experiment {config.key}</StepLabel>
-          <p className="mt-1.5 text-[13.5px] text-white">{config.title}</p>
+          <p className="mt-1.5 text-[13.5px] text-fg">{config.title}</p>
           <div className="mt-4 flex flex-col gap-2">
             {config.steps.map((step, stepIndex) => (
               <React.Fragment key={stepIndex}>
@@ -292,11 +297,11 @@ export function IntegrationSteps() {
       <span aria-hidden="true" className="absolute bottom-6 left-[13px] top-6 w-px bg-line" />
       {INTEGRATION_STEPS.map((step, index) => (
         <li key={step.title} className="relative flex items-start gap-4 py-2.5">
-          <span className="relative z-10 flex h-[27px] w-[27px] shrink-0 items-center justify-center rounded-full border border-line-strong bg-base font-mono text-[11px] text-white">
+          <span className="relative z-10 flex h-[27px] w-[27px] shrink-0 items-center justify-center rounded-full border border-line-strong bg-base font-mono text-[11px] text-fg">
             {index + 1}
           </span>
           <div className="flex min-w-0 flex-1 flex-col gap-1 pt-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-            <p className="text-[13.5px] text-white">{step.title}</p>
+            <p className="text-[13.5px] text-fg">{step.title}</p>
             <div className="flex items-center gap-2.5">
               <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-faint">{step.where}</span>
               <code className="rounded-md border border-line bg-base px-2 py-1 font-mono text-[11.5px] text-muted">{step.code}</code>
@@ -335,10 +340,10 @@ export function AsyncLifecycle() {
                   ? 'border-ok bg-ok'
                   : stop.kind === 'status'
                     ? 'border-line-strong bg-base'
-                    : 'border-white bg-base'
+                    : 'border-fg bg-base'
               }`}
             />
-            <code className={`mt-3 font-mono text-[11.5px] ${stop.kind === 'done' ? 'text-ok' : 'text-white'}`}>{stop.label}</code>
+            <code className={`mt-3 font-mono text-[11.5px] ${stop.kind === 'done' ? 'text-ok' : 'text-fg'}`}>{stop.label}</code>
             <span className="mt-1 text-[11.5px] leading-snug text-faint">{stop.note}</span>
           </li>
         ))}
@@ -352,11 +357,11 @@ export function AsyncLifecycle() {
             <span
               aria-hidden="true"
               className={`relative z-10 mt-0.5 h-[15px] w-[15px] shrink-0 rounded-full border ${
-                stop.kind === 'done' ? 'border-ok bg-ok' : stop.kind === 'status' ? 'border-line-strong bg-base' : 'border-white bg-base'
+                stop.kind === 'done' ? 'border-ok bg-ok' : stop.kind === 'status' ? 'border-line-strong bg-base' : 'border-fg bg-base'
               }`}
             />
             <div>
-              <code className={`font-mono text-[12px] ${stop.kind === 'done' ? 'text-ok' : 'text-white'}`}>{stop.label}</code>
+              <code className={`font-mono text-[12px] ${stop.kind === 'done' ? 'text-ok' : 'text-fg'}`}>{stop.label}</code>
               <p className="mt-0.5 text-[12px] text-faint">{stop.note}</p>
             </div>
           </li>

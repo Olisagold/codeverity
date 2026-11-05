@@ -34,10 +34,10 @@ export function ActivityChart({ points, metric = 'assessments', height = 180 }: 
         className="h-44 w-full"
       >
         {gridLines.map((fraction) => (
-          <line key={fraction} x1={0} x2={width} y1={height * fraction} y2={height * fraction} stroke="#18181B" strokeWidth={1} />
+          <line key={fraction} x1={0} x2={width} y1={height * fraction} y2={height * fraction} className="stroke-line-soft" strokeWidth={1} />
         ))}
-        <path d={area} fill="#3B82F6" fillOpacity={0.08} />
-        <path d={line} fill="none" stroke="#3B82F6" strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
+        <path d={area} className="fill-accent" fillOpacity={0.08} />
+        <path d={line} fill="none" className="stroke-accent" strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
       </svg>
 
       <div className="mt-3 flex justify-between font-mono text-[11px] text-faint">

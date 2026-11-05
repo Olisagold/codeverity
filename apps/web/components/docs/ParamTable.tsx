@@ -23,7 +23,7 @@ export function ParamTable({ columns, rows }: ParamTableProps) {
           {rows.map((row) => (
             <tr key={row.join('|')} className="border-b border-line-soft last:border-b-0">
               {row.map((cell, index) => (
-                <td key={index} className={`px-4 py-3 align-top text-[13px] ${index === 0 ? 'font-mono text-[12.5px] text-white' : 'text-muted'}`}>
+                <td key={index} className={`px-4 py-3 align-top text-[13px] ${index === 0 ? 'font-mono text-[12.5px] text-fg' : 'text-muted'}`}>
                   <InlineText text={cell} />
                 </td>
               ))}

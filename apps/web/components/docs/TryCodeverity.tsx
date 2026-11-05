@@ -47,7 +47,7 @@ export function TryCodeverity() {
               id="try-language"
               value={language}
               onChange={(event) => setLanguage(event.target.value)}
-              className="mt-2 h-10 w-full rounded-lg border border-line bg-base px-3 font-mono text-[12.5px] text-white transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              className="mt-2 h-10 w-full rounded-lg border border-line bg-base px-3 font-mono text-[12.5px] text-fg transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             >
               <option value="python">python</option>
               <option value="javascript">javascript</option>
@@ -65,7 +65,7 @@ export function TryCodeverity() {
               value={code}
               onChange={(event) => setCode(event.target.value)}
               spellCheck={false}
-              className="mt-2 w-full resize-y rounded-lg border border-line bg-base p-3 font-mono text-[12.5px] leading-6 text-white transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              className="mt-2 w-full resize-y rounded-lg border border-line bg-base p-3 font-mono text-[12.5px] leading-6 text-fg transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
 
@@ -78,7 +78,7 @@ export function TryCodeverity() {
               rows={2}
               value={assignment}
               onChange={(event) => setAssignment(event.target.value)}
-              className="mt-2 w-full resize-y rounded-lg border border-line bg-base p-3 text-[13px] leading-6 text-white transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              className="mt-2 w-full resize-y rounded-lg border border-line bg-base p-3 text-[13px] leading-6 text-fg transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
 
@@ -87,7 +87,7 @@ export function TryCodeverity() {
               type="button"
               disabled={running}
               onClick={() => setPhase('queued')}
-              className="flex h-10 items-center gap-2 rounded-lg bg-white px-4 text-[13px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted disabled:cursor-not-allowed disabled:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              className="flex h-10 items-center gap-2 rounded-lg bg-fg px-4 text-[13px] font-medium text-on-fg transition-colors duration-150 ease-out hover:bg-muted disabled:cursor-not-allowed disabled:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
             >
               {running ? <Loader2Icon aria-hidden="true" className="h-3.5 w-3.5 animate-spin" /> : <PlayIcon aria-hidden="true" className="h-3.5 w-3.5" />}
               Run assessment
@@ -96,7 +96,7 @@ export function TryCodeverity() {
               <button
                 type="button"
                 onClick={() => setPhase('idle')}
-                className="flex h-10 items-center gap-2 rounded-lg border border-line-strong px-4 text-[13px] text-white transition-colors duration-150 ease-out hover:border-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="flex h-10 items-center gap-2 rounded-lg border border-line-strong px-4 text-[13px] text-fg transition-colors duration-150 ease-out hover:border-fg/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 <RotateCcwIcon aria-hidden="true" className="h-3.5 w-3.5" />
                 Reset
@@ -121,7 +121,7 @@ export function TryCodeverity() {
                     {isDone ? <CheckIcon className="h-2.5 w-2.5 text-ok" /> : <span className={`h-1.5 w-1.5 rounded-full ${isActive ? 'bg-accent' : 'bg-line-strong'}`} />}
                   </span>
                   <span>
-                    <span className={`block text-[13px] ${isDone || isActive ? 'text-white' : 'text-faint'}`}>{stage.label}</span>
+                    <span className={`block text-[13px] ${isDone || isActive ? 'text-fg' : 'text-faint'}`}>{stage.label}</span>
                     <span className="mt-0.5 block font-mono text-[11px] text-faint">{stage.detail}</span>
                   </span>
                 </li>

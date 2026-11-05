@@ -43,7 +43,7 @@ export function QuickstartCard({ progress, onDismiss }: QuickstartCardProps) {
     <section className="mb-6 rounded-xl border border-line bg-surface">
       <div className="flex items-start justify-between gap-4 border-b border-line px-5 py-3.5">
         <div>
-          <h2 className="text-[14.5px] font-medium text-white">Get started with Codeverity</h2>
+          <h2 className="text-[14.5px] font-medium text-fg">Get started with Codeverity</h2>
           <p className="mt-1 font-mono text-[11.5px] text-faint">
             {completed} of {steps.length} steps complete
           </p>
@@ -52,7 +52,7 @@ export function QuickstartCard({ progress, onDismiss }: QuickstartCardProps) {
           type="button"
           onClick={onDismiss}
           aria-label="Dismiss quickstart"
-          className="rounded-md p-1.5 text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="rounded-md p-1.5 text-faint transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           <XIcon aria-hidden="true" className="h-4 w-4" />
         </button>
@@ -78,8 +78,8 @@ export function QuickstartCard({ progress, onDismiss }: QuickstartCardProps) {
               ) : (
                 <Link
                   href={step.href}
-                  className={`text-[13.5px] underline-offset-4 transition-colors duration-150 ease-out hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                    step === next ? 'text-white' : 'text-muted'
+                  className={`text-[13.5px] underline-offset-4 transition-colors duration-150 ease-out hover:text-fg hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                    step === next ? 'text-fg' : 'text-muted'
                   }`}
                 >
                   {step.label}
@@ -93,7 +93,7 @@ export function QuickstartCard({ progress, onDismiss }: QuickstartCardProps) {
           {next ? (
             <Link
               href={next.href}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-3.5 py-2 text-[13px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-fg px-3.5 py-2 text-[13px] font-medium text-on-fg transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
             >
               {next.action}
               <ArrowRightIcon aria-hidden="true" className="h-3.5 w-3.5" />
@@ -101,7 +101,7 @@ export function QuickstartCard({ progress, onDismiss }: QuickstartCardProps) {
           ) : null}
           <Link
             href="/docs/quickstart"
-            className="inline-flex items-center justify-center rounded-lg border border-line-strong px-3.5 py-2 text-[13px] text-white transition-colors duration-150 ease-out hover:border-white/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex items-center justify-center rounded-lg border border-line-strong px-3.5 py-2 text-[13px] text-fg transition-colors duration-150 ease-out hover:border-fg/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             Read the quickstart
           </Link>

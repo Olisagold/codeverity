@@ -34,7 +34,7 @@ export function TextField({
   return (
     <div>
       <div className="flex items-baseline justify-between gap-4">
-        <label htmlFor={id} className="text-[13px] font-medium text-white">
+        <label htmlFor={id} className="text-[13px] font-medium text-fg">
           {label}
         </label>
         {labelAction}
@@ -51,7 +51,7 @@ export function TextField({
           autoComplete={autoComplete}
           aria-invalid={Boolean(error)}
           aria-describedby={describedBy}
-          className={`h-14 w-full rounded-xl border bg-surface px-4 text-[15px] text-white placeholder:text-faint transition-colors duration-150 ease-out focus:outline-none focus:ring-1 ${
+          className={`h-14 w-full rounded-xl border bg-surface px-4 text-[15px] text-fg placeholder:text-faint transition-colors duration-150 ease-out focus:outline-none focus:ring-1 ${
             error
               ? 'border-amber focus:border-amber focus:ring-amber'
               : 'border-line hover:border-line-strong focus:border-accent focus:ring-accent'

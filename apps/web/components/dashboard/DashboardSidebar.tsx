@@ -83,7 +83,7 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps) {
                         href={item.to}
                         onClick={onNavigate}
                         className={`${itemClasses} ${
-                          isActive ? 'bg-surface-2 text-white' : 'text-muted hover:bg-surface hover:text-white'
+                          isActive ? 'bg-surface-2 text-fg' : 'text-muted hover:bg-surface hover:text-fg'
                         }`}
                       >
                         {item.label}
@@ -96,7 +96,7 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps) {
                     <Link
                       href={item.href ?? '/docs/introduction'}
                       onClick={onNavigate}
-                      className={`${itemClasses} flex items-center justify-between text-muted hover:bg-surface hover:text-white`}
+                      className={`${itemClasses} flex items-center justify-between text-muted hover:bg-surface hover:text-fg`}
                     >
                       {item.label}
                       <ExternalLinkIcon aria-hidden="true" className="h-3 w-3 text-faint" />
@@ -115,7 +115,7 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps) {
 }
 
 const menuItem =
-  'flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px] text-muted transition-colors duration-150 ease-out hover:bg-surface-2 hover:text-white focus-visible:bg-surface-2 focus-visible:text-white focus-visible:outline-none';
+  'flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px] text-muted transition-colors duration-150 ease-out hover:bg-surface-2 hover:text-fg focus-visible:bg-surface-2 focus-visible:text-fg focus-visible:outline-none';
 
 /** Organization row at the foot of the sidebar. Opens upward with account actions. */
 function AccountMenu({ onNavigate }: { onNavigate?: () => void }) {
@@ -150,10 +150,10 @@ function AccountMenu({ onNavigate }: { onNavigate?: () => void }) {
       {open ? (
         <div
           role="menu"
-          className="absolute bottom-full left-0 right-3 mb-1 overflow-hidden rounded-lg border border-line bg-surface shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
+          className="absolute bottom-full left-0 right-3 mb-1 overflow-hidden rounded-lg border border-line bg-surface shadow-menu"
         >
           <div className="border-b border-line px-3 py-2.5">
-            <p className="truncate text-[13px] text-white">{session?.user.name ?? ''}</p>
+            <p className="truncate text-[13px] text-fg">{session?.user.name ?? ''}</p>
             <p className="truncate font-mono text-[11px] text-faint">{session?.user.email ?? ''}</p>
           </div>
           <div className="py-1">
@@ -194,7 +194,7 @@ function AccountMenu({ onNavigate }: { onNavigate?: () => void }) {
         }`}
       >
         <span className="min-w-0">
-          <span className="block truncate text-[13px] text-white">{session?.organization.name ?? '…'}</span>
+          <span className="block truncate text-[13px] text-fg">{session?.organization.name ?? '…'}</span>
           <span className="block truncate font-mono text-[11px] text-faint">{session?.organization.slug ?? ''}</span>
         </span>
         <ChevronsUpDownIcon aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-faint" />

@@ -18,7 +18,7 @@ interface Release {
 
 function Code({ children }: { children: React.ReactNode }) {
   return (
-    <code className="rounded-md bg-surface-2 px-1.5 py-0.5 font-mono text-[0.88em] text-white ring-1 ring-inset ring-line-soft">
+    <code className="rounded-md bg-surface-2 px-1.5 py-0.5 font-mono text-[0.88em] text-fg ring-1 ring-inset ring-line-soft">
       {children}
     </code>
   );
@@ -28,7 +28,7 @@ function DocLink({ href, children }: { href: string; children: React.ReactNode }
   return (
     <Link
       href={href}
-      className="inline-flex items-center gap-1 font-medium text-white underline decoration-accent decoration-[1.5px] underline-offset-[5px] transition-colors duration-150 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      className="inline-flex items-center gap-1 font-medium text-fg underline decoration-accent decoration-[1.5px] underline-offset-[5px] transition-colors duration-150 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
     >
       {children}
       <ArrowRightIcon aria-hidden="true" className="h-4 w-4" />
@@ -226,7 +226,7 @@ export function Changelog() {
           </div>
 
           <div className="min-w-0">
-            <h2 className="text-[26px] font-medium leading-tight tracking-[-0.02em] text-white">{release.title}</h2>
+            <h2 className="text-[26px] font-medium leading-tight tracking-[-0.02em] text-fg">{release.title}</h2>
             <p className="mt-5 max-w-2xl text-[16px] leading-[1.85] text-muted">{release.body}</p>
             {release.link ? (
               <p className="mt-5 text-[16px]">
@@ -236,13 +236,13 @@ export function Changelog() {
 
             {release.fixes?.length ? (
               <>
-                <h3 className="mt-12 text-[22px] font-medium leading-tight tracking-[-0.02em] text-white">
+                <h3 className="mt-12 text-[22px] font-medium leading-tight tracking-[-0.02em] text-fg">
                   Fixes &amp; improvements
                 </h3>
                 <ol className="mt-5 max-w-2xl list-decimal space-y-3 pl-6 text-[16px] leading-[1.85] text-muted marker:text-faint">
                   {release.fixes.map((fix, index) => (
                     <li key={index} className="pl-2">
-                      {fix.lead ? <span className="font-medium text-white">{fix.lead}: </span> : null}
+                      {fix.lead ? <span className="font-medium text-fg">{fix.lead}: </span> : null}
                       {fix.text}
                     </li>
                   ))}

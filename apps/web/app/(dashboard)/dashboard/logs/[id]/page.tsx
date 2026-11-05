@@ -19,7 +19,7 @@ export default function LogDetailsPage() {
   const back = (
     <Link
       href="/dashboard/logs"
-      className="inline-flex items-center gap-1.5 font-mono text-[11.5px] uppercase tracking-[0.14em] text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      className="inline-flex items-center gap-1.5 font-mono text-[11.5px] uppercase tracking-[0.14em] text-faint transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
     >
       <ChevronLeftIcon aria-hidden="true" className="h-3.5 w-3.5" />
       Logs
@@ -43,7 +43,7 @@ export default function LogDetailsPage() {
         action={
           <Link
             href="/dashboard/logs"
-            className="rounded-lg border border-line-strong px-3.5 py-2 text-[13px] text-white transition-colors duration-150 ease-out hover:border-white/60"
+            className="rounded-lg border border-line-strong px-3.5 py-2 text-[13px] text-fg transition-colors duration-150 ease-out hover:border-fg/60"
           >
             Back to logs
           </Link>
@@ -58,7 +58,7 @@ export default function LogDetailsPage() {
 
       <div className="mb-6 flex flex-wrap items-center gap-x-5 gap-y-2 rounded-xl border border-line bg-surface px-4 py-3">
         <MethodBadge method={log.method} />
-        <code className="font-mono text-[13px] text-white">{log.path}</code>
+        <code className="font-mono text-[13px] text-fg">{log.path}</code>
         <span className={`font-mono text-[12.5px] ${statusColor(log.status)}`}>{log.status}</span>
       </div>
 
@@ -71,7 +71,7 @@ export default function LogDetailsPage() {
         ].map((item) => (
           <div key={item.label}>
             <dt className="font-mono text-[11px] uppercase tracking-[0.14em] text-faint">{item.label}</dt>
-            <dd className="mt-1.5 break-all font-mono text-[12.5px] text-white">{item.value}</dd>
+            <dd className="mt-1.5 break-all font-mono text-[12.5px] text-fg">{item.value}</dd>
           </div>
         ))}
       </dl>

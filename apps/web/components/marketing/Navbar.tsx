@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { MenuIcon, XIcon } from 'lucide-react';
 import { NavDropdown } from './NavDropdown';
 import { Button } from '@/components/ui/Button';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { navGroups } from '@/lib/content';
 
 export function Navbar() {
@@ -32,9 +33,10 @@ export function Navbar() {
           <a
             href="#top"
             aria-label="Codeverity home"
-            className="flex items-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            className="flex items-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
           >
-            <Image src="/icons/logo.png" alt="Codeverity" width={44} height={24} priority className="h-6 w-auto" />
+            <Image src="/icons/logo.png" alt="Codeverity" width={44} height={24} priority className="theme-dark-only h-6 w-auto" />
+            <Image src="/icons/logo-dark.png" alt="Codeverity" width={44} height={24} priority className="theme-light-only h-6 w-auto" />
           </a>
           <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
             {navGroups.map((group) => (
@@ -42,33 +44,37 @@ export function Navbar() {
             ))}
             <Link
               href="/docs/introduction"
-              className="rounded-md px-2 py-1.5 text-sm text-muted transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              className="rounded-md px-2 py-1.5 text-sm text-muted transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
             >
               Docs
             </Link>
           </nav>
         </div>
 
-        <div className="hidden items-center gap-2 md:flex">
-          <Button to="/login" variant="quiet" className="px-3">
-            Sign in
-          </Button>
-          <Button to="/signup">Get started</Button>
-        </div>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
 
-        <button
-          type="button"
-          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={mobileOpen}
-          onClick={() => setMobileOpen((value) => !value)}
-          className="rounded-md p-2 text-muted transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent md:hidden"
-        >
-          {mobileOpen ? (
-            <XIcon aria-hidden="true" className="h-5 w-5" />
-          ) : (
-            <MenuIcon aria-hidden="true" className="h-5 w-5" />
-          )}
-        </button>
+          <div className="hidden items-center gap-2 md:flex">
+            <Button to="/login" variant="quiet" className="px-3">
+              Sign in
+            </Button>
+            <Button to="/signup">Get started</Button>
+          </div>
+
+          <button
+            type="button"
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen((value) => !value)}
+            className="rounded-md p-2 text-muted transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent md:hidden"
+          >
+            {mobileOpen ? (
+              <XIcon aria-hidden="true" className="h-5 w-5" />
+            ) : (
+              <MenuIcon aria-hidden="true" className="h-5 w-5" />
+            )}
+          </button>
+        </div>
       </div>
 
       {mobileOpen ? (
@@ -84,7 +90,7 @@ export function Navbar() {
                         <a
                           href={item.href}
                           onClick={() => setMobileOpen(false)}
-                          className="text-sm text-muted transition-colors duration-150 ease-out hover:text-white"
+                          className="text-sm text-muted transition-colors duration-150 ease-out hover:text-fg"
                         >
                           {item.label}
                         </a>

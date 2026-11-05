@@ -26,7 +26,7 @@ const columns: Column<LogEntry>[] = [
   {
     key: 'endpoint',
     header: 'Endpoint',
-    render: (row) => <span className="font-mono text-[12.5px] text-white">{row.path}</span>,
+    render: (row) => <span className="font-mono text-[12.5px] text-fg">{row.path}</span>,
   },
   {
     key: 'status',
@@ -89,7 +89,7 @@ export default function LogsPage() {
           <button
             type="button"
             onClick={first.reload}
-            className="rounded-lg border border-line px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:border-line-strong hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="rounded-lg border border-line px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:border-line-strong hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             Refresh
           </button>
@@ -151,7 +151,7 @@ export default function LogsPage() {
             type="button"
             onClick={loadMore}
             disabled={loadingMore}
-            className="rounded-lg border border-line px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:border-line-strong hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50"
+            className="rounded-lg border border-line px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:border-line-strong hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50"
           >
             {loadingMore ? 'Loading…' : 'Load more'}
           </button>
@@ -164,20 +164,20 @@ export default function LogsPage() {
           <div className="flex items-center justify-between border-b border-line px-5 py-3">
             <div className="flex items-center gap-3">
               <MethodBadge method={selected.method} />
-              <code className="font-mono text-[12.5px] text-white">{selected.path}</code>
+              <code className="font-mono text-[12.5px] text-fg">{selected.path}</code>
               <span className={`font-mono text-[12px] ${statusColor(selected.status)}`}>{selected.status}</span>
             </div>
             <div className="flex items-center gap-2">
               <Link
                 href={`/dashboard/logs/${selected.id}`}
-                className="rounded-md px-2 py-1 text-[12.5px] text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded-md px-2 py-1 text-[12.5px] text-faint transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 Open
               </Link>
               <button
                 type="button"
                 onClick={() => setSelected(null)}
-                className="rounded-md px-2 py-1 text-[12.5px] text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded-md px-2 py-1 text-[12.5px] text-faint transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 Close
               </button>
@@ -192,7 +192,7 @@ export default function LogsPage() {
             ].map((item) => (
               <div key={item.label}>
                 <dt className="font-mono text-[11px] uppercase tracking-[0.14em] text-faint">{item.label}</dt>
-                <dd className="mt-1.5 break-all font-mono text-[12.5px] text-white">{item.value}</dd>
+                <dd className="mt-1.5 break-all font-mono text-[12.5px] text-fg">{item.value}</dd>
               </div>
             ))}
           </dl>

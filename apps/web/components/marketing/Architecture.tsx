@@ -124,6 +124,16 @@ export function Architecture() {
               <NodeBox x={CX - 120} y={Y.cv} w={240} h={H.cv} active="arch-on-2">
                 <image
                   href="/icons/logo.png"
+                  className="theme-dark-only"
+                  x={CX - 88}
+                  y={Y.cv + 20}
+                  width={48}
+                  height={28}
+                  preserveAspectRatio="xMidYMid meet"
+                />
+                <image
+                  href="/icons/logo-dark.png"
+                  className="theme-light-only"
                   x={CX - 88}
                   y={Y.cv + 20}
                   width={48}

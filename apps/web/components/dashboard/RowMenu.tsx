@@ -84,7 +84,7 @@ export function RowMenu({ items }: { items: RowMenuItem[] }) {
           event.stopPropagation();
           setOpen((value) => !value);
         }}
-        className="rounded-md p-1.5 text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="rounded-md p-1.5 text-faint transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         <MoreHorizontalIcon aria-hidden="true" className="h-4 w-4" />
       </button>
@@ -102,7 +102,7 @@ export function RowMenu({ items }: { items: RowMenuItem[] }) {
                 width: MENU_WIDTH,
                 visibility: position ? 'visible' : 'hidden',
               }}
-              className="z-50 overflow-hidden rounded-lg border border-line bg-surface py-1 shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
+              className="z-50 overflow-hidden rounded-lg border border-line bg-surface py-1 shadow-menu"
             >
               {items.map((item) => (
                 <li key={item.label} role="none">
@@ -115,7 +115,7 @@ export function RowMenu({ items }: { items: RowMenuItem[] }) {
                       item.onSelect();
                     }}
                     className={`block w-full px-3 py-1.5 text-left text-[13px] transition-colors duration-150 ease-out hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent ${
-                      item.danger ? 'text-[#EF4444]' : 'text-muted hover:text-white'
+                      item.danger ? 'text-danger' : 'text-muted hover:text-fg'
                     }`}
                   >
                     {item.label}

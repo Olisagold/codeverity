@@ -70,7 +70,7 @@ function LoginForm() {
           Don&apos;t have an account?{' '}
           <Link
             href="/signup"
-            className="text-white underline-offset-4 transition-colors duration-150 ease-out hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            className="text-fg underline-offset-4 transition-colors duration-150 ease-out hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
           >
             Sign up
           </Link>
@@ -80,7 +80,7 @@ function LoginForm() {
       <SocialButtons action="Continue" />
 
       {authError ? (
-        <p className="mt-4 text-center text-[13px] text-[#EF4444]" role="alert">
+        <p className="mt-4 text-center text-[13px] text-danger" role="alert">
           {authError}
         </p>
       ) : null}
@@ -112,7 +112,7 @@ function LoginForm() {
           labelAction={
             <Link
               href="/forgot-password"
-              className="text-[13px] text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              className="text-[13px] text-faint transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
             >
               Forgot password?
             </Link>
@@ -122,7 +122,7 @@ function LoginForm() {
         <button
           type="submit"
           disabled={status !== 'idle'}
-          className="flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-white text-[15px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted disabled:cursor-not-allowed disabled:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+          className="flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-fg text-[15px] font-medium text-on-fg transition-colors duration-150 ease-out hover:bg-muted disabled:cursor-not-allowed disabled:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
         >
           {status === 'loading' ? (
             <>

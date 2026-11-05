@@ -22,7 +22,7 @@ export function SectionHeading({
   return (
     <Reveal className={`${isCenter ? 'mx-auto max-w-2xl text-center' : 'max-w-2xl'} ${className}`}>
       {eyebrow ? <Eyebrow className={isCenter ? 'justify-center' : ''}>{eyebrow}</Eyebrow> : null}
-      <h2 className="mt-4 text-3xl font-medium leading-tight tracking-[-0.02em] text-white sm:text-4xl">
+      <h2 className="mt-4 text-3xl font-medium leading-tight tracking-[-0.02em] text-fg sm:text-4xl">
         {title}
       </h2>
       {description ? <p className="mt-4 text-[15px] leading-relaxed text-muted">{description}</p> : null}

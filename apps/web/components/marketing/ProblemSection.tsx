@@ -41,7 +41,7 @@ export function ProblemSection() {
                 </div>
                 <h3
                   className={`mt-6 text-lg font-medium tracking-[-0.01em] ${
-                    column.emphasis ? 'text-white' : 'text-muted'
+                    column.emphasis ? 'text-fg' : 'text-muted'
                   }`}
                 >
                   {column.title}

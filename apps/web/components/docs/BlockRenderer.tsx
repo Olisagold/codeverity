@@ -19,13 +19,13 @@ function renderBlock(block: DocBlock, index: number) {
   switch (block.type) {
     case 'heading':
       return (
-        <h2 key={index} id={block.id} className="scroll-mt-24 pt-6 text-[20px] font-medium tracking-[-0.01em] text-white">
+        <h2 key={index} id={block.id} className="scroll-mt-24 pt-6 text-[20px] font-medium tracking-[-0.01em] text-fg">
           {block.text}
         </h2>
       );
     case 'subheading':
       return (
-        <h3 key={index} className="pt-2 text-[15px] font-medium text-white">
+        <h3 key={index} className="pt-2 text-[15px] font-medium text-fg">
           {block.text}
         </h3>
       );
@@ -78,7 +78,7 @@ function renderBlock(block: DocBlock, index: number) {
         <dl key={index} className="divide-y divide-line-soft rounded-xl border border-line">
           {block.items.map((item) => (
             <div key={item.term} className="px-4 py-4">
-              <dt className="font-mono text-[12.5px] text-white">{item.term}</dt>
+              <dt className="font-mono text-[12.5px] text-fg">{item.term}</dt>
               <dd className="mt-1.5 text-[13.5px] leading-relaxed text-muted">
                 <InlineText text={item.text} />
               </dd>
@@ -93,9 +93,9 @@ function renderBlock(block: DocBlock, index: number) {
             <Link
               key={card.title}
               href={card.to}
-              className="group rounded-xl border border-line bg-surface p-4 transition-colors duration-150 ease-out hover:border-line-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              className="group rounded-xl border border-line bg-surface p-4 transition-colors duration-150 ease-out hover:border-line-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
             >
-              <p className="flex items-center justify-between gap-2 text-[14px] font-medium text-white">
+              <p className="flex items-center justify-between gap-2 text-[14px] font-medium text-fg">
                 {card.title}
                 <ArrowRightIcon aria-hidden="true" className="h-3.5 w-3.5 text-faint" />
               </p>

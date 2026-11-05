@@ -31,7 +31,7 @@ export function HeroApiDemo() {
         className="lg:col-span-3"
         label={
           <>
-            <span className="text-white">POST</span>
+            <span className="text-fg">POST</span>
             <span className="text-muted">/v1/assessments</span>
           </>
         }
@@ -40,23 +40,23 @@ export function HeroApiDemo() {
         <pre className="overflow-x-auto px-5 py-5 font-mono text-[12.5px] leading-6 text-muted">
           <code>
             {'{\n  '}
-            <span className="text-white">&quot;language&quot;</span>
+            <span className="text-fg">&quot;language&quot;</span>
             {': '}
             <span className="text-accent">&quot;python&quot;</span>
             {',\n  '}
-            <span className="text-white">&quot;assignment&quot;</span>
+            <span className="text-fg">&quot;assignment&quot;</span>
             {': {\n    '}
-            <span className="text-white">&quot;title&quot;</span>
+            <span className="text-fg">&quot;title&quot;</span>
             {': '}
             <span className="text-accent">&quot;Find the maximum number&quot;</span>
             {',\n    '}
-            <span className="text-white">&quot;requirements&quot;</span>
+            <span className="text-fg">&quot;requirements&quot;</span>
             {': '}
             <span className="text-accent">&quot;Return the largest value&quot;</span>
             {'\n  },\n  '}
-            <span className="text-white">&quot;submission&quot;</span>
+            <span className="text-fg">&quot;submission&quot;</span>
             {': {\n    '}
-            <span className="text-white">&quot;code&quot;</span>
+            <span className="text-fg">&quot;code&quot;</span>
             {': '}
             <span className="text-accent">&quot;def find_max(numbers): ...&quot;</span>
             {'\n  }\n}'}
@@ -90,7 +90,7 @@ export function HeroApiDemo() {
                 <span className="min-w-0">
                   <span
                     className={`block text-[13px] transition-colors duration-200 ease-out ${
-                      isActive ? 'text-white' : 'text-muted'
+                      isActive ? 'text-fg' : 'text-muted'
                     }`}
                   >
                     {stage.label}
@@ -106,11 +106,11 @@ export function HeroApiDemo() {
           <pre className="mt-2 font-mono text-[12.5px] leading-6 text-muted">
             <code>
               {'{ '}
-              <span className="text-white">&quot;status&quot;</span>
+              <span className="text-fg">&quot;status&quot;</span>
               {': '}
               <span className="text-ok">&quot;completed&quot;</span>
               {', '}
-              <span className="text-white">&quot;score&quot;</span>
+              <span className="text-fg">&quot;score&quot;</span>
               {': '}
               <span className="text-violet">9.2</span>
               {' }'}

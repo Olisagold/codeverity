@@ -9,7 +9,7 @@ import { errorMessage } from '@/lib/api/client';
 import { changePassword } from '@/lib/api/dashboard';
 
 const inputClasses =
-  'mt-2 h-11 w-full max-w-md rounded-lg border border-line bg-base px-3 text-[13.5px] text-white transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent';
+  'mt-2 h-11 w-full max-w-md rounded-lg border border-line bg-base px-3 text-[13.5px] text-fg transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent';
 
 export default function SettingsSecurityPage() {
   const session = useSession();
@@ -65,7 +65,7 @@ export default function SettingsSecurityPage() {
             </p>
             {hasPassword ? (
               <div>
-                <label htmlFor="current-password" className="block text-[13px] font-medium text-white">
+                <label htmlFor="current-password" className="block text-[13px] font-medium text-fg">
                   Current password
                 </label>
                 <input
@@ -79,7 +79,7 @@ export default function SettingsSecurityPage() {
               </div>
             ) : null}
             <div>
-              <label htmlFor="new-password" className="block text-[13px] font-medium text-white">
+              <label htmlFor="new-password" className="block text-[13px] font-medium text-fg">
                 New password
               </label>
               <input
@@ -92,7 +92,7 @@ export default function SettingsSecurityPage() {
               />
             </div>
             <div>
-              <label htmlFor="confirm-password" className="block text-[13px] font-medium text-white">
+              <label htmlFor="confirm-password" className="block text-[13px] font-medium text-fg">
                 Confirm new password
               </label>
               <input
@@ -108,7 +108,7 @@ export default function SettingsSecurityPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="rounded-lg bg-white px-3 py-1.5 text-[13px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:opacity-50"
+                className="rounded-lg bg-fg px-3 py-1.5 text-[13px] font-medium text-on-fg transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base disabled:opacity-50"
               >
                 {saving ? 'Saving…' : hasPassword ? 'Change password' : 'Set password'}
               </button>

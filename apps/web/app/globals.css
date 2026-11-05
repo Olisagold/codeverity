@@ -8,22 +8,96 @@
 
 /* END TAILWIND IMPORTS — ALL OTHER CSS MUST GO BELOW THIS LINE */
 
+/* ---------------------------------------------------------------------------
+   Theme tokens
+   Dark is the default. `data-theme` on <html> is set before first paint by the
+   inline script in app/layout.tsx and switched by <ThemeToggle>. Colours are RGB
+   channel triplets so Tailwind opacity modifiers work (see tailwind.config.ts).
+   --------------------------------------------------------------------------- */
 :root {
   color-scheme: dark;
+  --c-base: 0 0 0;
+  --c-surface: 5 5 5;
+  --c-surface-2: 10 10 10;
+  --c-line: 39 39 42;
+  --c-line-soft: 24 24 27;
+  --c-line-strong: 63 63 70;
+  --c-fg: 255 255 255;
+  --c-on-fg: 0 0 0;
+  --c-muted: 212 212 216;
+  --c-faint: 161 161 170;
+  --c-accent: 59 130 246;
+  --c-ok: 34 197 94;
+  --c-violet: 139 92 246;
+  --c-amber: 245 158 11;
+  --c-danger: 239 68 68;
+  --c-danger-strong: 220 38 38;
+  --c-scrim: 0 0 0;
+  --scrim-strength: 1;
+  --c-chrome: 14 14 16;
+  --c-chrome-dot: 63 63 70;
+  --c-selection: 29 78 216;
+  --c-on-selection: 255 255 255;
+  --shadow-menu: rgba(0, 0, 0, 0.5);
+  --shadow-window: rgba(0, 0, 0, 0.9);
+  --shadow-window-strong: rgba(0, 0, 0, 0.95);
 }
+/* Light values are darkened where needed so text tokens keep WCAG AA contrast on white. */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --c-base: 255 255 255;
+  --c-surface: 250 250 250;
+  --c-surface-2: 244 244 245;
+  --c-line: 228 228 231;
+  --c-line-soft: 238 238 240;
+  --c-line-strong: 212 212 216;
+  --c-fg: 9 9 11;
+  --c-on-fg: 255 255 255;
+  --c-muted: 63 63 70;
+  --c-faint: 113 113 122;
+  --c-accent: 37 99 235;
+  --c-ok: 21 128 61;
+  --c-violet: 124 58 237;
+  --c-amber: 180 83 9;
+  --c-danger: 220 38 38;
+  --c-danger-strong: 185 28 28;
+  --c-scrim: 24 24 27;
+  --scrim-strength: 0.5;
+  --c-chrome: 244 244 245;
+  --c-chrome-dot: 212 212 216;
+  --c-selection: 191 219 254;
+  --c-on-selection: 9 9 11;
+  --shadow-menu: rgba(24, 24, 27, 0.08);
+  --shadow-window: rgba(24, 24, 27, 0.25);
+  --shadow-window-strong: rgba(24, 24, 27, 0.3);
+}
+
 html {
   scroll-behavior: smooth;
-  background-color: #000000;
+  background-color: rgb(var(--c-base));
 }
 body {
-  background-color: #000000;
-  color: #ffffff;
+  background-color: rgb(var(--c-base));
+  color: rgb(var(--c-fg));
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 ::selection {
-  background-color: #1d4ed8;
-  color: #ffffff;
+  background-color: rgb(var(--c-selection));
+  color: rgb(var(--c-on-selection));
+}
+
+/* Show an element in one theme only (logos, toggle icons). */
+:root:not([data-theme='light']) .theme-light-only,
+:root[data-theme='light'] .theme-dark-only {
+  display: none;
+}
+
+/* Applied for a single frame while the theme switches; see hooks/useTheme.ts. */
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
 }
 .no-scrollbar {
   scrollbar-width: none;
@@ -39,14 +113,18 @@ body {
 
 /* ---------------------------------------------------------------------------
    Code blocks
-   One theme for every <CodePre>. Palette is a soft "midnight" scheme tuned for
-   the pure-black surface: muted base text, warm strings, cool keywords.
+   One theme for every <CodePre>. Dark is a soft "midnight" scheme tuned for
+   the pure-black surface: muted base text, warm strings, cool keywords. Light
+   keeps the same hue roles, darkened for contrast on a pale surface.
    --------------------------------------------------------------------------- */
 :root {
   --code-bg: #0b0b0c;
   --code-fg: #d9d9de;
   --code-gutter: #3f3f46;
   --code-gutter-border: #18181b;
+  --code-scrollbar: #27272a;
+  --code-header-border: #1c1c1f;
+  --code-tab: #8a8a93;
   --tok-comment: #6b7280;
   --tok-string: #e8b48f;
   --tok-property: #8fc1e8;
@@ -62,6 +140,29 @@ body {
   --tok-punctuation: #8a8a93;
   --tok-operator: #a1a1aa;
 }
+:root[data-theme='light'] {
+  --code-bg: #f7f7f8;
+  --code-fg: #27272a;
+  --code-gutter: #a1a1aa;
+  --code-gutter-border: #e4e4e7;
+  --code-scrollbar: #d4d4d8;
+  --code-header-border: #e4e4e7;
+  --code-tab: #71717a;
+  --tok-comment: #6b7280;
+  --tok-string: #9a4a0c;
+  --tok-property: #0b5394;
+  --tok-number: #2f6b1f;
+  --tok-literal: #1d4ed8;
+  --tok-keyword: #18181b;
+  --tok-method: #18181b;
+  --tok-flag: #1d4ed8;
+  --tok-variable: #9a4a0c;
+  --tok-function: #27272a;
+  --tok-type: #0b5394;
+  --tok-url: #9a4a0c;
+  --tok-punctuation: #71717a;
+  --tok-operator: #52525b;
+}
 
 .code-pre {
   position: relative;
@@ -76,17 +177,17 @@ body {
   font-variant-ligatures: none;
   tab-size: 2;
   scrollbar-width: thin;
-  scrollbar-color: #27272a transparent;
+  scrollbar-color: var(--code-scrollbar) transparent;
 }
 .code-pre:focus-visible {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid rgb(var(--c-accent));
   outline-offset: -2px;
 }
 .code-pre::-webkit-scrollbar {
   height: 6px;
 }
 .code-pre::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: var(--code-scrollbar);
   border-radius: 999px;
 }
 .code-pre code {
@@ -141,17 +242,17 @@ body {
 }
 .code-frame__header {
   background: var(--code-bg);
-  border-bottom: 1px solid #1c1c1f;
+  border-bottom: 1px solid var(--code-header-border);
 }
 .code-tab {
   position: relative;
   padding: 14px 0 12px;
   font-size: 14px;
-  color: #8a8a93;
+  color: var(--code-tab);
   transition: color 150ms ease-out;
 }
-.code-tab:hover { color: #d9d9de; }
-.code-tab[aria-selected='true'] { color: #3b82f6; }
+.code-tab:hover { color: var(--code-fg); }
+.code-tab[aria-selected='true'] { color: rgb(var(--c-accent)); }
 .code-tab[aria-selected='true']::after {
   content: '';
   position: absolute;
@@ -159,17 +260,23 @@ body {
   right: 0;
   bottom: -1px;
   height: 2px;
-  background: #3b82f6;
+  background: rgb(var(--c-accent));
 }
 .code-frame__label {
   padding: 14px 0 12px;
   font-size: 14px;
-  color: #d9d9de;
+  color: var(--code-fg);
 }
 
 /* ---------------------------------------------------------------------------
    Marquee (trust bar)
    --------------------------------------------------------------------------- */
+:root {
+  --marquee-fg: #52525b;
+}
+:root[data-theme='light'] {
+  --marquee-fg: #a1a1aa;
+}
 .marquee {
   overflow: hidden;
   mask-image: linear-gradient(to right, transparent, #000 15%, #000 85%, transparent);
@@ -197,7 +304,7 @@ body {
   font-size: 22px;
   font-weight: 600;
   letter-spacing: -0.02em;
-  color: #52525b;
+  color: var(--marquee-fg);
   white-space: nowrap;
 }
 @keyframes marquee {
@@ -213,11 +320,19 @@ body {
 /* ---------------------------------------------------------------------------
    How it works stage
    --------------------------------------------------------------------------- */
+:root {
+  --hiw-stage-bg: #0c0c0e;
+  --hiw-stage-grid: rgba(255, 255, 255, 0.035);
+}
+:root[data-theme='light'] {
+  --hiw-stage-bg: #f4f4f5;
+  --hiw-stage-grid: rgba(9, 9, 11, 0.05);
+}
 .hiw-stage {
-  background-color: #0c0c0e;
+  background-color: var(--hiw-stage-bg);
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    linear-gradient(to right, var(--hiw-stage-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--hiw-stage-grid) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
@@ -234,19 +349,29 @@ body {
   --arch-flow: #ffffff;
   --arch-node: #0a0a0b;
   --arch-node-line: #27272a;
+  --arch-caption: #71717a;
+  --arch-mark: #d4d4d8;
+}
+:root[data-theme='light'] .arch {
+  --arch-wire: #d4d4d8;
+  --arch-flow: #09090b;
+  --arch-node: #ffffff;
+  --arch-node-line: #d4d4d8;
+  --arch-caption: #71717a;
+  --arch-mark: #3f3f46;
 }
 .arch text {
   font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 }
-.arch-label { font-size: 13px; fill: #ffffff; }
-.arch-caption { font-size: 10.5px; fill: #71717a; }
-.arch-accent { fill: #3b82f6; }
-.arch-score-value { font-size: 13px; fill: #ffffff; }
-.arch-mark { fill: #d4d4d8; }
+.arch-label { font-size: 13px; fill: rgb(var(--c-fg)); }
+.arch-caption { font-size: 10.5px; fill: var(--arch-caption); }
+.arch-accent { fill: rgb(var(--c-accent)); }
+.arch-score-value { font-size: 13px; fill: rgb(var(--c-fg)); }
+.arch-mark { fill: var(--arch-mark); }
 .arch-mark-claude { fill: #d97757; }
 
 .arch-node { fill: var(--arch-node); stroke: var(--arch-node-line); stroke-width: 1; }
-.arch-node-active { fill: none; stroke: #ffffff; stroke-width: 1; opacity: 0; }
+.arch-node-active { fill: none; stroke: var(--arch-flow); stroke-width: 1; opacity: 0; }
 .arch-wire { fill: none; stroke: var(--arch-wire); stroke-width: 1; }
 .arch-flow {
   fill: none;
@@ -281,10 +406,10 @@ body {
 @keyframes arch-on-5 { 0%, 83% { opacity: 0; } 85% { opacity: 0.9; } 97%, 100% { opacity: 0; } }
 
 /* Model progress rings draw while assessing, then the score fades in. */
-.arch-ring-track { fill: none; stroke: #27272a; stroke-width: 1.5; }
+.arch-ring-track { fill: none; stroke: var(--arch-wire); stroke-width: 1.5; }
 .arch-ring {
   fill: none;
-  stroke: #ffffff;
+  stroke: var(--arch-flow);
   stroke-width: 1.5;
   stroke-linecap: round;
   stroke-dasharray: 119.4;
@@ -331,11 +456,23 @@ body {
 /* ---------------------------------------------------------------------------
    Result stage: flat tinted panel with a dotted grid and two horizontal bands.
    --------------------------------------------------------------------------- */
+:root {
+  --result-stage-bg: 10 11 15;
+  --result-stage-dot: rgba(255, 255, 255, 0.09);
+  --result-stage-band: #1c1f27;
+  --result-callout-bg: #09090b;
+}
+:root[data-theme='light'] {
+  --result-stage-bg: 244 244 246;
+  --result-stage-dot: rgba(9, 9, 11, 0.12);
+  --result-stage-band: #e4e4e7;
+  --result-callout-bg: #ffffff;
+}
 .result-stage {
-  background-color: #0a0b0f;
+  background-color: rgb(var(--result-stage-bg));
 }
 .result-stage__dots {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+  background-image: radial-gradient(var(--result-stage-dot) 1px, transparent 1px);
   background-size: 22px 22px;
   background-position: 11px 11px;
   mask-image: linear-gradient(to bottom, #000 0%, #000 70%, transparent 100%);
@@ -343,17 +480,17 @@ body {
 }
 .result-stage__band {
   height: 1px;
-  background: #1c1f27;
+  background: var(--result-stage-band);
 }
 .result-stage__band--a { top: 22%; }
 .result-stage__band--b { top: 64%; }
 .result-stage__fade {
-  background: linear-gradient(to bottom, rgba(10, 11, 15, 0) 0%, #0a0b0f 100%);
+  background: linear-gradient(to bottom, rgb(var(--result-stage-bg) / 0) 0%, rgb(var(--result-stage-bg)) 100%);
 }
 .result-callout {
   min-width: 112px;
   padding: 10px 12px;
-  border: 1px solid #27272a;
+  border: 1px solid rgb(var(--c-line));
   border-radius: 10px;
-  background: #09090b;
+  background: var(--result-callout-bg);
 }

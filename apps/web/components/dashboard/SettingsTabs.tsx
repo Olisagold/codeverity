@@ -22,7 +22,7 @@ export function SettingsTabs() {
             key={tab.label}
             href={tab.href}
             className={`relative px-3 py-2 text-[13.5px] transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-              isActive ? 'text-white' : 'text-faint hover:text-muted'
+              isActive ? 'text-fg' : 'text-faint hover:text-muted'
             }`}
           >
             {tab.label}
@@ -38,7 +38,7 @@ export function SettingsCard({ title, children }: { title: string; children: Rea
   return (
     <section className="overflow-hidden rounded-xl border border-line bg-surface">
       <div className="border-b border-line px-5 py-3.5">
-        <h2 className="text-[14.5px] font-medium text-white">{title}</h2>
+        <h2 className="text-[14.5px] font-medium text-fg">{title}</h2>
       </div>
       <div className="px-5 py-5">{children}</div>
     </section>

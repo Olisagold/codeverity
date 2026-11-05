@@ -29,7 +29,7 @@ function BackLink() {
   return (
     <Link
       href="/dashboard/assessments"
-      className="inline-flex items-center gap-1.5 font-mono text-[11.5px] uppercase tracking-[0.14em] text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      className="inline-flex items-center gap-1.5 font-mono text-[11.5px] uppercase tracking-[0.14em] text-faint transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
     >
       <ChevronLeftIcon aria-hidden="true" className="h-3.5 w-3.5" />
       Assessments
@@ -46,7 +46,7 @@ function ScoreBars({ scores }: { scores: Record<string, number> }) {
           <span className="h-px w-16 bg-line-soft">
             <span className="block h-px bg-accent" style={{ width: `${value * 10}%` }} />
           </span>
-          <span className="w-8 text-right font-mono text-[12.5px] text-white">{value.toFixed(1)}</span>
+          <span className="w-8 text-right font-mono text-[12.5px] text-fg">{value.toFixed(1)}</span>
         </li>
       ))}
     </ul>
@@ -59,7 +59,7 @@ function ModelCard({ model }: { model: ModelResult }) {
   return (
     <article className="rounded-xl border border-line bg-surface p-4">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-[13.5px] text-white">{PROVIDERS[model.provider] ?? titleCase(model.provider)}</p>
+        <p className="text-[13.5px] text-fg">{PROVIDERS[model.provider] ?? titleCase(model.provider)}</p>
         <span className="truncate font-mono text-[11.5px] text-faint">{model.model ?? '—'}</span>
       </div>
       {failed ? (
@@ -74,7 +74,7 @@ function ModelCard({ model }: { model: ModelResult }) {
       ) : (
         <>
           <div className="mt-4 flex items-baseline gap-4">
-            <span className="font-mono text-[18px] text-white">{score === null ? '—' : score.toFixed(1)}</span>
+            <span className="font-mono text-[18px] text-fg">{score === null ? '—' : score.toFixed(1)}</span>
             <span className="font-mono text-[11.5px] text-faint">
               {model.issues.length} issue{model.issues.length === 1 ? '' : 's'} identified
             </span>
@@ -125,7 +125,7 @@ export default function AssessmentDetailsPage() {
         action={
           <Link
             href="/dashboard/assessments"
-            className="rounded-lg border border-line-strong px-3.5 py-2 text-[13px] text-white transition-colors duration-150 ease-out hover:border-white/60"
+            className="rounded-lg border border-line-strong px-3.5 py-2 text-[13px] text-fg transition-colors duration-150 ease-out hover:border-fg/60"
           >
             Back to assessments
           </Link>
@@ -147,7 +147,7 @@ export default function AssessmentDetailsPage() {
       />
 
       <div className="mb-6 flex flex-wrap items-center gap-x-5 gap-y-2 rounded-xl border border-line bg-surface px-4 py-3">
-        <code className="font-mono text-[13px] text-white">{assessment.id}</code>
+        <code className="font-mono text-[13px] text-fg">{assessment.id}</code>
         <StatusBadge status={assessment.status} />
         <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-faint">{assessment.environment}</span>
         <span className="font-mono text-[12px] text-faint">Created {formatDateTime(assessment.created_at)}</span>
@@ -166,7 +166,7 @@ export default function AssessmentDetailsPage() {
           <StatusBadge status={assessment.status} />
           <p className="mt-3 max-w-xl text-[13.5px] leading-relaxed text-muted">
             The submission is being assessed by multiple models, then reviewed. This page refreshes automatically, and
-            your webhook endpoint will receive <code className="font-mono text-[12.5px] text-white">assessment.completed</code>.
+            your webhook endpoint will receive <code className="font-mono text-[12.5px] text-fg">assessment.completed</code>.
           </p>
         </div>
       ) : null}
@@ -205,7 +205,7 @@ export default function AssessmentDetailsPage() {
             <h2 className="font-mono text-[11px] uppercase tracking-[0.14em] text-faint">Assignment</h2>
           </div>
           <div className="px-4 py-4">
-            <p className="text-[14px] text-white">{assessment.title}</p>
+            <p className="text-[14px] text-fg">{assessment.title}</p>
             <p className="mt-2 whitespace-pre-wrap text-[13px] leading-relaxed text-muted">
               {assessment.assignment_requirements}
             </p>
@@ -217,7 +217,7 @@ export default function AssessmentDetailsPage() {
                 <ul className="mt-2 space-y-1.5">
                   {assessment.rubric.criteria.map((criterion) => (
                     <li key={criterion.name} className="text-[12.5px] text-muted">
-                      <span className="text-white">{criterion.name}</span> ({criterion.weight}%): {criterion.description}
+                      <span className="text-fg">{criterion.name}</span> ({criterion.weight}%): {criterion.description}
                     </li>
                   ))}
                 </ul>
@@ -232,7 +232,7 @@ export default function AssessmentDetailsPage() {
 
       {completed && assessment.models.length > 0 ? (
         <section className="mt-8">
-          <h2 className="mb-3 text-[14.5px] font-medium text-white">Model assessments</h2>
+          <h2 className="mb-3 text-[14.5px] font-medium text-fg">Model assessments</h2>
           <div className="grid gap-3 lg:grid-cols-3">
             {assessment.models.map((model) => (
               <ModelCard key={model.provider} model={model} />
@@ -250,17 +250,17 @@ export default function AssessmentDetailsPage() {
       {completed && assessment.rubric_scores ? (
         <section className="mt-8 overflow-hidden rounded-xl border border-line bg-surface">
           <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
-            <h2 className="text-[14.5px] font-medium text-white">Rubric</h2>
+            <h2 className="text-[14.5px] font-medium text-fg">Rubric</h2>
             <span className="font-mono text-[11.5px] text-faint">Grades the code itself</span>
           </div>
           <ul className="divide-y divide-line-soft">
             {assessment.rubric_scores.map((item) => (
               <li key={item.name} className="px-5 py-3.5">
                 <div className="flex items-center justify-between gap-3">
-                  <span className="text-[13.5px] text-white">
+                  <span className="text-[13.5px] text-fg">
                     {item.name} <span className="font-mono text-[11.5px] text-faint">{item.weight}%</span>
                   </span>
-                  <span className="font-mono text-[13px] text-white">{item.score.toFixed(1)}</span>
+                  <span className="font-mono text-[13px] text-fg">{item.score.toFixed(1)}</span>
                 </div>
                 <p className="mt-1 text-[13px] leading-relaxed text-muted">{item.comment}</p>
               </li>
@@ -283,7 +283,7 @@ export default function AssessmentDetailsPage() {
               {feedback.issues.length > 0 ? (
                 <div className="mt-5 border-t border-line pt-4">
                   <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-faint">Issues</p>
-                  <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[13.5px] leading-relaxed text-white">
+                  <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[13.5px] leading-relaxed text-fg">
                     {feedback.issues.map((issue) => (
                       <li key={issue}>{issue}</li>
                     ))}
@@ -293,7 +293,7 @@ export default function AssessmentDetailsPage() {
               {feedback.suggestions.length > 0 ? (
                 <div className="mt-5 border-t border-line pt-4">
                   <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-faint">Suggestions</p>
-                  <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[13.5px] leading-relaxed text-white">
+                  <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[13.5px] leading-relaxed text-fg">
                     {feedback.suggestions.map((suggestion) => (
                       <li key={suggestion}>{suggestion}</li>
                     ))}

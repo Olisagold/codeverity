@@ -8,7 +8,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-screen w-full bg-base font-sans text-white">
+    <div className="min-h-screen w-full bg-base font-sans text-fg">
       <DashboardTopBar mobileOpen={mobileOpen} onToggleMobile={() => setMobileOpen((value) => !value)} />
 
       {mobileOpen ? (

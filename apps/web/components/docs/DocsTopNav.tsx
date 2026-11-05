@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { GithubIcon, MenuIcon, XIcon } from 'lucide-react';
 import { DocsSearch } from './DocsSearch';
 import { DocsSidebar } from './DocsSidebar';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 const primary = [
   { label: 'Docs', href: '/docs/introduction' },
@@ -27,16 +28,16 @@ export function DocsTopNav() {
             aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((value) => !value)}
-            className="rounded-md p-1.5 text-muted transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent lg:hidden"
+            className="rounded-md p-1.5 text-muted transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent lg:hidden"
           >
             {mobileOpen ? <XIcon aria-hidden="true" className="h-5 w-5" /> : <MenuIcon aria-hidden="true" className="h-5 w-5" />}
           </button>
 
           <Link
             href="/"
-            className="flex items-baseline gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            className="flex items-baseline gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
           >
-            <span className="font-mono text-[13px] font-medium uppercase tracking-[0.2em] text-white">Codeverity</span>
+            <span className="font-mono text-[13px] font-medium uppercase tracking-[0.2em] text-fg">Codeverity</span>
             <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">Docs</span>
           </Link>
         </div>
@@ -49,7 +50,7 @@ export function DocsTopNav() {
                 key={item.label}
                 href={item.href}
                 className={`rounded-md px-2.5 py-1.5 text-[13.5px] transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                  isActive ? 'text-white' : 'text-muted hover:text-white'
+                  isActive ? 'text-fg' : 'text-muted hover:text-fg'
                 }`}
               >
                 {item.label}
@@ -62,12 +63,13 @@ export function DocsTopNav() {
           <div className="hidden sm:block">
             <DocsSearch />
           </div>
+          <ThemeToggle />
           <a
             href="https://github.com/Olisagold/codeverity"
             target="_blank"
             rel="noreferrer"
             aria-label="GitHub"
-            className="hidden rounded-md p-1.5 text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:block"
+            className="hidden rounded-md p-1.5 text-faint transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:block"
           >
             <GithubIcon aria-hidden="true" className="h-4 w-4" />
           </a>
@@ -77,7 +79,7 @@ export function DocsTopNav() {
           </span>
           <Link
             href="/dashboard"
-            className="rounded-md bg-white px-3 py-1.5 text-[13px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            className="rounded-md bg-fg px-3 py-1.5 text-[13px] font-medium text-on-fg transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
           >
             Dashboard
           </Link>

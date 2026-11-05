@@ -60,7 +60,7 @@ export function CommandMenu({ open, onClose }: { open: boolean; onClose: () => v
   }
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-start justify-center bg-black/70 px-4 pt-[14vh]" onMouseDown={onClose}>
+    <div className="fixed inset-0 z-[70] flex items-start justify-center bg-scrim/70 px-4 pt-[14vh]" onMouseDown={onClose}>
       <div
         role="dialog"
         aria-modal="true"
@@ -80,7 +80,7 @@ export function CommandMenu({ open, onClose }: { open: boolean; onClose: () => v
             onKeyDown={handleKeyDown}
             placeholder="Go to a page, or paste an asm_ or req_ ID…"
             aria-label="Search"
-            className="h-12 w-full bg-transparent text-[13.5px] text-white placeholder:text-faint focus:outline-none"
+            className="h-12 w-full bg-transparent text-[13.5px] text-fg placeholder:text-faint focus:outline-none"
           />
         </div>
         <ul className="max-h-80 overflow-y-auto py-1">
@@ -94,7 +94,7 @@ export function CommandMenu({ open, onClose }: { open: boolean; onClose: () => v
                   onMouseEnter={() => setActive(index)}
                   onClick={() => go(result.href)}
                   className={`block w-full px-4 py-2 text-left text-[13px] ${
-                    index === active ? 'bg-surface-2 text-white' : 'text-muted'
+                    index === active ? 'bg-surface-2 text-fg' : 'text-muted'
                   }`}
                 >
                   {result.label}

@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { MenuIcon, SearchIcon, XIcon } from 'lucide-react';
 import { CommandMenu } from '@/components/dashboard/CommandMenu';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useSession } from '@/hooks/useSession';
 import { signOut } from '@/lib/api/dashboard';
 
@@ -59,7 +60,7 @@ export function DashboardTopBar({ mobileOpen, onToggleMobile }: DashboardTopBarP
           aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}
           aria-expanded={mobileOpen}
           onClick={onToggleMobile}
-          className="rounded-md p-1.5 text-muted transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent lg:hidden"
+          className="rounded-md p-1.5 text-muted transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent lg:hidden"
         >
           {mobileOpen ? (
             <XIcon aria-hidden="true" className="h-5 w-5" />
@@ -70,7 +71,7 @@ export function DashboardTopBar({ mobileOpen, onToggleMobile }: DashboardTopBarP
 
         <Link
           href="/dashboard"
-          className="font-mono text-[13px] font-medium uppercase tracking-[0.2em] text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+          className="font-mono text-[13px] font-medium uppercase tracking-[0.2em] text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
         >
           Codeverity
         </Link>
@@ -88,10 +89,12 @@ export function DashboardTopBar({ mobileOpen, onToggleMobile }: DashboardTopBarP
 
           <Link
             href="/docs/introduction"
-            className="hidden text-[13px] text-muted transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:block"
+            className="hidden text-[13px] text-muted transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:block"
           >
             Docs
           </Link>
+
+          <ThemeToggle />
 
           <div ref={menuRef} className="relative">
             <button
@@ -99,7 +102,7 @@ export function DashboardTopBar({ mobileOpen, onToggleMobile }: DashboardTopBarP
               aria-haspopup="true"
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen((value) => !value)}
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-surface font-mono text-[11px] text-white transition-colors duration-150 ease-out hover:border-line-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-surface font-mono text-[11px] text-fg transition-colors duration-150 ease-out hover:border-line-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {initials}
             </button>
@@ -107,7 +110,7 @@ export function DashboardTopBar({ mobileOpen, onToggleMobile }: DashboardTopBarP
             {menuOpen ? (
               <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-lg border border-line bg-surface">
                 <div className="border-b border-line px-3 py-2.5">
-                  <p className="text-[13px] text-white">{session?.user.name ?? ''}</p>
+                  <p className="text-[13px] text-fg">{session?.user.name ?? ''}</p>
                   <p className="font-mono text-[11px] text-faint">{session?.user.email ?? ''}</p>
                 </div>
                 <ul className="py-1">
@@ -115,7 +118,7 @@ export function DashboardTopBar({ mobileOpen, onToggleMobile }: DashboardTopBarP
                     <Link
                       href="/dashboard/settings"
                       onClick={() => setMenuOpen(false)}
-                      className="block px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:bg-surface-2 hover:text-white"
+                      className="block px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:bg-surface-2 hover:text-fg"
                     >
                       Settings
                     </Link>
@@ -124,7 +127,7 @@ export function DashboardTopBar({ mobileOpen, onToggleMobile }: DashboardTopBarP
                     <Link
                       href="/docs/introduction"
                       onClick={() => setMenuOpen(false)}
-                      className="block px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:bg-surface-2 hover:text-white"
+                      className="block px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:bg-surface-2 hover:text-fg"
                     >
                       Documentation
                     </Link>
@@ -137,7 +140,7 @@ export function DashboardTopBar({ mobileOpen, onToggleMobile }: DashboardTopBarP
                       setMenuOpen(false);
                       void signOut();
                     }}
-                    className="block w-full px-3 py-1.5 text-left text-[13px] text-muted transition-colors duration-150 ease-out hover:bg-surface-2 hover:text-white"
+                    className="block w-full px-3 py-1.5 text-left text-[13px] text-muted transition-colors duration-150 ease-out hover:bg-surface-2 hover:text-fg"
                   >
                     Sign out
                   </button>

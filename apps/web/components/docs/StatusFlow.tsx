@@ -15,7 +15,7 @@ export function StatusFlow() {
           <React.Fragment key={status.label}>
             {index > 0 ? <ArrowRightIcon aria-hidden="true" className="hidden h-4 w-4 self-center text-faint sm:block" /> : null}
             <div className="flex-1 rounded-lg border border-line-soft bg-base px-4 py-3">
-              <p className="font-mono text-[12.5px] text-white">{status.label}</p>
+              <p className="font-mono text-[12.5px] text-fg">{status.label}</p>
               <p className="mt-1 text-[12.5px] text-faint">{status.detail}</p>
             </div>
           </React.Fragment>
@@ -23,7 +23,7 @@ export function StatusFlow() {
       </div>
       <p className="mt-3 text-[12.5px] text-faint">
         An assessment that cannot be completed ends in <code className="font-mono text-[12px] text-amber">failed</code> instead of{' '}
-        <code className="font-mono text-[12px] text-white">completed</code>.
+        <code className="font-mono text-[12px] text-fg">completed</code>.
       </p>
     </div>
   );

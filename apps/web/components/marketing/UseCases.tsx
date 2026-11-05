@@ -14,7 +14,7 @@ export function UseCases() {
             <Reveal key={useCase.title} delay={index * 0.04} className="h-full">
               <article className="flex h-full flex-col rounded-xl border border-line bg-surface p-6 transition-colors duration-150 ease-out hover:border-line-strong">
                 <span className="font-mono text-[11px] tracking-[0.16em] text-faint">{useCase.index}</span>
-                <h3 className="mt-6 text-[15px] font-medium text-white">{useCase.title}</h3>
+                <h3 className="mt-6 text-[15px] font-medium text-fg">{useCase.title}</h3>
                 <p className="mt-2 text-[13px] leading-relaxed text-faint">{useCase.body}</p>
               </article>
             </Reveal>

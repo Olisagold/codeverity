@@ -21,9 +21,9 @@ import type { Environment, Webhook, WebhookEvent } from '@/types/api';
 const allEvents: WebhookEvent[] = ['assessment.completed', 'assessment.failed'];
 
 const primaryButton =
-  'rounded-lg bg-white px-3 py-1.5 text-[13px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:opacity-50';
+  'rounded-lg bg-fg px-3 py-1.5 text-[13px] font-medium text-on-fg transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base disabled:opacity-50';
 const secondaryButton =
-  'rounded-lg border border-line px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:border-line-strong hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent';
+  'rounded-lg border border-line px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:border-line-strong hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent';
 
 export default function WebhooksPage() {
   const { data: endpoints, setData: setEndpoints, error: loadError, loading } = useApi(
@@ -138,7 +138,7 @@ export default function WebhooksPage() {
                   <div className="min-w-0">
                     <Link
                       href={`/dashboard/webhooks/${endpoint.id}`}
-                      className="block truncate font-mono text-[13px] text-white underline-offset-4 transition-colors duration-150 ease-out hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                      className="block truncate font-mono text-[13px] text-fg underline-offset-4 transition-colors duration-150 ease-out hover:text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     >
                       {endpoint.url}
                     </Link>
@@ -203,7 +203,7 @@ export default function WebhooksPage() {
       >
         <div className="space-y-5">
           <div>
-            <label htmlFor="endpoint-url" className="text-[13px] font-medium text-white">
+            <label htmlFor="endpoint-url" className="text-[13px] font-medium text-fg">
               Endpoint URL
             </label>
             <input
@@ -215,7 +215,7 @@ export default function WebhooksPage() {
               }}
               placeholder="https://your-platform.com/webhooks"
               aria-invalid={Boolean(formError)}
-              className={`mt-2 h-11 w-full rounded-lg border bg-base px-3 font-mono text-[12.5px] text-white placeholder:text-faint transition-colors duration-150 ease-out focus:outline-none focus:ring-1 ${
+              className={`mt-2 h-11 w-full rounded-lg border bg-base px-3 font-mono text-[12.5px] text-fg placeholder:text-faint transition-colors duration-150 ease-out focus:outline-none focus:ring-1 ${
                 formError ? 'border-amber focus:border-amber focus:ring-amber' : 'border-line hover:border-line-strong focus:border-accent focus:ring-accent'
               }`}
             />
@@ -223,7 +223,7 @@ export default function WebhooksPage() {
           </div>
 
           <fieldset>
-            <legend className="text-[13px] font-medium text-white">Environment</legend>
+            <legend className="text-[13px] font-medium text-fg">Environment</legend>
             <p className="mt-1 text-[12.5px] text-faint">Events from assessments made with keys in this environment.</p>
             <div className="mt-2 flex gap-4">
               {(['live', 'test'] as const).map((value) => (
@@ -242,7 +242,7 @@ export default function WebhooksPage() {
           </fieldset>
 
           <fieldset>
-            <legend className="text-[13px] font-medium text-white">Events</legend>
+            <legend className="text-[13px] font-medium text-fg">Events</legend>
             <div className="mt-2 space-y-2">
               {allEvents.map((event) => (
                 <label key={event} className="flex items-center gap-2.5 font-mono text-[12.5px] text-muted">
@@ -250,7 +250,7 @@ export default function WebhooksPage() {
                     type="checkbox"
                     checked={events.includes(event)}
                     onChange={() => toggleEvent(event)}
-                    className="h-3.5 w-3.5 rounded border-line-strong bg-base text-accent focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-black"
+                    className="h-3.5 w-3.5 rounded border-line-strong bg-base text-accent focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-base"
                   />
                   {event}
                 </label>
@@ -272,7 +272,7 @@ export default function WebhooksPage() {
             <button
               type="button"
               onClick={confirmDelete}
-              className="rounded-lg bg-[#EF4444] px-3 py-1.5 text-[13px] font-medium text-white transition-colors duration-150 ease-out hover:bg-[#DC2626] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded-lg bg-danger px-3 py-1.5 text-[13px] font-medium text-white transition-colors duration-150 ease-out hover:bg-danger-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               Delete
             </button>
@@ -280,7 +280,7 @@ export default function WebhooksPage() {
         }
       >
         <p className="text-[13.5px] leading-relaxed text-muted">
-          Events will stop being sent to <code className="font-mono text-[12.5px] text-white">{deleteTarget?.url}</code>,
+          Events will stop being sent to <code className="font-mono text-[12.5px] text-fg">{deleteTarget?.url}</code>,
           and its delivery history will be removed.
         </p>
       </Modal>

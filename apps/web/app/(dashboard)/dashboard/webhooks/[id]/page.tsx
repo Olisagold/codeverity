@@ -28,7 +28,7 @@ const deliveryTone: Record<Delivery['status'], 'success' | 'error' | 'neutral'> 
 };
 
 const buttonClasses =
-  'rounded-lg border border-line px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:border-line-strong hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50';
+  'rounded-lg border border-line px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:border-line-strong hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50';
 
 function headersFor(delivery: Delivery) {
   return `Content-Type: application/json
@@ -79,7 +79,7 @@ export default function WebhookDetailsPage() {
   const back = (
     <Link
       href="/dashboard/webhooks"
-      className="inline-flex items-center gap-1.5 font-mono text-[11.5px] uppercase tracking-[0.14em] text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      className="inline-flex items-center gap-1.5 font-mono text-[11.5px] uppercase tracking-[0.14em] text-faint transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
     >
       <ChevronLeftIcon aria-hidden="true" className="h-3.5 w-3.5" />
       Webhooks
@@ -104,7 +104,7 @@ export default function WebhookDetailsPage() {
         action={
           <Link
             href="/dashboard/webhooks"
-            className="rounded-lg border border-line-strong px-3.5 py-2 text-[13px] text-white transition-colors duration-150 ease-out hover:border-white/60"
+            className="rounded-lg border border-line-strong px-3.5 py-2 text-[13px] text-fg transition-colors duration-150 ease-out hover:border-fg/60"
           >
             Back to webhooks
           </Link>
@@ -143,7 +143,7 @@ export default function WebhookDetailsPage() {
     {
       key: 'event',
       header: 'Event',
-      render: (row) => <span className="font-mono text-[12.5px] text-white">{row.event_type}</span>,
+      render: (row) => <span className="font-mono text-[12.5px] text-fg">{row.event_type}</span>,
     },
     { key: 'status', header: 'Status', render: (row) => <StatusBadge status={row.status} tone={deliveryTone[row.status]} /> },
     {
@@ -235,11 +235,11 @@ export default function WebhookDetailsPage() {
 
       <section>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-[14.5px] font-medium text-white">Recent deliveries</h2>
+          <h2 className="text-[14.5px] font-medium text-fg">Recent deliveries</h2>
           <button
             type="button"
             onClick={deliveries.reload}
-            className="inline-flex items-center gap-1.5 text-[12.5px] text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex items-center gap-1.5 text-[12.5px] text-faint transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             <RefreshCwIcon aria-hidden="true" className="h-3.5 w-3.5" />
             Refresh
@@ -272,14 +272,14 @@ export default function WebhookDetailsPage() {
         <section className="mt-6 overflow-hidden rounded-xl border border-line bg-surface">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3">
             <div className="flex items-center gap-3">
-              <code className="font-mono text-[12.5px] text-white">{selected.event_id}</code>
+              <code className="font-mono text-[12.5px] text-fg">{selected.event_id}</code>
               <StatusBadge status={selected.status} tone={deliveryTone[selected.status]} />
               <span className="font-mono text-[11.5px] text-faint">{formatDateTime(selected.created_at)}</span>
             </div>
             <button
               type="button"
               onClick={() => setSelected(null)}
-              className="rounded-md px-2 py-1 text-[12.5px] text-faint transition-colors duration-150 ease-out hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="rounded-md px-2 py-1 text-[12.5px] text-faint transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               Close
             </button>
@@ -294,7 +294,7 @@ export default function WebhookDetailsPage() {
                 aria-selected={tab === item}
                 onClick={() => setTab(item)}
                 className={`relative px-3 py-2.5 font-mono text-[12px] capitalize transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent ${
-                  tab === item ? 'text-white' : 'text-faint hover:text-muted'
+                  tab === item ? 'text-fg' : 'text-faint hover:text-muted'
                 }`}
               >
                 {item}
@@ -329,7 +329,7 @@ export default function WebhookDetailsPage() {
               type="button"
               onClick={saveEdit}
               disabled={busy}
-              className="rounded-lg bg-white px-3 py-1.5 text-[13px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50"
+              className="rounded-lg bg-fg px-3 py-1.5 text-[13px] font-medium text-on-fg transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50"
             >
               Save
             </button>
@@ -338,18 +338,18 @@ export default function WebhookDetailsPage() {
       >
         <div className="space-y-5">
           <div>
-            <label htmlFor="edit-url" className="text-[13px] font-medium text-white">
+            <label htmlFor="edit-url" className="text-[13px] font-medium text-fg">
               Endpoint URL
             </label>
             <input
               id="edit-url"
               value={editUrl}
               onChange={(event) => setEditUrl(event.target.value)}
-              className="mt-2 h-11 w-full rounded-lg border border-line bg-base px-3 font-mono text-[12.5px] text-white transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              className="mt-2 h-11 w-full rounded-lg border border-line bg-base px-3 font-mono text-[12.5px] text-fg transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
           </div>
           <fieldset>
-            <legend className="text-[13px] font-medium text-white">Events</legend>
+            <legend className="text-[13px] font-medium text-fg">Events</legend>
             <div className="mt-2 space-y-2">
               {allEvents.map((event) => (
                 <label key={event} className="flex items-center gap-2.5 font-mono text-[12.5px] text-muted">

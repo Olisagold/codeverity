@@ -22,7 +22,7 @@ const columns: Column<AssessmentSummary>[] = [
   {
     key: 'id',
     header: 'Assessment ID',
-    render: (row) => <span className="font-mono text-[12.5px] text-white">{row.id}</span>,
+    render: (row) => <span className="font-mono text-[12.5px] text-fg">{row.id}</span>,
   },
   { key: 'status', header: 'Status', render: (row) => <StatusBadge status={row.status} /> },
   { key: 'language', header: 'Language', render: (row) => <span className="capitalize">{row.language}</span> },
@@ -35,7 +35,7 @@ const columns: Column<AssessmentSummary>[] = [
     key: 'score',
     header: 'Score',
     render: (row) => (
-      <span className="font-mono text-[12.5px] text-white">{row.score === null ? '—' : row.score.toFixed(1)}</span>
+      <span className="font-mono text-[12.5px] text-fg">{row.score === null ? '—' : row.score.toFixed(1)}</span>
     ),
   },
   {
@@ -123,7 +123,7 @@ export default function AssessmentsPage() {
             type="button"
             onClick={() => exportCsv(rows)}
             disabled={rows.length === 0}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:border-line-strong hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:border-line-strong hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50"
           >
             <DownloadIcon aria-hidden="true" className="h-3.5 w-3.5" />
             Export
@@ -181,7 +181,7 @@ export default function AssessmentsPage() {
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search assessment ID…"
             aria-label="Search assessment ID"
-            className="h-8 w-56 rounded-lg border border-line bg-surface pl-8 pr-3 font-mono text-[12.5px] text-white placeholder:text-faint transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+            className="h-8 w-56 rounded-lg border border-line bg-surface pl-8 pr-3 font-mono text-[12.5px] text-fg placeholder:text-faint transition-colors duration-150 ease-out hover:border-line-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           />
         </div>
       </div>
@@ -206,7 +206,7 @@ export default function AssessmentsPage() {
                 action={
                   <Link
                     href="/docs/quickstart"
-                    className="rounded-lg bg-white px-3.5 py-2 text-[13px] font-medium text-black transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+                    className="rounded-lg bg-fg px-3.5 py-2 text-[13px] font-medium text-on-fg transition-colors duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
                   >
                     Read the quickstart
                   </Link>
@@ -223,7 +223,7 @@ export default function AssessmentsPage() {
             type="button"
             onClick={loadMore}
             disabled={loadingMore}
-            className="rounded-lg border border-line px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:border-line-strong hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50"
+            className="rounded-lg border border-line px-3 py-1.5 text-[13px] text-muted transition-colors duration-150 ease-out hover:border-line-strong hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50"
           >
             {loadingMore ? 'Loading…' : 'Load more'}
           </button>
